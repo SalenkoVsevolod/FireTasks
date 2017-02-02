@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">FirebaseTests</string>
+    <string name="date">Date…</string>
+    <string name="description">description…</string>
+    <string name="time">Time…</string>
+    <string name="ID_SHARED_KEY">user_id</string>
+    <string name="sharedPreferencesFileName">prefs</string>
+    <string name="no_tasks_created_yet">No tasks created yet</string>
+    <string name="logout">logout</string>
+    <string name="login">Login</string>
+    <string name="edit">edit</string>
+    <string name="add_subtask">add subtask</string>
+</resources>

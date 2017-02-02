@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.portable.firebasetests.fragments.TasksListFragment">
+
+    <ExpandableListView
+        android:id="@+id/tasksExpandableListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/emptyTasksTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/no_tasks_created_yet"
+        android:visibility="invisible" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addFloatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="35dp"
+        android:layout_marginEnd="39dp"
+        android:layout_marginRight="39dp"
+        android:clickable="true"
+        android:visibility="invisible"
+        app:fabSize="normal"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
+    <ProgressBar
+        android:id="@+id/tasksListProgressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+
+</RelativeLayout>

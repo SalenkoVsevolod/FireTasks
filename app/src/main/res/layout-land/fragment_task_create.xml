@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.portable.firebasetests.fragments.TaskCreateFragment">
+
+    <Button
+        android:id="@+id/addTaskButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@android:string/ok" />
+
+    <EditText
+        android:id="@+id/taskDescriptionEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:hint="@string/description"
+        android:inputType="textPersonName" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/subTasksRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/addSubTaskButton"
+        android:layout_toEndOf="@+id/taskDescriptionEdit"
+        android:layout_toRightOf="@+id/taskDescriptionEdit" />
+
+    <Spinner
+        android:id="@+id/tagSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/dateTextView"
+        android:layout_alignStart="@+id/dateTextView"
+        android:layout_below="@+id/taskDescriptionEdit" />
+
+    <Button
+        android:id="@+id/addSubTaskButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/addTaskButton"
+        android:layout_marginBottom="10dp"
+        android:layout_toEndOf="@+id/addTaskButton"
+        android:layout_toRightOf="@+id/addTaskButton"
+        android:text="@string/add_subtask" />
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/subTasksRecyclerView"
+        android:layout_marginLeft="52dp"
+        android:layout_marginStart="52dp"
+        android:text="@string/date" />
+
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/dateTextView"
+        android:layout_alignStart="@+id/dateTextView"
+        android:layout_centerVertical="true"
+        android:text="@string/time" />
+
+</RelativeLayout>

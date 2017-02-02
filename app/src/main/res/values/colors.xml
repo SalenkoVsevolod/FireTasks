@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="doneTask">#79ff4d</color>
+    <color name="failedTask">#ff3333</color>
+    <color name="undoneTask">#ffff4d</color>>
+    <color name="doneDay">#66ff66</color>
+    <color name="failedDay">#ff4d4d</color>
+    <color name="emptyDay">#aeadad</color>
+    <color name="undoneDay">#ffff96</color>
+</resources>
