@@ -5,9 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.listeners.OnDateIdentifiedListener;
 import com.example.portable.firebasetests.model.Task;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ import static com.example.portable.firebasetests.TimeUtils.isDayBefore;
 
 public class TasksAdapter extends BaseExpandableListAdapter {
     private static final String[] days = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-
+    private OnDateIdentifiedListener onImageClickListenter;
     private HashMap<String, ArrayList<Task>> tasksMap;
     private LayoutInflater layoutInflater;
     private Context context;
@@ -90,7 +92,7 @@ public class TasksAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View
+    public View getGroupView(final int groupPosition, boolean isExpanded, View
             convertView, ViewGroup parent) {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.group_tasks_list, parent, false);
@@ -98,7 +100,28 @@ public class TasksAdapter extends BaseExpandableListAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.groupTasksTextView);
         textView.setText(days[groupPosition]);
         convertView.setBackgroundColor(getGroupColor(groupPosition));
+        ImageView addView = (ImageView) convertView.findViewById(R.id.groupTasksImageView);
+        addView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(System.currentTimeMillis());
+                calendar.set(Calendar.DAY_OF_WEEK, getDayOfWeek(groupPosition));
+                onImageClickListenter.onIdentified(calendar.getTimeInMillis());
+            }
+        });
+
         return convertView;
+    }
+
+    //TODO crutch
+    private int getDayOfWeek(int group) {
+
+        if (group == Calendar.SUNDAY) {
+            return 1;
+        } else {
+            return group + 2;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -151,5 +174,9 @@ public class TasksAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+    }
+
+    public void setOnImageClickListenter(OnDateIdentifiedListener onImageClickListenter) {
+        this.onImageClickListenter = onImageClickListenter;
     }
 }

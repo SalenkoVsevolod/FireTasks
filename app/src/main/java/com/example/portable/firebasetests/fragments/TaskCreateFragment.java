@@ -1,6 +1,5 @@
 package com.example.portable.firebasetests.fragments;
 
-import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
@@ -9,11 +8,11 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,26 +37,30 @@ import static android.R.string.cancel;
 import static android.R.string.ok;
 
 public class TaskCreateFragment extends Fragment {
-    private static final String ID_ARG = "id", TASK_ARG = "task";
+    private static final String ID_ARG = "id", TASK_ARG = "task", MILLIS_ARG = "millis";
     private String userId;
     private Task task;
     private EditText descriptionEdit;
     private Button okButton, addSubTaskButton;
-    private TextView dateTextView, timeTextView;
+    private TextView timeTextView;
     private Spinner tagSpinner;
     private boolean timeSpecified = false;
     private RecyclerView subTasksRecycleView;
+    private long millis;
 
     public TaskCreateFragment() {
         // Required empty public constructor
     }
 
-    public static TaskCreateFragment newInstance(String userId, Task task) {
+    public static TaskCreateFragment newInstance(String userId, long millis, Task task) {
         TaskCreateFragment fragment = new TaskCreateFragment();
         Bundle args = new Bundle();
         args.putString(ID_ARG, userId);
         if (task != null) {
             args.putSerializable(TASK_ARG, task);
+        }
+        if (millis != 0) {
+            args.putLong(MILLIS_ARG, millis);
         }
         fragment.setArguments(args);
         return fragment;
@@ -70,6 +73,10 @@ public class TaskCreateFragment extends Fragment {
         if (getArguments() != null) {
             userId = getArguments().getString(ID_ARG);
             task = (Task) getArguments().getSerializable(TASK_ARG);
+            millis = getArguments().getLong(MILLIS_ARG);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(millis);
+            Log.i("date", "create fragment input calendar:" + calendar);
         }
     }
 
@@ -78,7 +85,6 @@ public class TaskCreateFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_task_create, container, false);
         descriptionEdit = (EditText) rootView.findViewById(R.id.taskDescriptionEdit);
-        dateTextView = (TextView) rootView.findViewById(R.id.dateTextView);
         tagSpinner = (Spinner) rootView.findViewById(R.id.tagSpinner);
         timeTextView = (TextView) rootView.findViewById(R.id.timeTextView);
         timeTextView = (TextView) rootView.findViewById(R.id.timeTextView);
@@ -93,13 +99,12 @@ public class TaskCreateFragment extends Fragment {
         tagSpinner.setAdapter(new TagAdapter(getActivity(), PredefinedTags.getTags()));
         if (task == null) {
             task = new Task();
+            task.setTimeStamp(millis);
             task.setId(userId + "_task_" + System.currentTimeMillis());
-            dateTextView.setTextColor(Color.RED);
             timeTextView.setTextColor(Color.RED);
-            task.setTimeStamp(System.currentTimeMillis());
         } else {
             descriptionEdit.setText(task.getDescription());
-            initDateAndTime();
+            initTime();
             timeSpecified = task.isTimeSpecified();
             tagSpinner.setSelection(PredefinedTags.getTags().indexOf(task.getTag()));
         }
@@ -123,12 +128,7 @@ public class TaskCreateFragment extends Fragment {
                 }
             }
         });
-        dateTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDatePicker();
-            }
-        });
+
         timeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,39 +141,6 @@ public class TaskCreateFragment extends Fragment {
                 openAddSubTaskDialog();
             }
         });
-    }
-
-    private void openDatePicker() {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                calendar.setTimeInMillis(task.getTimeStamp());
-                calendar.set(Calendar.YEAR, year);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                if (dateIsCorrect(calendar)) {
-                    task.setTimeStamp(calendar.getTimeInMillis());
-                    dateTextView.setText(task.getDateString());
-                    dateTextView.setTextColor(Color.BLACK);
-                } else {
-                    showErrorToast("day of that week");
-                    dateTextView.setText(R.string.date);
-                    dateTextView.setTextColor(Color.RED);
-                }
-            }
-        };
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        new DatePickerDialog(getActivity(), listener,
-                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-    }
-
-    private boolean dateIsCorrect(Calendar calendar) {
-        Calendar now = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        now.setTimeInMillis(System.currentTimeMillis());
-        return calendar.get(Calendar.WEEK_OF_YEAR) == now.get(Calendar.WEEK_OF_YEAR);
     }
 
     private void openTimePicker() {
@@ -197,8 +164,8 @@ public class TaskCreateFragment extends Fragment {
     }
 
 
-    private void initDateAndTime() {
-        dateTextView.setText(task.getDateString());
+    private void initTime() {
+
         if (task.isTimeSpecified()) {
             timeTextView.setText(task.getTimeString());
         } else {
@@ -211,6 +178,7 @@ public class TaskCreateFragment extends Fragment {
         DatabaseReference myRef = database.getReference("users");
         task.setTag((Tag) tagSpinner.getSelectedItem());
         task.setTimeSpecified(timeSpecified);
+        Log.i("date", "outputTaskDate:" + task.getDateString());
         if (timeSpecified && task.getTimeStamp() > System.currentTimeMillis()) {
             Notifier.removeAlarm(getActivity(), (int) task.getTimeStamp());
             Notifier.setAlarm(task, getActivity());
@@ -226,10 +194,6 @@ public class TaskCreateFragment extends Fragment {
     private boolean canComplete() {
         if (task.getDescription().length() < 1) {
             showErrorToast("description");
-            return false;
-        }
-        if (dateTextView.getText().toString().equals(getString(R.string.date))) {
-            showErrorToast("date");
             return false;
         }
         if (task.getSubTasks().size() == 0) {

@@ -5,19 +5,18 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.example.portable.firebasetests.Notifier;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.adapters.TasksAdapter;
 import com.example.portable.firebasetests.listeners.DataChangingListener;
+import com.example.portable.firebasetests.listeners.OnDateIdentifiedListener;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.tasks.DataObserverTask;
 import com.google.firebase.database.DatabaseReference;
@@ -33,8 +32,6 @@ public class TasksListFragment extends Fragment {
     private String id;
     private ProgressBar progressBar;
     private DataObserverTask dataObserverTask;
-    private FloatingActionButton addButton;
-    private TextView emptyTextView;
     private ExpandableListView expandableListView;
 
     public TasksListFragment() {
@@ -62,15 +59,7 @@ public class TasksListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tasks_list, container, false);
-        addButton = (FloatingActionButton) rootView.findViewById(R.id.addFloatingButton);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addClick();
-            }
-        });
         progressBar = (ProgressBar) rootView.findViewById(R.id.tasksListProgressBar);
-        emptyTextView = (TextView) rootView.findViewById(R.id.emptyTasksTextView);
         expandableListView = (ExpandableListView) rootView.findViewById(R.id.tasksExpandableListView);
         return rootView;
     }
@@ -85,8 +74,18 @@ public class TasksListFragment extends Fragment {
                 if (tasks == null) {
                     tasks = new ArrayList<>();
                 }
-                setVisibilities(tasks.isEmpty());
+                showList();
                 final TasksAdapter adapter = new TasksAdapter(getActivity(), tasks);
+                adapter.setOnImageClickListenter(new OnDateIdentifiedListener() {
+                    @Override
+                    public void onIdentified(long millis) {
+                        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                        transaction.add(R.id.activity_tasks, TaskCreateFragment.newInstance(id, millis, null));
+                        transaction.remove(TasksListFragment.this);
+                        transaction.addToBackStack(null);
+                        transaction.commit();
+                    }
+                });
                 expandableListView.setAdapter(adapter);
                 expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                     @Override
@@ -107,12 +106,10 @@ public class TasksListFragment extends Fragment {
                         return false;
                     }
                 });
-
             }
         });
         dataObserverTask.execute();
     }
-
 
     @Override
     public void onDestroyView() {
@@ -122,30 +119,15 @@ public class TasksListFragment extends Fragment {
 
     private void onTaskClick(Task task) {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.add(R.id.activity_tasks, TaskCreateFragment.newInstance(TasksListFragment.this.id, task));
+        transaction.add(R.id.activity_tasks, TaskCreateFragment.newInstance(TasksListFragment.this.id, 0, task));
         transaction.addToBackStack(null);
         transaction.remove(this);
         transaction.commit();
     }
 
-    private void addClick() {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.add(R.id.activity_tasks, TaskCreateFragment.newInstance(id, null));
-        transaction.remove(this);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-    private void setVisibilities(boolean isEmpty) {
-        if (isEmpty) {
-            expandableListView.setVisibility(View.INVISIBLE);
-            emptyTextView.setVisibility(View.VISIBLE);
-        } else {
-            expandableListView.setVisibility(View.VISIBLE);
-            emptyTextView.setVisibility(View.INVISIBLE);
-        }
+    private void showList() {
+        expandableListView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
-        addButton.setVisibility(View.VISIBLE);
     }
 
     private void deleteDialog(final Task task) {
