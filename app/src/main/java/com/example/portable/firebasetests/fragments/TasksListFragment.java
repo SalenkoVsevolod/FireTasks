@@ -29,7 +29,7 @@ import static android.R.string.ok;
 
 public class TasksListFragment extends Fragment {
     private static final String ID_ARG = "id_arg";
-    private String id;
+    private String userId;
     private ProgressBar progressBar;
     private DataObserverTask dataObserverTask;
     private ExpandableListView expandableListView;
@@ -50,7 +50,7 @@ public class TasksListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         if (getArguments() != null) {
-            id = getArguments().getString(ID_ARG);
+            userId = getArguments().getString(ID_ARG);
         }
 
     }
@@ -67,7 +67,7 @@ public class TasksListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        dataObserverTask = new DataObserverTask(getActivity(), id);
+        dataObserverTask = new DataObserverTask(getActivity(), userId);
         dataObserverTask.setDataChangingListener(new DataChangingListener() {
             @Override
             public void onDataChanged(ArrayList<Task> tasks) {
@@ -76,21 +76,26 @@ public class TasksListFragment extends Fragment {
                 }
                 showList();
                 final TasksAdapter adapter = new TasksAdapter(getActivity(), tasks);
-                adapter.setOnImageClickListenter(new OnDateIdentifiedListener() {
+                adapter.setOnImageClickListener(new OnDateIdentifiedListener() {
                     @Override
                     public void onIdentified(long millis) {
-                        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                        transaction.add(R.id.activity_tasks, TaskCreateFragment.newInstance(id, millis, null));
-                        transaction.remove(TasksListFragment.this);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
+                        openTaskCreateFragment(null, millis);
                     }
                 });
                 expandableListView.setAdapter(adapter);
                 expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                     @Override
                     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                        onTaskClick((Task) adapter.getChild(groupPosition, childPosition));
+                        openTaskCreateFragment((Task) adapter.getChild(groupPosition, childPosition), 0);
+                        return false;
+                    }
+                });
+                expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                    @Override
+                    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                        if (adapter.isChildEmpty(groupPosition)) {
+                            openTaskCreateFragment(null, adapter.getGroupMillis(groupPosition));
+                        }
                         return false;
                     }
                 });
@@ -117,9 +122,10 @@ public class TasksListFragment extends Fragment {
         dataObserverTask.cancel(true);
     }
 
-    private void onTaskClick(Task task) {
+
+    private void openTaskCreateFragment(Task task, long millis) {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.add(R.id.activity_tasks, TaskCreateFragment.newInstance(TasksListFragment.this.id, 0, task));
+        transaction.add(R.id.activity_tasks, TaskCreateFragment.newInstance(userId, millis, task));
         transaction.addToBackStack(null);
         transaction.remove(this);
         transaction.commit();
@@ -138,7 +144,7 @@ public class TasksListFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 Notifier.removeAlarm(getActivity(), (int) task.getTimeStamp());
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("users").child(id).child(task.getId());
+                DatabaseReference myRef = database.getReference("users").child(userId).child(task.getId());
                 myRef.setValue(null);
             }
         });

@@ -1,6 +1,7 @@
 package com.example.portable.firebasetests.adapters;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,7 @@ import static com.example.portable.firebasetests.TimeUtils.isDayBefore;
 
 public class TasksAdapter extends BaseExpandableListAdapter {
     private static final String[] days = new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-    private OnDateIdentifiedListener onImageClickListenter;
+    private OnDateIdentifiedListener onImageClickListener;
     private HashMap<String, ArrayList<Task>> tasksMap;
     private LayoutInflater layoutInflater;
     private Context context;
@@ -40,14 +41,11 @@ public class TasksAdapter extends BaseExpandableListAdapter {
     public TasksAdapter(Context context, ArrayList<Task> tasksArrayList) {
         this();
         Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
         for (Task task : tasksArrayList) {
             calendar.setTimeInMillis(task.getTimeStamp());
-            int dayOfWeek;
-            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-                dayOfWeek = 6;
-            } else {
-                dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 2;
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            if (dayOfWeek == 7) {
+                dayOfWeek = 0;
             }
             tasksMap.get(days[dayOfWeek]).add(task);
         }
@@ -104,16 +102,13 @@ public class TasksAdapter extends BaseExpandableListAdapter {
         addView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(System.currentTimeMillis());
-                calendar.set(Calendar.DAY_OF_WEEK, getDayOfWeek(groupPosition));
-                onImageClickListenter.onIdentified(calendar.getTimeInMillis());
+                onImageClickListener.onIdentified(getGroupMillis(groupPosition));
             }
         });
 
         return convertView;
     }
-
+/*
     //TODO crutch
     private int getDayOfWeek(int group) {
 
@@ -122,7 +117,7 @@ public class TasksAdapter extends BaseExpandableListAdapter {
         } else {
             return group + 2;
         }
-    }
+    }*/
 
     @SuppressWarnings("unchecked")
     private int getGroupColor(int groupId) {
@@ -148,16 +143,17 @@ public class TasksAdapter extends BaseExpandableListAdapter {
             convertView = layoutInflater.inflate(R.layout.item_tasks_list, parent, false);
         }
         Task task = (Task) getChild(groupPosition, childPosition);
-        convertView.setBackgroundColor(getTaskColor(task));
-
+        CardView item = (CardView) convertView.findViewById(R.id.ItemTaskCardView);
+        item.setCardBackgroundColor(getTaskColor(task));
         TextView description = (TextView) convertView.findViewById(R.id.itemTaskDescriptionView);
         description.setText(task.getDescription());
-        TextView date = (TextView) convertView.findViewById(R.id.itemTaskDateView);
-        date.setText(task.getDateString());
+        TextView time = (TextView) convertView.findViewById(R.id.itemTaskTimeView);
 
-        TextView tag = (TextView) convertView.findViewById(R.id.itemTaskTagView);
-        tag.setText(task.getTag().getName());
-        tag.setBackgroundColor((int) task.getTag().getColor());
+        time.setText(task.isTimeSpecified() ? task.getTimeString() : "");
+        CardView tag = (CardView) convertView.findViewById(R.id.itemTaskTagCardView);
+        tag.setCardBackgroundColor((int) task.getTag().getColor());
+        TextView tagText = (TextView) convertView.findViewById(R.id.itemTaskTagTextView);
+        tagText.setText(task.getTag().getName());
         return convertView;
     }
 
@@ -176,7 +172,21 @@ public class TasksAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    public void setOnImageClickListenter(OnDateIdentifiedListener onImageClickListenter) {
-        this.onImageClickListenter = onImageClickListenter;
+
+    public long getGroupMillis(int groupIndex) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.DAY_OF_WEEK, groupIndex);
+        return calendar.getTimeInMillis();
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean isChildEmpty(int group) {
+        ArrayList<Task> tasks = (ArrayList<Task>) getGroup(group);
+        return tasks.isEmpty();
+    }
+
+    public void setOnImageClickListener(OnDateIdentifiedListener onImageClickListener) {
+        this.onImageClickListener = onImageClickListener;
     }
 }

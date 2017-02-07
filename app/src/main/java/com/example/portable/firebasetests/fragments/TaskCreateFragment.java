@@ -44,12 +44,10 @@ public class TaskCreateFragment extends Fragment {
     private Button okButton, addSubTaskButton;
     private TextView timeTextView;
     private Spinner tagSpinner;
-    private boolean timeSpecified = false;
     private RecyclerView subTasksRecycleView;
     private long millis;
 
     public TaskCreateFragment() {
-        // Required empty public constructor
     }
 
     public static TaskCreateFragment newInstance(String userId, long millis, Task task) {
@@ -74,9 +72,6 @@ public class TaskCreateFragment extends Fragment {
             userId = getArguments().getString(ID_ARG);
             task = (Task) getArguments().getSerializable(TASK_ARG);
             millis = getArguments().getLong(MILLIS_ARG);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(millis);
-            Log.i("date", "create fragment input calendar:" + calendar);
         }
     }
 
@@ -96,28 +91,18 @@ public class TaskCreateFragment extends Fragment {
     }
 
     private void initInterface() {
-        tagSpinner.setAdapter(new TagAdapter(getActivity(), PredefinedTags.getTags()));
         if (task == null) {
             task = new Task();
             task.setTimeStamp(millis);
             task.setId(userId + "_task_" + System.currentTimeMillis());
-            timeTextView.setTextColor(Color.RED);
         } else {
             descriptionEdit.setText(task.getDescription());
-            initTime();
-            timeSpecified = task.isTimeSpecified();
             tagSpinner.setSelection(PredefinedTags.getTags().indexOf(task.getTag()));
-        }
-        final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks());
-
-        subTaskAdapter.setLongClickListener(new OnMyItemLongClickListener() {
-            @Override
-            public void onLongClick(int index) {
-                openDeletingDialog(subTaskAdapter.getItem(index));
+            if (task.isTimeSpecified()) {
+                timeTextView.setText(task.getTimeString());
             }
-        });
-        subTasksRecycleView.setAdapter(subTaskAdapter);
-        subTasksRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
+        initTagSpinner();
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,7 +113,6 @@ public class TaskCreateFragment extends Fragment {
                 }
             }
         });
-
         timeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,6 +127,21 @@ public class TaskCreateFragment extends Fragment {
         });
     }
 
+    private void initTagSpinner() {
+        tagSpinner.setAdapter(new TagAdapter(getActivity(), PredefinedTags.getTags()));
+        final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks());
+
+        subTaskAdapter.setLongClickListener(new OnMyItemLongClickListener() {
+            @Override
+            public void onLongClick(int index) {
+                openDeletingDialog(subTaskAdapter.getItem(index));
+            }
+        });
+        subTasksRecycleView.setAdapter(subTaskAdapter);
+        subTasksRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+    }
+
     private void openTimePicker() {
         final Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
@@ -154,8 +153,7 @@ public class TaskCreateFragment extends Fragment {
                 calendar.set(Calendar.MINUTE, minute);
                 task.setTimeStamp(calendar.getTimeInMillis());
                 timeTextView.setText(task.getTimeString());
-                timeTextView.setTextColor(Color.BLACK);
-                timeSpecified = true;
+                task.setTimeSpecified(true);
             }
         };
         calendar.setTimeInMillis(task.getTimeStamp());
@@ -163,23 +161,12 @@ public class TaskCreateFragment extends Fragment {
                 calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
     }
 
-
-    private void initTime() {
-
-        if (task.isTimeSpecified()) {
-            timeTextView.setText(task.getTimeString());
-        } else {
-            timeTextView.setTextColor(Color.RED);
-        }
-    }
-
     private void saveTask() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
         task.setTag((Tag) tagSpinner.getSelectedItem());
-        task.setTimeSpecified(timeSpecified);
         Log.i("date", "outputTaskDate:" + task.getDateString());
-        if (timeSpecified && task.getTimeStamp() > System.currentTimeMillis()) {
+        if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
             Notifier.removeAlarm(getActivity(), (int) task.getTimeStamp());
             Notifier.setAlarm(task, getActivity());
         }
@@ -213,7 +200,6 @@ public class TaskCreateFragment extends Fragment {
     private void openAddSubTaskDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final EditText editText = new EditText(getActivity());
-        editText.setHint(R.string.description);
         builder.setView(editText);
         builder.setMessage("Subtask's description:");
         builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {
