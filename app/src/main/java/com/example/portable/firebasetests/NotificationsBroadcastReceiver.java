@@ -6,12 +6,16 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.NotificationCompat;
 
 import com.example.portable.firebasetests.activities.TasksActivity;
 
+import java.util.Locale;
+
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     public static final String TITLE_TAG = "title", TEXT_TAG = "text";
+    TextToSpeech textToSpeech;
 
     public NotificationsBroadcastReceiver() {
     }
@@ -20,7 +24,16 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, buildNotification(intent.getStringExtra(TITLE_TAG), intent.getStringExtra(TEXT_TAG), context));
+        textToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(Locale.ENGLISH);
+                }
+            }
+        });
+        String title = intent.getStringExtra(TITLE_TAG), text = intent.getStringExtra(TEXT_TAG);
+        mNotificationManager.notify(1, buildNotification(title, text, context));
     }
 
     private Notification buildNotification(String title, String text, Context context) {
@@ -29,7 +42,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setContentText(text);
         Intent intent = new Intent(context, TasksActivity.class);
-        intent.putExtra(TasksActivity.LIST_FRAGMENT, true);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
         return builder.build();

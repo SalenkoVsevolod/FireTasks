@@ -25,4 +25,22 @@ public class TimeUtils {
         now.setTimeInMillis(System.currentTimeMillis());
         return calendar.get(Calendar.WEEK_OF_YEAR) < now.get(Calendar.WEEK_OF_YEAR);
     }
+
+    public static int adapterToReal(int adapter) {
+        if (adapter == 6) {
+            adapter = 1;
+        } else {
+            adapter += 2;
+        }
+        return adapter;
+    }
+
+    public static int realToAdapter(int real) {
+        if (real == 1) {
+            real = 6;
+        } else {
+            real -= 2;
+        }
+        return real;
+    }
 }

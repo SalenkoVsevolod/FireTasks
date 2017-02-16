@@ -5,5 +5,5 @@ package com.example.portable.firebasetests.listeners;
  */
 
 public interface OnDateIdentifiedListener {
-    void onIdentified(long millis);
+    void onIdentified(int year, int weekOfYear, int dayOfWeek);
 }

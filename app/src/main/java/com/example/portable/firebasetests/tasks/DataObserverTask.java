@@ -2,10 +2,10 @@ package com.example.portable.firebasetests.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.Notifier;
-import com.example.portable.firebasetests.TimeUtils;
 import com.example.portable.firebasetests.listeners.DataChangingListener;
 import com.example.portable.firebasetests.model.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -28,15 +28,17 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     private Context context;
     private DatabaseReference myRef;
     private ValueEventListener listener;
+    private int week;
 
-    public DataObserverTask(Context context, String id) {
+    public DataObserverTask(Context context, String id, int week) {
         this.id = id;
         this.context = context;
+        this.week = week;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        myRef = FirebaseDatabase.getInstance().getReference("users").child(id);
+        myRef = FirebaseDatabase.getInstance().getReference("users").child(id).child("" + week);
         listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -64,23 +66,16 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
         for (String key : keys) {
             Task task = new Task((HashMap<String, Object>) map.get(key));
             task.setId(key);
-            if (TimeUtils.isOutdatedByWeek(task.getTimeStamp())) {
-                deleteTask(task.getId());
-            } else {
-                if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
-                    Notifier.setAlarm(task, context);
-                }
-                res.add(task);
+            if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
+                Notifier.setAlarm(task, context);
             }
+            res.add(task);
+            Log.i("tasks", "task readed:" + task.getDescription());
+
         }
         return res;
     }
 
-    private void deleteTask(String taskId) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("users").child(id).child(taskId);
-        myRef.setValue(null);
-    }
 
     @Override
     protected void onCancelled(Void aVoid) {

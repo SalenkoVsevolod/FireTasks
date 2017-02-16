@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,14 +20,14 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.Notifier;
-import com.example.portable.firebasetests.PredefinedTags;
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.adapters.TagAdapter;
 import com.example.portable.firebasetests.listeners.OnMyItemLongClickListener;
 import com.example.portable.firebasetests.model.SubTask;
-import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -37,7 +38,7 @@ import static android.R.string.cancel;
 import static android.R.string.ok;
 
 public class TaskCreateFragment extends Fragment {
-    private static final String ID_ARG = "id", TASK_ARG = "task", MILLIS_ARG = "millis";
+    private static final String TASK_ARG = "task";
     private String userId;
     private Task task;
     private EditText descriptionEdit;
@@ -45,21 +46,14 @@ public class TaskCreateFragment extends Fragment {
     private TextView timeTextView;
     private Spinner tagSpinner;
     private RecyclerView subTasksRecycleView;
-    private long millis;
 
     public TaskCreateFragment() {
     }
 
-    public static TaskCreateFragment newInstance(String userId, long millis, Task task) {
+    public static TaskCreateFragment newInstance(@NonNull Task task) {
         TaskCreateFragment fragment = new TaskCreateFragment();
         Bundle args = new Bundle();
-        args.putString(ID_ARG, userId);
-        if (task != null) {
-            args.putSerializable(TASK_ARG, task);
-        }
-        if (millis != 0) {
-            args.putLong(MILLIS_ARG, millis);
-        }
+        args.putSerializable(TASK_ARG, task);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,9 +63,8 @@ public class TaskCreateFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         if (getArguments() != null) {
-            userId = getArguments().getString(ID_ARG);
             task = (Task) getArguments().getSerializable(TASK_ARG);
-            millis = getArguments().getLong(MILLIS_ARG);
+            userId = MySharedPreferences.readUserId(getActivity());
         }
     }
 
@@ -91,18 +84,17 @@ public class TaskCreateFragment extends Fragment {
     }
 
     private void initInterface() {
-        if (task == null) {
-            task = new Task();
-            task.setTimeStamp(millis);
+        if (task.getId() == null) {
             task.setId(userId + "_task_" + System.currentTimeMillis());
         } else {
             descriptionEdit.setText(task.getDescription());
-            tagSpinner.setSelection(PredefinedTags.getTags().indexOf(task.getTag()));
+            Log.i("tag", task.getTagIndex() + "");
             if (task.isTimeSpecified()) {
                 timeTextView.setText(task.getTimeString());
             }
         }
         initTagSpinner();
+        tagSpinner.setSelection((int) task.getTagIndex());
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,7 +120,7 @@ public class TaskCreateFragment extends Fragment {
     }
 
     private void initTagSpinner() {
-        tagSpinner.setAdapter(new TagAdapter(getActivity(), PredefinedTags.getTags()));
+        tagSpinner.setAdapter(new TagAdapter(getActivity(), TagsColors.getTags()));
         final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks());
 
         subTaskAdapter.setLongClickListener(new OnMyItemLongClickListener() {
@@ -163,16 +155,15 @@ public class TaskCreateFragment extends Fragment {
 
     private void saveTask() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("users");
-        task.setTag((Tag) tagSpinner.getSelectedItem());
-        Log.i("date", "outputTaskDate:" + task.getDateString());
+        DatabaseReference myRef = database.getReference("users").child(userId).child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR));
+        task.setTagIndex(tagSpinner.getSelectedItemPosition());
         if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
             Notifier.removeAlarm(getActivity(), (int) task.getTimeStamp());
             Notifier.setAlarm(task, getActivity());
         }
-        myRef.child(userId).child(task.getId()).setValue(task);
+        myRef.child(task.getId()).setValue(task);
         for (SubTask subTask : task.getSubTasks()) {
-            myRef = database.getReference("users").child(userId).child(task.getId()).child("subTasks")
+            myRef = database.getReference("users").child(userId).child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR)).child(task.getId()).child("subTasks")
                     .child(subTask.getId());
             myRef.setValue(subTask);
         }
@@ -224,7 +215,7 @@ public class TaskCreateFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("users").child(userId).child(task.getId()).child("subTasks").child(subTask.getId());
+                DatabaseReference myRef = database.getReference("users").child(userId).child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR)).child(task.getId()).child("subTasks").child(subTask.getId());
                 myRef.setValue(null);
                 task.getSubTasks().remove(subTask);
                 subTasksRecycleView.getAdapter().notifyDataSetChanged();

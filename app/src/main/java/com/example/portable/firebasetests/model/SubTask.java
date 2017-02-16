@@ -2,13 +2,14 @@ package com.example.portable.firebasetests.model;
 
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Created by Portable on 24.01.2017.
  */
 
-public class SubTask {
+public class SubTask implements Serializable {
     private String description;
     private boolean done;
     private String id;

@@ -8,15 +8,14 @@ import android.view.ViewGroup;
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.listeners.OnDateIdentifiedListener;
-import com.example.portable.firebasetests.listeners.OnDayClickListener;
 import com.example.portable.firebasetests.listeners.OnTaskClickListener;
-import com.example.portable.firebasetests.model.DayOfWeek;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.model.TasksDay;
 import com.example.portable.firebasetests.view_holders.TaskChildViewHolder;
 import com.example.portable.firebasetests.view_holders.TaskParentViewHolder;
 
-import java.util.Calendar;
 import java.util.List;
 
 import static com.example.portable.firebasetests.AppCompatColors.getColor;
@@ -29,10 +28,9 @@ import static com.example.portable.firebasetests.TimeUtils.isDayBefore;
 public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParentViewHolder, TaskChildViewHolder> {
 
     private LayoutInflater inflater;
-    private OnDateIdentifiedListener onImageClickListener;
     private Context context;
-    private OnDayClickListener onGroupClickListener;
-    private OnTaskClickListener onTaskClickListener, onTaskLongClicListener;
+    private OnDateIdentifiedListener onGroupClickListener;
+    private OnTaskClickListener onTaskClickListener, onTaskLongClickListener;
 
     public TasksExpandableAdapter(Context context, List<ParentObject> parentItemList) {
         super(context, parentItemList);
@@ -40,7 +38,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
         this.context = context;
     }
 
-    public void setOnGroupClickListener(OnDayClickListener onGroupClickListener) {
+    public void setOnGroupClickListener(OnDateIdentifiedListener onGroupClickListener) {
         this.onGroupClickListener = onGroupClickListener;
     }
 
@@ -59,14 +57,15 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
 
     @Override
     public void onBindParentViewHolder(TaskParentViewHolder parentViewHolder, final int i, Object o) {
-        final DayOfWeek dayOfWeek = (DayOfWeek) o;
-        parentViewHolder.groupTextView.setText(dayOfWeek.getDayName());
-        parentViewHolder.groupCardView.setBackgroundColor(getGroupColor(dayOfWeek.getChildObjectList()));
+        final TasksDay dayOfWeek = (TasksDay) o;
+        parentViewHolder.dayNameTextView.setText(dayOfWeek.getName());
+        parentViewHolder.cardView.setCardBackgroundColor(getGroupColor(dayOfWeek.getChildObjectList()));
+        parentViewHolder.dateNameTextView.setText(dayOfWeek.getDateString());
         if (dayOfWeek.getChildObjectList().isEmpty()) {
-            parentViewHolder.groupCardView.setOnClickListener(new View.OnClickListener() {
+            parentViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onGroupClickListener.onClick(dayOfWeek);
+                    onGroupClickListener.onIdentified(dayOfWeek.getYear(), dayOfWeek.getWeek(), dayOfWeek.getDay());
                 }
             });
 
@@ -74,7 +73,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
         parentViewHolder.plusImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onImageClickListener.onIdentified(getGroupMillis(dayOfWeek.getDayPosition()));
+                onGroupClickListener.onIdentified(dayOfWeek.getYear(), dayOfWeek.getWeek(), dayOfWeek.getDay());
             }
         });
     }
@@ -82,35 +81,24 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
     @Override
     public void onBindChildViewHolder(TaskChildViewHolder childViewHolder, final int i, Object o) {
         final Task task = (Task) o;
-        childViewHolder.cardItemView.setCardBackgroundColor(getTaskColor(task));
-        childViewHolder.descriptionTextView.setText(task.getDescription());
-        childViewHolder.timeTextView.setText(task.isCompleted() ? task.getTimeString() : "");
-        childViewHolder.tagTextView.setText(task.getTag().getName());
-        childViewHolder.tagCardView.setCardBackgroundColor((int) task.getTag().getColor());
-        childViewHolder.cardItemView.setOnClickListener(new View.OnClickListener() {
+        childViewHolder.taskCardView.setCardBackgroundColor(getTaskColor(task));
+        childViewHolder.description.setText(task.getDescription());
+        childViewHolder.time.setText(task.isCompleted() ? task.getTimeString() : "");
+        childViewHolder.tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
+        childViewHolder.tagCardView.setCardBackgroundColor(TagsColors.getTags().get((int) task.getTagIndex()).getColor());
+        childViewHolder.taskCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onTaskClickListener.onClick(task);
             }
         });
-        childViewHolder.cardItemView.setOnLongClickListener(new View.OnLongClickListener() {
+        childViewHolder.taskCardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                onTaskLongClicListener.onClick(task);
+                onTaskLongClickListener.onClick(task);
                 return false;
             }
         });
-    }
-
-    public void setOnImageClickListener(OnDateIdentifiedListener onImageClickListener) {
-        this.onImageClickListener = onImageClickListener;
-    }
-
-    public long getGroupMillis(int groupIndex) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.DAY_OF_WEEK, groupIndex);
-        return calendar.getTimeInMillis();
     }
 
     private int getTaskColor(Task task) {
@@ -143,7 +131,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
         this.onTaskClickListener = onTaskClickListener;
     }
 
-    public void setOnTaskLongClicListener(OnTaskClickListener onTaskLongClicListener) {
-        this.onTaskLongClicListener = onTaskLongClicListener;
+    public void setOnTaskLongClickListener(OnTaskClickListener onTaskLongClickListener) {
+        this.onTaskLongClickListener = onTaskLongClickListener;
     }
 }

@@ -18,7 +18,7 @@ public class Notifier {
 
     public static void setAlarm(Task task, Context context) {
         Intent notificationIntent = new Intent(context, NotificationsBroadcastReceiver.class);
-        notificationIntent.putExtra(NotificationsBroadcastReceiver.TITLE_TAG, task.getTag().getName());
+        notificationIntent.putExtra(NotificationsBroadcastReceiver.TITLE_TAG, TagsColors.getTags().get((int) task.getTagIndex()).getName());
         notificationIntent.putExtra(NotificationsBroadcastReceiver.TEXT_TAG, task.getDescription());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) task.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

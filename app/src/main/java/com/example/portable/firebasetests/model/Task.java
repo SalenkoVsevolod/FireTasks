@@ -1,6 +1,7 @@
 package com.example.portable.firebasetests.model;
 
 
+import com.example.portable.firebasetests.StringUtils;
 import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
@@ -17,21 +18,22 @@ import java.util.Set;
 public class Task implements Serializable {
     private String description;
     private boolean timeSpecified;
-    private long timeStamp;
     private ArrayList<SubTask> subTasks;
     private String id;
-    private Tag tag;
+    private long tagIndex;
+    private Calendar calendar;
 
     public Task() {
         subTasks = new ArrayList<>();
+        calendar = Calendar.getInstance();
     }
 
     public Task(HashMap<String, Object> map) {
         this();
         description = (String) map.get("description");
-        timeStamp = (long) map.get("timeStamp");
+        calendar.setTimeInMillis((long) map.get("timeStamp"));
         timeSpecified = (boolean) map.get("timeSpecified");
-        tag = new Tag((HashMap<String, Object>) map.get("tag"));
+        tagIndex = (long) map.get("tagIndex");
         subTasks = getSubTasks((HashMap<String, Object>) map.get("subTasks"));
     }
 
@@ -54,10 +56,6 @@ public class Task implements Serializable {
         return subTasks;
     }
 
-    public void setSubTasks(ArrayList<SubTask> subTasks) {
-        this.subTasks = subTasks;
-    }
-
 
     public String getDescription() {
         return description;
@@ -77,18 +75,6 @@ public class Task implements Serializable {
     }
 
     @Exclude
-    public String getDateString() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        calendar.setTimeInMillis(timeStamp);
-        return formatNumber(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatNumber(calendar.get(Calendar.MONTH) + 1) + "." + calendar.get(Calendar.YEAR);
-    }
-
-    private String formatNumber(int num) {
-        return (num < 10 ? "0" : "") + num;
-    }
-
-    @Exclude
     public boolean isCompleted() {
         for (SubTask subTask : subTasks) {
             if (!subTask.isDone()) {
@@ -100,10 +86,7 @@ public class Task implements Serializable {
 
     @Exclude
     public String getTimeString() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        calendar.setTimeInMillis(timeStamp);
-        return formatNumber(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatNumber(calendar.get(Calendar.MINUTE));
+        return StringUtils.formatNumber(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + StringUtils.formatNumber(calendar.get(Calendar.MINUTE));
     }
 
     public boolean isTimeSpecified() {
@@ -115,18 +98,28 @@ public class Task implements Serializable {
     }
 
     public long getTimeStamp() {
-        return timeStamp;
+        return calendar.getTimeInMillis();
     }
 
     public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+        calendar.setTimeInMillis(timeStamp);
     }
 
-    public Tag getTag() {
-        return tag;
+    @Exclude
+    public Calendar getCalendar() {
+        return calendar;
     }
 
-    public void setTag(Tag tag) {
-        this.tag = tag;
+    @Override
+    public String toString() {
+        return description;
+    }
+
+    public long getTagIndex() {
+        return tagIndex;
+    }
+
+    public void setTagIndex(int tagIndex) {
+        this.tagIndex = tagIndex;
     }
 }
