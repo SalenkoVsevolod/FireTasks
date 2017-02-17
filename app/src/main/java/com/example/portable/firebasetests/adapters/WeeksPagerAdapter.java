@@ -15,10 +15,10 @@ import java.util.ArrayList;
 public class WeeksPagerAdapter extends FragmentPagerAdapter {
     private ArrayList<Fragment> fragments;
 
-    public WeeksPagerAdapter(FragmentManager fm, int nowWeek) {
+    public WeeksPagerAdapter(FragmentManager fm) {
         super(fm);
         fragments = new ArrayList<>();
-        for (int i = 1; i <= nowWeek; i++) {
+        for (int i = 1; i <= 52; i++) {
             fragments.add(TasksWeekFragment.newInstance(i));
         }
     }

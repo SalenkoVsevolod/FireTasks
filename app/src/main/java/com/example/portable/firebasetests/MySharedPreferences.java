@@ -19,4 +19,11 @@ public class MySharedPreferences {
         SharedPreferences sPref = context.getSharedPreferences(context.getString(R.string.sharedPreferencesFileName), Context.MODE_PRIVATE);
         return sPref.getString(context.getString(R.string.ID_SHARED_KEY), null);
     }
+
+    public static void logout(Context context) {
+        SharedPreferences sPref = context.getSharedPreferences(context.getString(R.string.sharedPreferencesFileName), Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.remove(context.getString(R.string.ID_SHARED_KEY));
+        ed.commit();
+    }
 }

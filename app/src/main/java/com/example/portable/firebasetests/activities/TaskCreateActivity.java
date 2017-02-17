@@ -20,4 +20,5 @@ public class TaskCreateActivity extends AppCompatActivity {
         transaction.add(R.id.activity_task_create, TaskCreateFragment.newInstance(task));
         transaction.commit();
     }
+
 }

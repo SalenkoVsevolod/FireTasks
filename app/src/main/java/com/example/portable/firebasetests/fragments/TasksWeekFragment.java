@@ -16,7 +16,6 @@ import android.widget.ProgressBar;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 import com.example.portable.firebasetests.MySharedPreferences;
-import com.example.portable.firebasetests.Notifier;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TimeUtils;
 import com.example.portable.firebasetests.activities.TaskCreateActivity;
@@ -26,6 +25,7 @@ import com.example.portable.firebasetests.listeners.OnDateIdentifiedListener;
 import com.example.portable.firebasetests.listeners.OnTaskClickListener;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
+import com.example.portable.firebasetests.notifications.Notifier;
 import com.example.portable.firebasetests.tasks.DataObserverTask;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -132,8 +132,10 @@ public class TasksWeekFragment extends Fragment {
         Task task = new Task();
         task.getCalendar().set(Calendar.YEAR, year);
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, week);
-        task.getCalendar().roll(Calendar.DAY_OF_WEEK, TimeUtils.adapterToReal(day));
-        Log.i("creating", "open task creator with week:" + task.getCalendar().get(Calendar.WEEK_OF_YEAR));
+        task.getCalendar().set(Calendar.DAY_OF_WEEK, day);
+
+        Log.i("creating", "open task creator with week:" + task.getCalendar().get(Calendar.WEEK_OF_YEAR) +
+                " and day of month:" + task.getCalendar().get(Calendar.DAY_OF_MONTH));
         openTaskCreateFragment(task);
     }
 

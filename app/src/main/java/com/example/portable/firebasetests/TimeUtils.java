@@ -18,19 +18,11 @@ public class TimeUtils {
         return calendar.get(Calendar.DAY_OF_WEEK) < now.get(Calendar.DAY_OF_WEEK);
     }
 
-    public static boolean isOutdatedByWeek(long millis) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(millis);
-        Calendar now = Calendar.getInstance();
-        now.setTimeInMillis(System.currentTimeMillis());
-        return calendar.get(Calendar.WEEK_OF_YEAR) < now.get(Calendar.WEEK_OF_YEAR);
-    }
-
     public static int adapterToReal(int adapter) {
         if (adapter == 6) {
             adapter = 1;
         } else {
-            adapter += 2;
+            adapter++;
         }
         return adapter;
     }

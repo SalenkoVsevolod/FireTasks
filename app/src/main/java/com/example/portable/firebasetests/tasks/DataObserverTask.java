@@ -5,9 +5,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.Notifier;
 import com.example.portable.firebasetests.listeners.DataChangingListener;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.notifications.Notifier;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

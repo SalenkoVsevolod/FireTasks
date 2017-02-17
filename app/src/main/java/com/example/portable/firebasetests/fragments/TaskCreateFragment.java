@@ -21,7 +21,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.MySharedPreferences;
-import com.example.portable.firebasetests.Notifier;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.adapters.SubTaskAdapter;
@@ -29,6 +28,7 @@ import com.example.portable.firebasetests.adapters.TagAdapter;
 import com.example.portable.firebasetests.listeners.OnMyItemLongClickListener;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.notifications.Notifier;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 

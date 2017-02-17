@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests;
+package com.example.portable.firebasetests.notifications;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.model.Task;
 
 import java.util.Calendar;

@@ -20,7 +20,7 @@
         <activity android:name=".activities.TasksActivity" />
 
         <receiver
-            android:name=".NotificationsBroadcastReceiver"
+            android:name=".notifications.NotificationsBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
 
