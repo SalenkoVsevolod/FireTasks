@@ -130,9 +130,11 @@ public class TasksWeekFragment extends Fragment {
 
     private void openTaskCreateFragment(int year, int week, int day) {
         Task task = new Task();
-        task.getCalendar().set(Calendar.YEAR, year);
-        task.getCalendar().set(Calendar.WEEK_OF_YEAR, week);
         task.getCalendar().set(Calendar.DAY_OF_WEEK, day);
+        task.getCalendar().set(Calendar.WEEK_OF_YEAR, week);
+        task.getCalendar().set(Calendar.YEAR, year);
+
+
 
         Log.i("creating", "open task creator with week:" + task.getCalendar().get(Calendar.WEEK_OF_YEAR) +
                 " and day of month:" + task.getCalendar().get(Calendar.DAY_OF_MONTH));

@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.adapters.WeeksPagerAdapter;
@@ -14,6 +15,7 @@ import java.util.Calendar;
 
 public class TasksActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;
+    private TextView weekBoundsTextView;
 
     @SuppressWarnings("all")
     @Override
@@ -32,6 +34,9 @@ public class TasksActivity extends AppCompatActivity {
                 pager.setCurrentItem(getCurrentWeekOfYearPosition());
             }
         });
+        weekBoundsTextView = (TextView) findViewById(R.id.weekBoundsTextView);
+        String currentWeekBounds = "" + getCurrentWeekOfYearPosition();
+        weekBoundsTextView.setText(getWeekBoundsString(getCurrentWeekOfYearPosition()));
         pager.addOnPageChangeListener(getOnPageChangeListener());
     }
 
@@ -44,12 +49,14 @@ public class TasksActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
+
                 Log.i("page", "page selected:" + position + " current week:" + getCurrentWeekOfYearPosition());
                 if (position == getCurrentWeekOfYearPosition()) {
                     floatingActionButton.hide();
                 } else {
                     floatingActionButton.show();
                 }
+                weekBoundsTextView.setText(getWeekBoundsString(position));
             }
 
             @Override
@@ -65,5 +72,18 @@ public class TasksActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         return calendar.get(Calendar.WEEK_OF_YEAR) - 1;
+    }
+
+    private String getWeekBoundsString(int weekOfYear) {
+        weekOfYear--;
+        Log.i("weekBounds", "input week of year:" + weekOfYear);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        String firstDay = calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH);
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        String lastDay = calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH);
+        Log.i("weekBounds", firstDay + "-" + lastDay);
+        return firstDay + "-" + lastDay;
     }
 }
