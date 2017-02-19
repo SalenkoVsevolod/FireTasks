@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.StringUtils;
 import com.example.portable.firebasetests.adapters.WeeksPagerAdapter;
 
 import java.util.Calendar;
@@ -75,14 +76,15 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private String getWeekBoundsString(int weekOfYear) {
-        weekOfYear--;
+        weekOfYear++;
         Log.i("weekBounds", "input week of year:" + weekOfYear);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        String firstDay = calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH);
+        calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
+        String firstDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.YEAR));
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        String lastDay = calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH);
+        calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
+        String lastDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.YEAR));
         Log.i("weekBounds", firstDay + "-" + lastDay);
         return firstDay + "-" + lastDay;
     }

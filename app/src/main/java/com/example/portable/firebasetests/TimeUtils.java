@@ -10,11 +10,14 @@ public class TimeUtils {
     public static boolean isDayBefore(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(System.currentTimeMillis());
+        if (calendar.get(Calendar.WEEK_OF_YEAR) < now.get(Calendar.WEEK_OF_YEAR)) {
+            return true;
+        }
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
             return false;
         }
-        Calendar now = Calendar.getInstance();
-        now.setTimeInMillis(System.currentTimeMillis());
         return calendar.get(Calendar.DAY_OF_WEEK) < now.get(Calendar.DAY_OF_WEEK);
     }
 
