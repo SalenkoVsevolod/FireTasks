@@ -81,10 +81,10 @@ public class TasksActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
-        String firstDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.YEAR));
+        String firstDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
-        String lastDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.YEAR));
+        String lastDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
         Log.i("weekBounds", firstDay + "-" + lastDay);
         return firstDay + "-" + lastDay;
     }

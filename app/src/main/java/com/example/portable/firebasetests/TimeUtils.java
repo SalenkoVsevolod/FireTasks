@@ -21,15 +21,6 @@ public class TimeUtils {
         return calendar.get(Calendar.DAY_OF_WEEK) < now.get(Calendar.DAY_OF_WEEK);
     }
 
-    public static int adapterToReal(int adapter) {
-        if (adapter == 6) {
-            adapter = 1;
-        } else {
-            adapter++;
-        }
-        return adapter;
-    }
-
     public static int realToAdapter(int real) {
         if (real == 1) {
             real = 6;

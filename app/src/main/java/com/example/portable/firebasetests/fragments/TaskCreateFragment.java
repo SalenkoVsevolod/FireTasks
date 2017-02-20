@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,7 +87,6 @@ public class TaskCreateFragment extends Fragment {
             task.setId(userId + "_task_" + System.currentTimeMillis());
         } else {
             descriptionEdit.setText(task.getDescription());
-            Log.i("tag", task.getTagIndex() + "");
             if (task.isTimeSpecified()) {
                 timeTextView.setText(task.getTimeString());
             }
@@ -122,7 +120,6 @@ public class TaskCreateFragment extends Fragment {
     private void initTagSpinner() {
         tagSpinner.setAdapter(new TagAdapter(getActivity(), TagsColors.getTags()));
         final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks());
-
         subTaskAdapter.setLongClickListener(new OnMyItemLongClickListener() {
             @Override
             public void onLongClick(int index) {

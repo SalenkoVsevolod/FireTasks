@@ -54,7 +54,7 @@ public class TasksDay implements ParentObject {
     }
 
     public String getDateString() {
-        return StringUtils.formatNumber(calendar.get(Calendar.DAY_OF_MONTH)) + "." + StringUtils.formatNumber(calendar.get(Calendar.MONTH) + 1) + "." + calendar.get(Calendar.YEAR);
+        return StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
     }
 
     public String getName() {

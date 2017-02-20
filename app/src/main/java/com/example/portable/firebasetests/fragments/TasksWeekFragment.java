@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -133,11 +132,6 @@ public class TasksWeekFragment extends Fragment {
         task.getCalendar().set(Calendar.DAY_OF_WEEK, day);
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, week);
         task.getCalendar().set(Calendar.YEAR, year);
-
-
-
-        Log.i("creating", "open task creator with week:" + task.getCalendar().get(Calendar.WEEK_OF_YEAR) +
-                " and day of month:" + task.getCalendar().get(Calendar.DAY_OF_MONTH));
         openTaskCreateFragment(task);
     }
 
