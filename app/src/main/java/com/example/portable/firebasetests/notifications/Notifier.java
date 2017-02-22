@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.model.Task;
 
 import java.util.Calendar;
@@ -19,8 +18,7 @@ public class Notifier {
 
     public static void setAlarm(Task task, Context context) {
         Intent notificationIntent = new Intent(context, NotificationsBroadcastReceiver.class);
-        notificationIntent.putExtra(NotificationsBroadcastReceiver.TITLE_TAG, TagsColors.getTags().get((int) task.getTagIndex()).getName());
-        notificationIntent.putExtra(NotificationsBroadcastReceiver.TEXT_TAG, task.getDescription());
+        notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_TAG, task);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) task.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 

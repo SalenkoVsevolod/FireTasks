@@ -29,10 +29,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        String id = MySharedPreferences.readUserId(this);
-        if (id != null) {
-            startTasksActivity();
-        }
         mAuth = FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -42,7 +38,10 @@ public class LoginActivity extends AppCompatActivity {
                 .enableAutoManage(this, null)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
+        String idToken = MySharedPreferences.readTokenId(this);
+        if (idToken != null) {
+            firebaseAuthWithGoogle(idToken);
+        }
     }
 
     public void loginClick(View view) {
@@ -64,14 +63,15 @@ public class LoginActivity extends AppCompatActivity {
                 GoogleSignInAccount account = result.getSignInAccount();
                 if (account != null && account.getId() != null) {
                     MySharedPreferences.writeUserId(this, account.getId());
+                    MySharedPreferences.writeTokenId(this, account.getIdToken());
+                    firebaseAuthWithGoogle(account.getIdToken());
                 }
-                firebaseAuthWithGoogle(account);
             }
         }
     }
 
-    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+    private void firebaseAuthWithGoogle(final String tokenId) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(tokenId, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -79,12 +79,11 @@ public class LoginActivity extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
+
                         } else {
                             startTasksActivity();
                         }
-
                     }
                 });
     }
-
 }

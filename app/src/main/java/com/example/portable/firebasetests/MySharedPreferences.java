@@ -24,6 +24,20 @@ public class MySharedPreferences {
         SharedPreferences sPref = context.getSharedPreferences(context.getString(R.string.sharedPreferencesFileName), Context.MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
         ed.remove(context.getString(R.string.ID_SHARED_KEY));
+        ed.remove(context.getString(R.string.TOKEN_ID_SHARED_KED));
         ed.commit();
     }
+
+    public static void writeTokenId(Context context, String tokenId) {
+        SharedPreferences sPref = context.getSharedPreferences(context.getString(R.string.sharedPreferencesFileName), Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putString(context.getString(R.string.TOKEN_ID_SHARED_KED), tokenId);
+        ed.apply();
+    }
+
+    public static String readTokenId(Context context) {
+        SharedPreferences sPref = context.getSharedPreferences(context.getString(R.string.sharedPreferencesFileName), Context.MODE_PRIVATE);
+        return sPref.getString(context.getString(R.string.TOKEN_ID_SHARED_KED), null);
+    }
+
 }

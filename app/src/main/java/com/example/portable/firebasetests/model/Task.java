@@ -24,6 +24,7 @@ public class Task implements Serializable {
     private Calendar calendar;
 
     public Task() {
+        description = "";
         subTasks = new ArrayList<>();
         calendar = Calendar.getInstance();
     }

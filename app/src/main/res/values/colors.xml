@@ -10,4 +10,5 @@
     <color name="failedDay">#ff4d4d</color>
     <color name="emptyDay">#aeadad</color>
     <color name="undoneDay">#ffff96</color>
+    <color name="titleText">#ffffff</color>
 </resources>

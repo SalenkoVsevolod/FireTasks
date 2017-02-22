@@ -19,7 +19,7 @@ import com.example.portable.firebasetests.view_holders.TaskParentViewHolder;
 import java.util.List;
 
 import static com.example.portable.firebasetests.AppCompatColors.getColor;
-import static com.example.portable.firebasetests.TimeUtils.isDayBefore;
+import static com.example.portable.firebasetests.TimeUtils.isInPast;
 
 /**
  * Created by Salenko Vsevolod on 07.02.2017.
@@ -83,7 +83,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
         final Task task = (Task) o;
         childViewHolder.taskCardView.setCardBackgroundColor(getTaskColor(task));
         childViewHolder.description.setText(task.getDescription());
-        childViewHolder.time.setText(task.isCompleted() ? task.getTimeString() : "");
+        childViewHolder.time.setText(task.isTimeSpecified() ? task.getTimeString() : "");
         childViewHolder.tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
         childViewHolder.tagCardView.setCardBackgroundColor(TagsColors.getTags().get((int) task.getTagIndex()).getColor());
         childViewHolder.taskCardView.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +102,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
     }
 
     private int getTaskColor(Task task) {
-        if (isDayBefore(task.getTimeStamp()) && !task.isCompleted()) {
+        if (isInPast(task.getTimeStamp()) && !task.isCompleted()) {
             return getColor(R.color.failedTask, context);
         }
         if (!task.isCompleted()) {
@@ -115,7 +115,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TaskParent
         if (tasks.isEmpty()) {
             return getColor(R.color.emptyDay, context);
         }
-        boolean isInPast = isDayBefore(((Task) tasks.get(0)).getTimeStamp());
+        boolean isInPast = isInPast(((Task) tasks.get(0)).getTimeStamp());
         for (Object o : tasks) {
             Task t = (Task) o;
             if (t.isCompleted()) {

@@ -8,10 +8,4 @@
         android:title="@string/logout"
         android:visible="true"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/editItem"
-        android:icon="@drawable/ic_edit"
-        android:title="@string/edit"
-        android:visible="false"
-        app:showAsAction="ifRoom" />
 </menu>
