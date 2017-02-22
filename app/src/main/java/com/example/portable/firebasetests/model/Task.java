@@ -94,8 +94,8 @@ public class Task implements Serializable {
         return timeSpecified;
     }
 
-    public void setTimeSpecified(boolean timeSpecified) {
-        this.timeSpecified = timeSpecified;
+    public void setTimeSpecified() {
+        this.timeSpecified = true;
     }
 
     public long getTimeStamp() {

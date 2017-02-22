@@ -25,7 +25,7 @@ public class MySharedPreferences {
         SharedPreferences.Editor ed = sPref.edit();
         ed.remove(context.getString(R.string.ID_SHARED_KEY));
         ed.remove(context.getString(R.string.TOKEN_ID_SHARED_KED));
-        ed.commit();
+        ed.apply();
     }
 
     public static void writeTokenId(Context context, String tokenId) {

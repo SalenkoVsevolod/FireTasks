@@ -71,7 +71,9 @@ public class TaskCreateActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(AppCompatColors.getColor(R.color.titleText, this));
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
         configViewsForClosingKeyBord(descriptionEdit.getRootView());
     }
 
@@ -79,7 +81,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         if (!(rootView instanceof EditText)) {
             rootView.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
-                    hideSoftKeyboard();
+                    hideKeyboard();
                     return false;
                 }
             });
@@ -92,12 +94,13 @@ public class TaskCreateActivity extends AppCompatActivity {
         }
     }
 
-    private void hideSoftKeyboard() {
+    private void hideKeyboard() {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) getSystemService(
                         Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(
-                getCurrentFocus().getWindowToken(), 0);
+        if (getCurrentFocus() != null) {
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     private void initInterface() {
@@ -110,7 +113,8 @@ public class TaskCreateActivity extends AppCompatActivity {
                 timeTextView.setText(task.getTimeString());
             }
         }
-        initTagSpinner();
+        tagSpinner.setAdapter(new TagAdapter(this, TagsColors.getTags()));
+        initSubtasksRecyclerView();
         tagSpinner.setSelection((int) task.getTagIndex());
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +129,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         timeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openTimePicker();
+                showTimePickerDialog();
             }
         });
         addSubTaskButton.setOnClickListener(new View.OnClickListener() {
@@ -136,13 +140,12 @@ public class TaskCreateActivity extends AppCompatActivity {
         });
     }
 
-    private void initTagSpinner() {
-        tagSpinner.setAdapter(new TagAdapter(this, TagsColors.getTags()));
+    private void initSubtasksRecyclerView() {
         final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks());
         subTaskAdapter.setLongClickListener(new OnMyItemLongClickListener() {
             @Override
             public void onLongClick(int index) {
-                openDeletingDialog(subTaskAdapter.getItem(index));
+                openSubtaskDeleteDialog(subTaskAdapter.getItem(index));
             }
         });
         subTasksRecycleView.setAdapter(subTaskAdapter);
@@ -150,7 +153,7 @@ public class TaskCreateActivity extends AppCompatActivity {
 
     }
 
-    private void openTimePicker() {
+    private void showTimePickerDialog() {
         final Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
@@ -161,7 +164,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                 calendar.set(Calendar.MINUTE, minute);
                 task.setTimeStamp(calendar.getTimeInMillis());
                 timeTextView.setText(task.getTimeString());
-                task.setTimeSpecified(true);
+                task.setTimeSpecified();
             }
         };
         calendar.setTimeInMillis(task.getTimeStamp());
@@ -216,6 +219,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                     SubTask subtask = new SubTask(editText.getText().toString());
                     subtask.setId(task.getId() + "_subtask_" + System.currentTimeMillis());
                     task.getSubTasks().add(subtask);
+
                 }
             }
         });
@@ -224,7 +228,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void openDeletingDialog(final SubTask subTask) {
+    private void openSubtaskDeleteDialog(final SubTask subTask) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Delete \"" + subTask.getDescription() + "\" subtask?");
         builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {

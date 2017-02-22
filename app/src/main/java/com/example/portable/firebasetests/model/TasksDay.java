@@ -46,7 +46,6 @@ public class TasksDay implements ParentObject {
         children = list;
     }
 
-    //TODO maybe crutch
     public void addChild(Object o) {
         ArrayList<Object> res = new ArrayList<>(getChildObjectList());
         res.add(o);

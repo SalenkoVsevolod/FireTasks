@@ -42,7 +42,6 @@ public class TasksWeekFragment extends Fragment {
     private ProgressBar progressBar;
     private DataObserverTask dataObserverTask;
     private RecyclerView expandableListView;
-    private TasksExpandableAdapter tasksExpandableAdapter;
     private int weekOfYear;
 
     public TasksWeekFragment() {
@@ -72,7 +71,32 @@ public class TasksWeekFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_tasks_list, container, false);
         progressBar = (ProgressBar) rootView.findViewById(R.id.tasksListProgressBar);
         expandableListView = (RecyclerView) rootView.findViewById(R.id.tasksExpandableListView);
+        expandableListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return rootView;
+    }
+
+    private TasksExpandableAdapter initExpandableListViewAdapter(List<ParentObject> parents) {
+
+        TasksExpandableAdapter tasksExpandableAdapter = new TasksExpandableAdapter(getActivity(), parents);
+        tasksExpandableAdapter.setOnGroupClickListener(new OnDateIdentifiedListener() {
+            @Override
+            public void onIdentified(int year, int weekOfYear, int dayOfWeek) {
+                openTaskCreateFragment(year, weekOfYear, dayOfWeek);
+            }
+        });
+        tasksExpandableAdapter.setOnTaskLongClickListener(new OnTaskClickListener() {
+            @Override
+            public void onClick(Task task) {
+                deleteDialog(task);
+            }
+        });
+        tasksExpandableAdapter.setOnTaskClickListener(new OnTaskClickListener() {
+            @Override
+            public void onClick(Task task) {
+                openTaskCreateFragment(task);
+            }
+        });
+        return tasksExpandableAdapter;
     }
 
     @Override
@@ -86,28 +110,9 @@ public class TasksWeekFragment extends Fragment {
                 if (tasks == null) {
                     tasks = new ArrayList<>();
                 }
+                expandableListView.setAdapter(initExpandableListViewAdapter(generateWeekFromTasks(tasks)));
                 showList();
-                tasksExpandableAdapter = new TasksExpandableAdapter(getActivity(), generateWeekFromTasks(tasks));
-                tasksExpandableAdapter.setOnGroupClickListener(new OnDateIdentifiedListener() {
-                    @Override
-                    public void onIdentified(int year, int weekOfYear, int dayOfWeek) {
-                        openTaskCreateFragment(year, weekOfYear, dayOfWeek);
-                    }
-                });
-                tasksExpandableAdapter.setOnTaskLongClickListener(new OnTaskClickListener() {
-                    @Override
-                    public void onClick(Task task) {
-                        deleteDialog(task);
-                    }
-                });
-                tasksExpandableAdapter.setOnTaskClickListener(new OnTaskClickListener() {
-                    @Override
-                    public void onClick(Task task) {
-                        openTaskCreateFragment(task);
-                    }
-                });
-                expandableListView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                expandableListView.setAdapter(tasksExpandableAdapter);
+
             }
         });
         dataObserverTask.execute();

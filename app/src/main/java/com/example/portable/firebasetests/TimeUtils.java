@@ -7,7 +7,6 @@ import java.util.Calendar;
  */
 
 public class TimeUtils {
-    //TODO terrible crutch
     public static boolean isInPast(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);

@@ -2,34 +2,48 @@ package com.example.portable.firebasetests.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.listeners.OnLoginListener;
+import com.example.portable.firebasetests.tasks.LoginTask;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginActivity extends AppCompatActivity {
     private GoogleApiClient mGoogleApiClient;
-    private FirebaseAuth mAuth;
+    private Button loginButton;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        mAuth = FirebaseAuth.getInstance();
+        loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginClick();
+            }
+        });
+        progressBar = (ProgressBar) findViewById(R.id.loginProgressBar);
+        String idToken = MySharedPreferences.readTokenId(this);
+        if (idToken != null) {
+            firebaseAuthWithGoogle(idToken);
+        } else {
+            loginWithGoogle();
+        }
+    }
+
+    private void loginWithGoogle() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -38,13 +52,10 @@ public class LoginActivity extends AppCompatActivity {
                 .enableAutoManage(this, null)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        String idToken = MySharedPreferences.readTokenId(this);
-        if (idToken != null) {
-            firebaseAuthWithGoogle(idToken);
-        }
+
     }
 
-    public void loginClick(View view) {
+    private void loginClick() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, 18);
     }
@@ -71,19 +82,31 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(final String tokenId) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(tokenId, null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-
-                        } else {
-                            startTasksActivity();
-                        }
-                    }
-                });
+        LoginTask task = new LoginTask(this, tokenId);
+        setButtonVisibility(false);
+        task.setOnLoginListener(new OnLoginListener() {
+            @Override
+            public void onLogin(int resultCode) {
+                if (resultCode == LoginTask.DONE) {
+                    startTasksActivity();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show();
+                    setButtonVisibility(true);
+                }
+            }
+        });
+        task.execute();
     }
+
+    private void setButtonVisibility(boolean b) {
+        if (b) {
+            loginButton.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+        } else {
+            loginButton.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
 }

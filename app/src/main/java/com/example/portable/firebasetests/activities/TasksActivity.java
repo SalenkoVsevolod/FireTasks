@@ -40,8 +40,7 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
         final ViewPager pager = (ViewPager) findViewById(R.id.tasksViewPager);
-        WeeksPagerAdapter adapter = new WeeksPagerAdapter(getSupportFragmentManager());
-        pager.setAdapter(adapter);
+        pager.setAdapter(new WeeksPagerAdapter(getSupportFragmentManager()));
         pager.setCurrentItem(getCurrentWeekOfYearPosition());
         floatingActionButton = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
         floatingActionButton.hide();
@@ -121,7 +120,7 @@ public class TasksActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showLogoutDialog() {
+    private void showLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Logout");
         builder.setMessage("Logout?");
