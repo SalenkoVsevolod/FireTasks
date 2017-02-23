@@ -2,6 +2,7 @@ package com.example.portable.firebasetests.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +18,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 
 public class LoginActivity extends AppCompatActivity {
     private GoogleApiClient mGoogleApiClient;
@@ -35,12 +38,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         progressBar = (ProgressBar) findViewById(R.id.loginProgressBar);
-        String idToken = MySharedPreferences.readTokenId(this);
-        if (idToken != null) {
-            firebaseAuthWithGoogle(idToken);
-        } else {
-            loginWithGoogle();
-        }
+        loginWithGoogle();
     }
 
     private void loginWithGoogle() {
@@ -52,7 +50,18 @@ public class LoginActivity extends AppCompatActivity {
                 .enableAutoManage(this, null)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
+        OptionalPendingResult<GoogleSignInResult> pendingResult =
+                Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (pendingResult.isDone()) {
+            login(pendingResult.get().getSignInAccount());
+        } else {
+            pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(@NonNull GoogleSignInResult result) {
+                    login(result.getSignInAccount());
+                }
+            });
+        }
     }
 
     private void loginClick() {
@@ -71,13 +80,15 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == 18) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                GoogleSignInAccount account = result.getSignInAccount();
-                if (account != null && account.getId() != null) {
-                    MySharedPreferences.writeUserId(this, account.getId());
-                    MySharedPreferences.writeTokenId(this, account.getIdToken());
-                    firebaseAuthWithGoogle(account.getIdToken());
-                }
+                login(result.getSignInAccount());
             }
+        }
+    }
+
+    private void login(GoogleSignInAccount account) {
+        if (account != null && account.getId() != null) {
+            MySharedPreferences.writeUserId(this, account.getId());
+            firebaseAuthWithGoogle(account.getIdToken());
         }
     }
 

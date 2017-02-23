@@ -219,7 +219,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                     SubTask subtask = new SubTask(editText.getText().toString());
                     subtask.setId(task.getId() + "_subtask_" + System.currentTimeMillis());
                     task.getSubTasks().add(subtask);
-
+                    subTasksRecycleView.getAdapter().notifyDataSetChanged();
                 }
             }
         });

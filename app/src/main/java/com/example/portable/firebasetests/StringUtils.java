@@ -14,7 +14,7 @@ public class StringUtils {
         for (int number : numbers) {
             builder.append(formatNumber(number)).append(".");
         }
-        builder.deleteCharAt(builder.length()-1);
+        builder.deleteCharAt(builder.length() - 1);
         return builder.toString();
     }
 }
