@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/taskCreateToolbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="?attr/colorPrimary"
         android:theme="?attr/actionBarTheme"
@@ -16,117 +16,8 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/descriptionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="@string/descriptionName"
-        app:layout_constraintBaseline_toBaselineOf="@+id/taskDescriptionEdit"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <EditText
-        android:id="@+id/taskDescriptionEdit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:hint="@string/descriptionHint"
-        android:inputType="textPersonName"
-        app:layout_constraintLeft_toRightOf="@+id/descriptionTextView"
-        app:layout_constraintTop_toBottomOf="@id/taskCreateToolbar" />
-
-    <TextView
-        android:id="@+id/tagTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:text="@string/tagName"
-        app:layout_constraintBottom_toBottomOf="@+id/tagSpinner"
-        app:layout_constraintRight_toLeftOf="@+id/tagSpinner"
-        app:layout_constraintTop_toTopOf="@+id/tagSpinner" />
-
-    <Spinner
-        android:id="@+id/tagSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:spinnerMode="dropdown"
-        app:layout_constraintLeft_toLeftOf="@+id/taskDescriptionEdit"
-        app:layout_constraintTop_toBottomOf="@+id/taskDescriptionEdit" />
-
-    <TextView
-        android:id="@+id/subTasksTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="@string/subitems"
-        app:layout_constraintBottom_toBottomOf="@+id/subTasksRecyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/subTasksRecyclerView"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <Button
-        android:id="@+id/addSubTaskButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/add_subtask"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subTasksRecyclerView" />
-
-    <TextView
-        android:id="@+id/timeNameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/timeName"
-        app:layout_constraintLeft_toLeftOf="@+id/subTasksTextView"
-        app:layout_constraintTop_toBottomOf="@+id/addSubTaskButton" />
-
-    <TextView
-        android:id="@+id/timeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="@string/_0_0"
-        app:layout_constraintBaseline_toBaselineOf="@+id/timeNameTextView"
-        app:layout_constraintLeft_toRightOf="@+id/timeNameTextView" />
-
-    <Button
-        android:id="@+id/addTaskButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="@android:string/ok"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeTextView" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/subTasksRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="16dp"
-        android:clipToPadding="true"
-        app:layout_constraintLeft_toLeftOf="@+id/tagSpinner"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tagSpinner" />
-</android.support.constraint.ConstraintLayout>
+    <FrameLayout
+        android:id="@+id/task_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

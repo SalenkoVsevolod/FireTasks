@@ -1,0 +1,65 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.portable.firebasetests.ui.fragments.TaskDisplayFragment">
+
+    <TextView
+        android:id="@+id/description_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/descriptionName" />
+
+    <TextView
+        android:id="@+id/description_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/description_name"
+        android:layout_toEndOf="@id/description_name"
+        android:layout_toRightOf="@id/description_name" />
+
+    <TextView
+        android:id="@+id/tag_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/description_display"
+        android:text="@string/tagName" />
+
+    <TextView
+        android:id="@+id/tag_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/tag_name"
+        android:layout_toEndOf="@id/tag_name"
+        android:layout_toRightOf="@id/tag_name" />
+
+    <TextView
+        android:id="@+id/subtasks_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tag_name"
+        android:text="@string/subtasks_name" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/subTasksRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/subtasks_name"
+        android:layout_toEndOf="@id/subtasks_name"
+        android:layout_toRightOf="@id/subtasks_name" />
+
+    <TextView
+        android:id="@+id/timeNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/subtasks_name"
+        android:text="@string/timeName" />
+
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/timeNameTextView"
+        android:layout_toEndOf="@id/timeNameTextView"
+        android:layout_toRightOf="@id/timeNameTextView" />
+</RelativeLayout>

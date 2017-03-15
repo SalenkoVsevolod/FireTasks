@@ -8,8 +8,11 @@
     <string name="add_subtask">add subtask</string>
     <string name="descriptionName">Description:</string>
     <string name="tagName">Tag:</string>
-    <string name="subitems">SubTasks:</string>
+    <string name="subtasks_name">SubTasks:</string>
     <string name="timeName">Time:</string>
     <string name="_0_0">0:0</string>
     <string name="TOKEN_ID_SHARED_KED">tokenId</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
