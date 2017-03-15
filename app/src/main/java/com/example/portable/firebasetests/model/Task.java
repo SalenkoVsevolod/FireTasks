@@ -1,7 +1,7 @@
 package com.example.portable.firebasetests.model;
 
 
-import com.example.portable.firebasetests.StringUtils;
+import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;

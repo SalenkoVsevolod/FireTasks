@@ -1,10 +1,10 @@
-package com.example.portable.firebasetests.tasks;
+package com.example.portable.firebasetests.async_tasks;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-import com.example.portable.firebasetests.listeners.OnLoginListener;
+import com.example.portable.firebasetests.ui.activities.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -18,7 +18,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginTask extends AsyncTask<Void, Void, Void> {
     public static final int DONE = 0;
-    private OnLoginListener onLoginListener;
+    private LoginActivity.OnLoginListener onLoginListener;
     private FirebaseAuth mAuth;
     private String tokenId;
     private Activity activity;
@@ -49,7 +49,7 @@ public class LoginTask extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    public void setOnLoginListener(OnLoginListener onLoginListener) {
+    public void setOnLoginListener(LoginActivity.OnLoginListener onLoginListener) {
         this.onLoginListener = onLoginListener;
     }
 }

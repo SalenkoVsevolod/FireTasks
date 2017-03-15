@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests;
+package com.example.portable.firebasetests.utils;
 
 import java.util.Calendar;
 

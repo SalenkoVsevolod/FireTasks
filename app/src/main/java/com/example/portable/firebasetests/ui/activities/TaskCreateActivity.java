@@ -1,10 +1,13 @@
-package com.example.portable.firebasetests.activities;
+package com.example.portable.firebasetests.ui.activities;
 
 import android.app.Activity;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,13 +26,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.AppCompatColors;
 import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
-import com.example.portable.firebasetests.adapters.SubTaskAdapter;
-import com.example.portable.firebasetests.adapters.TagAdapter;
-import com.example.portable.firebasetests.listeners.OnMyItemLongClickListener;
+import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
+import com.example.portable.firebasetests.ui.adapters.TagAdapter;
+import com.example.portable.firebasetests.ui.OnListItemClickListener;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.notifications.Notifier;
@@ -52,6 +54,12 @@ public class TaskCreateActivity extends AppCompatActivity {
     private String userId;
     private boolean shouldHoldUser = false;
 
+    public static void start(Context context, Task task) {
+        Intent starter = new Intent(context, TaskCreateActivity.class);
+        starter.putExtra(TASK_ARG, task);
+        context.startActivity(starter);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +76,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         initInterface();
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitle(getString(R.string.app_name));
-        toolbar.setTitleTextColor(AppCompatColors.getColor(R.color.titleText, this));
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.titleText));
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -142,7 +150,7 @@ public class TaskCreateActivity extends AppCompatActivity {
 
     private void initSubtasksRecyclerView() {
         final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks());
-        subTaskAdapter.setLongClickListener(new OnMyItemLongClickListener() {
+        subTaskAdapter.setLongClickListener(new OnListItemClickListener() {
             @Override
             public void onLongClick(int index) {
                 openSubtaskDeleteDialog(subTaskAdapter.getItem(index));

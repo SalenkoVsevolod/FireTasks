@@ -1,8 +1,7 @@
-package com.example.portable.firebasetests.fragments;
+package com.example.portable.firebasetests.ui.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,16 +15,13 @@ import android.widget.ProgressBar;
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.TimeUtils;
-import com.example.portable.firebasetests.activities.TaskCreateActivity;
-import com.example.portable.firebasetests.adapters.TasksExpandableAdapter;
-import com.example.portable.firebasetests.listeners.DataChangingListener;
-import com.example.portable.firebasetests.listeners.OnDateIdentifiedListener;
-import com.example.portable.firebasetests.listeners.OnTaskClickListener;
+import com.example.portable.firebasetests.utils.TimeUtils;
+import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
+import com.example.portable.firebasetests.ui.adapters.TasksExpandableAdapter;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
 import com.example.portable.firebasetests.notifications.Notifier;
-import com.example.portable.firebasetests.tasks.DataObserverTask;
+import com.example.portable.firebasetests.async_tasks.DataObserverTask;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -81,19 +77,19 @@ public class TasksWeekFragment extends Fragment {
         tasksExpandableAdapter.setOnGroupClickListener(new OnDateIdentifiedListener() {
             @Override
             public void onIdentified(int year, int weekOfYear, int dayOfWeek) {
-                openTaskCreateFragment(year, weekOfYear, dayOfWeek);
+                openTaskCreator(year, weekOfYear, dayOfWeek);
             }
         });
-        tasksExpandableAdapter.setOnTaskLongClickListener(new OnTaskClickListener() {
+        tasksExpandableAdapter.setOnTaskLongClickListener(new TasksExpandableAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
                 deleteDialog(task);
             }
         });
-        tasksExpandableAdapter.setOnTaskClickListener(new OnTaskClickListener() {
+        tasksExpandableAdapter.setOnTaskClickListener(new TasksExpandableAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
-                openTaskCreateFragment(task);
+                TaskCreateActivity.start(getActivity(), task);
             }
         });
         return tasksExpandableAdapter;
@@ -104,7 +100,8 @@ public class TasksWeekFragment extends Fragment {
         super.onStart();
         userId = MySharedPreferences.readUserId(getActivity());
         dataObserverTask = new DataObserverTask(getActivity(), userId, weekOfYear);
-        dataObserverTask.setDataChangingListener(new DataChangingListener() {
+        dataObserverTask.setDataChangingListener(new DataObserverTask.DataChangingListener() {
+
             @Override
             public void onDataChanged(ArrayList<Task> tasks) {
                 if (tasks == null) {
@@ -126,18 +123,13 @@ public class TasksWeekFragment extends Fragment {
         }
     }
 
-    private void openTaskCreateFragment(Task task) {
-        Intent intent = new Intent(getActivity(), TaskCreateActivity.class);
-        intent.putExtra(TaskCreateActivity.TASK_ARG, task);
-        startActivity(intent);
-    }
 
-    private void openTaskCreateFragment(int year, int week, int day) {
+    private void openTaskCreator(int year, int week, int day) {
         Task task = new Task();
         task.getCalendar().set(Calendar.DAY_OF_WEEK, day);
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, week);
         task.getCalendar().set(Calendar.YEAR, year);
-        openTaskCreateFragment(task);
+        TaskCreateActivity.start(getActivity(), task);
     }
 
     private void showList() {
@@ -185,4 +177,7 @@ public class TasksWeekFragment extends Fragment {
         return res;
     }
 
+    public interface OnDateIdentifiedListener {
+        void onIdentified(int year, int weekOfYear, int dayOfWeek);
+    }
 }

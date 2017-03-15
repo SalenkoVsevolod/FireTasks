@@ -1,10 +1,10 @@
-package com.example.portable.firebasetests.adapters;
+package com.example.portable.firebasetests.ui.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.example.portable.firebasetests.fragments.TasksWeekFragment;
+import com.example.portable.firebasetests.ui.fragments.TasksWeekFragment;
 
 import java.util.ArrayList;
 

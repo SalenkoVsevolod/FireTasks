@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.activities;
+package com.example.portable.firebasetests.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +11,7 @@ import android.widget.Toast;
 
 import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.listeners.OnLoginListener;
-import com.example.portable.firebasetests.tasks.LoginTask;
+import com.example.portable.firebasetests.async_tasks.LoginTask;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -120,4 +119,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    public interface OnLoginListener {
+        void onLogin(int resultCode);
+    }
 }

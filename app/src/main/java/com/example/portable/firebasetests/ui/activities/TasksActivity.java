@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.activities;
+package com.example.portable.firebasetests.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,11 +17,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.AppCompatColors;
 import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.StringUtils;
-import com.example.portable.firebasetests.adapters.WeeksPagerAdapter;
+import com.example.portable.firebasetests.utils.StringUtils;
+import com.example.portable.firebasetests.ui.adapters.WeeksPagerAdapter;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -56,7 +56,7 @@ public class TasksActivity extends AppCompatActivity {
         pager.addOnPageChangeListener(getOnPageChangeListener());
         Toolbar toolbar = (Toolbar) findViewById(R.id.tasksActivityToolbar);
         toolbar.setTitle(getString(R.string.app_name));
-        toolbar.setTitleTextColor(AppCompatColors.getColor(R.color.titleText, this));
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.titleText));
         setSupportActionBar(toolbar);
     }
 

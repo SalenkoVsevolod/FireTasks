@@ -1,10 +1,9 @@
-package com.example.portable.firebasetests.tasks;
+package com.example.portable.firebasetests.async_tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.listeners.DataChangingListener;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.notifications.Notifier;
 import com.google.firebase.database.DataSnapshot;
@@ -104,5 +103,8 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     private void deleteTask(String taskId) {
         myRef = FirebaseDatabase.getInstance().getReference("users").child(id).child("" + week).child(taskId);
         myRef.setValue(null);
+    }
+    public interface DataChangingListener {
+        void onDataChanged(ArrayList<Task> tasks);
     }
 }

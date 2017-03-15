@@ -1,7 +1,7 @@
 package com.example.portable.firebasetests.model;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
-import com.example.portable.firebasetests.StringUtils;
+import com.example.portable.firebasetests.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.adapters;
+package com.example.portable.firebasetests.ui.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

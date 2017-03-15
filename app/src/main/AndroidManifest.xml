@@ -10,14 +10,14 @@
         android:supportsRtl="true"
         android:theme="@style/MainTheme.NoActionBar"
         tools:replace="android:allowBackup">
-        <activity android:name=".activities.LoginActivity">
+        <activity android:name=".ui.activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.TasksActivity" />
+        <activity android:name=".ui.activities.TasksActivity" />
 
         <receiver
             android:name=".notifications.NotificationsBroadcastReceiver"
@@ -25,8 +25,8 @@
             android:exported="false" />
 
         <activity
-            android:name=".activities.TaskCreateActivity"
-            android:parentActivityName=".activities.TasksActivity" />
+            android:name=".ui.activities.TaskCreateActivity"
+            android:parentActivityName=".ui.activities.TasksActivity" />
     </application>
 
 </manifest>

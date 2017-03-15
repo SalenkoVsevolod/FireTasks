@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
-import com.example.portable.firebasetests.activities.TaskCreateActivity;
+import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
 import com.example.portable.firebasetests.model.Task;
 
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {

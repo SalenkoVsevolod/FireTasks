@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests;
+package com.example.portable.firebasetests.utils;
 
 /**
  * Created by Salenko Vsevolod on 15.02.2017.
