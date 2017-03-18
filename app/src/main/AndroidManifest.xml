@@ -4,6 +4,7 @@
     package="com.example.portable.firebasetests">
 
     <application
+        android:name=".core.FireTasksApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.MySharedPreferences;
+import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.async_tasks.LoginTask;
 import com.google.android.gms.auth.api.Auth;
@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void login(GoogleSignInAccount account) {
         if (account != null && account.getId() != null) {
-            MySharedPreferences.writeUserId(this, account.getId());
+            Preferences.getInstance().writeUserId(account.getId());
             firebaseAuthWithGoogle(account.getIdToken());
         }
     }

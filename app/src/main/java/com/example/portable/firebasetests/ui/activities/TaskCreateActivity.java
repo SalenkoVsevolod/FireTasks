@@ -26,17 +26,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
-import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
-import com.example.portable.firebasetests.ui.adapters.TagAdapter;
-import com.example.portable.firebasetests.ui.OnListItemClickListener;
+import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseManager;
 import com.example.portable.firebasetests.notifications.Notifier;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.example.portable.firebasetests.ui.OnListItemClickListener;
+import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
+import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 
 import java.util.Calendar;
 
@@ -72,7 +71,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         subTasksRecycleView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         addSubTaskButton = (Button) findViewById(R.id.addSubTaskButton);
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
-        userId = MySharedPreferences.readUserId(this);
+        userId = Preferences.getInstance().readUserId();
         initInterface();
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitle(getString(R.string.app_name));
@@ -181,19 +180,12 @@ public class TaskCreateActivity extends AppCompatActivity {
     }
 
     private void saveTask() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("users").child(userId).child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR));
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
         if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
-            Notifier.removeAlarm(this, (int) task.getTimeStamp());
-            Notifier.setAlarm(task, this);
+            Notifier.removeAlarm((int) task.getTimeStamp());
+            Notifier.setAlarm(task);
         }
-        myRef.child(task.getId()).setValue(task);
-        for (SubTask subTask : task.getSubTasks()) {
-            myRef = database.getReference("users").child(userId).child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR)).child(task.getId()).child("subTasks")
-                    .child(subTask.getId());
-            myRef.setValue(subTask);
-        }
+        FirebaseManager.getInstance().saveTask(task);
     }
 
     private boolean canComplete() {
@@ -242,9 +234,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("users").child(userId).child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR)).child(task.getId()).child("subTasks").child(subTask.getId());
-                myRef.setValue(null);
+                FirebaseManager.getInstance().deleteSubtask(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), subTask.getId());
                 task.getSubTasks().remove(subTask);
                 if (task.getSubTasks().size() == 0) {
                     shouldHoldUser = true;

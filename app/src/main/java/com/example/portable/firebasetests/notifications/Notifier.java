@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.Task;
 
 import java.util.Calendar;
@@ -16,11 +17,11 @@ import java.util.Calendar;
 
 public class Notifier {
 
-    public static void setAlarm(Task task, Context context) {
-        Intent notificationIntent = new Intent(context, NotificationsBroadcastReceiver.class);
+    public static void setAlarm(Task task) {
+        Intent notificationIntent = new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class);
         notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_TAG, task);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) task.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) task.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
@@ -35,8 +36,8 @@ public class Notifier {
     }
 
 
-    public static void removeAlarm(Context context, int requestCode) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(PendingIntent.getBroadcast(context, requestCode, new Intent(context, NotificationsBroadcastReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT));
+    public static void removeAlarm(int requestCode) {
+        AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(PendingIntent.getBroadcast(FireTasksApp.getInstance(), requestCode, new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT));
     }
 }
