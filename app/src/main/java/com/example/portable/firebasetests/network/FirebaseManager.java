@@ -5,11 +5,9 @@ import android.util.SparseArray;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.notifications.Notifier;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.lang.ref.Reference;
 import java.util.Calendar;
 
 /**

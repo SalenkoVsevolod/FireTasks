@@ -21,7 +21,7 @@
         <activity android:name=".ui.activities.TasksActivity" />
 
         <receiver
-            android:name=".notifications.NotificationsBroadcastReceiver"
+            android:name=".NotificationsBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
 

@@ -5,7 +5,7 @@ import android.widget.Toast;
 
 import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.notifications.Notifier;
+import com.example.portable.firebasetests.core.Notifier;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;

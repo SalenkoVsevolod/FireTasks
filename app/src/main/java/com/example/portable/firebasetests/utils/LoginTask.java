@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.async_tasks;
+package com.example.portable.firebasetests.utils;
 
 import android.app.Activity;
 import android.os.AsyncTask;

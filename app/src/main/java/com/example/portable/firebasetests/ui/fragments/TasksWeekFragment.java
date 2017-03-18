@@ -14,12 +14,11 @@ import android.widget.ProgressBar;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
 import com.example.portable.firebasetests.network.DataObserverTask;
 import com.example.portable.firebasetests.network.FirebaseManager;
-import com.example.portable.firebasetests.notifications.Notifier;
+import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
 import com.example.portable.firebasetests.ui.adapters.TasksExpandableAdapter;
 import com.example.portable.firebasetests.utils.TimeUtils;

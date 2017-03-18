@@ -32,7 +32,7 @@ import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
-import com.example.portable.firebasetests.notifications.Notifier;
+import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.ui.OnListItemClickListener;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
