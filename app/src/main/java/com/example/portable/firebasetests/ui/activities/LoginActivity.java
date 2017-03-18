@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -98,8 +99,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onLogin(int resultCode) {
                 if (resultCode == LoginTask.DONE) {
+                    Log.i("login", "everything is okay, starting next activity");
                     startTasksActivity();
                 } else {
+                    Log.i("login", "nope, it's not okay:C");
                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
                     setButtonVisibility(true);

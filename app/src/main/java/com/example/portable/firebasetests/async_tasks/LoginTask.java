@@ -3,6 +3,7 @@ package com.example.portable.firebasetests.async_tasks;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.portable.firebasetests.ui.activities.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,7 +33,6 @@ public class LoginTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-
         AuthCredential credential = GoogleAuthProvider.getCredential(tokenId, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
