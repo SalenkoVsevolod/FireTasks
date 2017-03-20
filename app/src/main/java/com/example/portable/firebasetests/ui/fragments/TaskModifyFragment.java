@@ -23,13 +23,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
+import com.example.portable.firebasetests.core.Notifier;
+import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.notifications.Notifier;
-import com.example.portable.firebasetests.ui.OnListItemClickListener;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -89,7 +88,7 @@ public class TaskModifyFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (task.getId() == null) {
-            task.setId(MySharedPreferences.readUserId(getActivity()) + "_task_" + System.currentTimeMillis());
+            task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         } else {
             descriptionEdit.setText(task.getDescription());
             if (task.isTimeSpecified()) {
@@ -174,18 +173,18 @@ public class TaskModifyFragment extends Fragment {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         DatabaseReference myRef = database.getReference("users")
-                .child(MySharedPreferences.readUserId(getActivity()))
+                .child(Preferences.getInstance().readUserId())
                 .child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR));
 
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
         if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
-            Notifier.removeAlarm(getActivity(), (int) task.getTimeStamp());
-            Notifier.setAlarm(task, getActivity());
+            Notifier.removeAlarm((int) task.getTimeStamp());
+            Notifier.setAlarm(task);
         }
         myRef.child(task.getId()).setValue(task);
         for (SubTask subTask : task.getSubTasks()) {
             myRef = database.getReference("users")
-                    .child(MySharedPreferences.readUserId(getActivity()))
+                    .child(Preferences.getInstance().readUserId())
                     .child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR))
                     .child(task.getId())
                     .child("subTasks")
@@ -224,7 +223,7 @@ public class TaskModifyFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference("users")
-                        .child(MySharedPreferences.readUserId(getActivity()))
+                        .child(Preferences.getInstance().readUserId())
                         .child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR))
                         .child(task.getId())
                         .child("subTasks")
@@ -260,15 +259,16 @@ public class TaskModifyFragment extends Fragment {
     }
 
     private void initSubtasksRecyclerView() {
-        final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks());
-        subTaskAdapter.setLongClickListener(new OnListItemClickListener() {
+        final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskClickListener() {
             @Override
-            public void onLongClick(int index) {
-                openSubtaskDeleteDialog(subTaskAdapter.getItem(index));
+            public void onClick(SubTask subTask) {
+                openSubtaskDeleteDialog(subTask);
             }
         });
         subTasksRecycleView.setAdapter(subTaskAdapter);
         subTasksRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
     }
+
+
 }

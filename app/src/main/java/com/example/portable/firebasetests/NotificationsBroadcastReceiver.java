@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.notifications;
+package com.example.portable.firebasetests;
 
 import android.app.Notification;
 import android.app.NotificationManager;

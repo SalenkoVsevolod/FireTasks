@@ -1,15 +1,13 @@
-package com.example.portable.firebasetests.async_tasks;
+package com.example.portable.firebasetests.network;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.notifications.Notifier;
+import com.example.portable.firebasetests.core.Notifier;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -23,17 +21,13 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     private DataChangingListener dataChangingListener;
-    private String id;
-    private Context context;
-    private DatabaseReference myRef;
     private ValueEventListener listener;
     private int week;
     private int currentYear;
 
-    public DataObserverTask(Context context, String id, int week) {
-        this.id = id;
-        this.context = context;
+    public DataObserverTask( int week, DataChangingListener listener) {
         this.week = week;
+        dataChangingListener = listener;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         currentYear = calendar.get(Calendar.YEAR);
@@ -41,7 +35,6 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        myRef = FirebaseDatabase.getInstance().getReference("users").child(id).child("" + week);
         listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -53,7 +46,7 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
                 ArrayList<Task> taskArrayList = getTasks(tasks);
                 for (Task t : taskArrayList) {
                     if (t.getCalendar().get(Calendar.YEAR) < currentYear) {
-                        deleteTask(t.getId());
+                        FirebaseManager.getInstance().deleteTask(week, t.getId());
                     }
                 }
                 publishProgress(taskArrayList);
@@ -61,10 +54,10 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                Toast.makeText(context, "connection cancelled", Toast.LENGTH_LONG).show();
+                Toast.makeText(FireTasksApp.getInstance(), "connection cancelled", Toast.LENGTH_LONG).show();
             }
         };
-        myRef.addValueEventListener(listener);
+        FirebaseManager.getInstance().getWeekReference(week).addValueEventListener(listener);
         return null;
     }
 
@@ -75,7 +68,7 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
             Task task = new Task((HashMap<String, Object>) map.get(key));
             task.setId(key);
             if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
-                Notifier.setAlarm(task, context);
+                Notifier.setAlarm(task);
             }
             res.add(task);
 
@@ -87,7 +80,7 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     @Override
     protected void onCancelled(Void aVoid) {
         super.onCancelled(aVoid);
-        myRef.removeEventListener(listener);
+        FirebaseManager.getInstance().getWeekReference(week).removeEventListener(listener);
     }
 
     @Override
@@ -96,14 +89,6 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
         dataChangingListener.onDataChanged(values[0]);
     }
 
-    public void setDataChangingListener(DataChangingListener dataChangingListener) {
-        this.dataChangingListener = dataChangingListener;
-    }
-
-    private void deleteTask(String taskId) {
-        myRef = FirebaseDatabase.getInstance().getReference("users").child(id).child("" + week).child(taskId);
-        myRef.setValue(null);
-    }
     public interface DataChangingListener {
         void onDataChanged(ArrayList<Task> tasks);
     }

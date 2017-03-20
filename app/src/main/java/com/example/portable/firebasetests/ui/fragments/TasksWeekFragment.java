@@ -13,17 +13,15 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
-import com.example.portable.firebasetests.MySharedPreferences;
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.utils.TimeUtils;
-import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
-import com.example.portable.firebasetests.ui.adapters.TasksExpandableAdapter;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
-import com.example.portable.firebasetests.notifications.Notifier;
-import com.example.portable.firebasetests.async_tasks.DataObserverTask;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.example.portable.firebasetests.network.DataObserverTask;
+import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.core.Notifier;
+import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
+import com.example.portable.firebasetests.ui.adapters.TasksExpandableAdapter;
+import com.example.portable.firebasetests.utils.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,9 +32,7 @@ import static android.R.string.ok;
 
 public class TasksWeekFragment extends Fragment {
     private static final String WEEK_ARG = "week";
-    private String userId;
     private ProgressBar progressBar;
-    private DataObserverTask dataObserverTask;
     private RecyclerView expandableListView;
     private int weekOfYear;
 
@@ -98,9 +94,7 @@ public class TasksWeekFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        userId = MySharedPreferences.readUserId(getActivity());
-        dataObserverTask = new DataObserverTask(getActivity(), userId, weekOfYear);
-        dataObserverTask.setDataChangingListener(new DataObserverTask.DataChangingListener() {
+        DataObserverTask.DataChangingListener listener = new DataObserverTask.DataChangingListener() {
 
             @Override
             public void onDataChanged(ArrayList<Task> tasks) {
@@ -111,16 +105,14 @@ public class TasksWeekFragment extends Fragment {
                 showList();
 
             }
-        });
-        dataObserverTask.execute();
+        };
+        FirebaseManager.getInstance().setWeekListener(weekOfYear, listener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (dataObserverTask != null) {
-            dataObserverTask.cancel(true);
-        }
+        FirebaseManager.getInstance().removeWeekListener(weekOfYear);
     }
 
 
@@ -143,10 +135,8 @@ public class TasksWeekFragment extends Fragment {
         builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Notifier.removeAlarm(getActivity(), (int) task.getTimeStamp());
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("users").child(userId).child(weekOfYear + "").child(task.getId());
-                myRef.setValue(null);
+                Notifier.removeAlarm((int) task.getTimeStamp());
+                FirebaseManager.getInstance().deleteTask(weekOfYear, task.getId());
             }
         });
         builder.setNegativeButton(cancel, null);

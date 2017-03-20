@@ -5,10 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.ui.OnListItemClickListener;
 import com.example.portable.firebasetests.model.SubTask;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -18,22 +22,28 @@ import java.util.ArrayList;
 
 public class SubTaskAdapter extends RecyclerView.Adapter<SubTaskAdapter.ViewHolder> {
     private ArrayList<SubTask> subTasks;
-    private OnListItemClickListener longClickListener;
+    private OnSubTaskClickListener subTaskClickListener;
+    private OnSubTaskCheckBoxCliCkListener subTaskCheckBoxCliCkListener;
 
     public SubTaskAdapter(ArrayList<SubTask> subTasks) {
         this.subTasks = subTasks;
+
+    }
+
+    public SubTaskAdapter(ArrayList<SubTask> subTasks, OnSubTaskClickListener subTaskClickListener) {
+        this(subTasks);
+        this.subTaskClickListener = subTaskClickListener;
+    }
+
+    public SubTaskAdapter(ArrayList<SubTask> subTasks, OnSubTaskCheckBoxCliCkListener onSubTaskCheckBoxCliCkListener) {
+        this(subTasks);
+        this.subTaskCheckBoxCliCkListener = onSubTaskCheckBoxCliCkListener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_subtasks_list, parent, false);
-        OnSubTaskClickListener listener = new OnSubTaskClickListener() {
-            @Override
-            public void onClick(int index, SubTask subTask) {
-                subTasks.get(index).setDone(subTask.isDone());
-            }
-        };
-        return new ViewHolder(view, listener, longClickListener);
+        return subTaskClickListener == null ? new ViewHolder(view, subTaskCheckBoxCliCkListener) : new ViewHolder(view, subTaskClickListener);
     }
 
     @Override
@@ -48,38 +58,53 @@ public class SubTaskAdapter extends RecyclerView.Adapter<SubTaskAdapter.ViewHold
         return subTasks.size();
     }
 
-    public void setLongClickListener(OnListItemClickListener longClickListener) {
-        this.longClickListener = longClickListener;
-    }
 
     public SubTask getItem(int index) {
         return subTasks.get(index);
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public int index;
         public CheckBox checkBox;
+        public TextView textView;
 
-        public ViewHolder(View rootView, final OnSubTaskClickListener onSubTaskClickListener, final OnListItemClickListener onMyItemLongClickListener) {
+        private ViewHolder(View rootView) {
             super(rootView);
-            checkBox = (CheckBox) rootView.findViewById(R.id.itemSubTaskCheckbox);
-            checkBox.setOnClickListener(new View.OnClickListener() {
+            checkBox = (CheckBox) rootView.findViewById(R.id.subtask_checkbox);
+            textView = (TextView) rootView.findViewById(R.id.subtask_tv);
+        }
+
+        public ViewHolder(View rootView, final OnSubTaskClickListener subTaskClickListener) {
+            this(rootView);
+            rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onSubTaskClickListener.onClick(index, subTasks.get(getAdapterPosition()));
+                    subTaskClickListener.onClick(subTasks.get(getAdapterPosition()));
                 }
             });
-            checkBox.setOnLongClickListener(new View.OnLongClickListener() {
+            checkBox.setVisibility(View.GONE);
+            textView.setVisibility(View.VISIBLE);
+        }
+
+        public ViewHolder(View rootView, final OnSubTaskCheckBoxCliCkListener listener) {
+            this(rootView);
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public boolean onLongClick(View v) {
-                    onMyItemLongClickListener.onLongClick(index);
-                    return false;
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    listener.onClick(subTasks.get(getAdapterPosition()), isChecked);
                 }
             });
+            checkBox.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.GONE);
         }
     }
 
     public interface OnSubTaskClickListener {
-        void onClick(int index, SubTask subTask);
+        void onClick(SubTask subTask);
+    }
+
+    public interface OnSubTaskCheckBoxCliCkListener {
+        void onClick(SubTask subTask, boolean checked);
     }
 }

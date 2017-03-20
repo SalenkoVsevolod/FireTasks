@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.MySharedPreferences;
+import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.utils.StringUtils;
 import com.example.portable.firebasetests.ui.adapters.WeeksPagerAdapter;
@@ -106,7 +106,7 @@ public class TasksActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_items, menu);
+        getMenuInflater().inflate(R.menu.weeks_toolbar, menu);
         return true;
     }
 
@@ -138,7 +138,7 @@ public class TasksActivity extends AppCompatActivity {
     @SuppressWarnings("all")
     private void logout() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(MySharedPreferences.readUserId(this))
+                .requestIdToken(Preferences.getInstance().readUserId())
                 .requestEmail()
                 .build();
         final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -155,7 +155,7 @@ public class TasksActivity extends AppCompatActivity {
                         @Override
                         public void onResult(@NonNull Status status) {
                             if (status.isSuccess()) {
-                                MySharedPreferences.logout(TasksActivity.this);
+                                Preferences.getInstance().logout();
                                 startActivity(new Intent(TasksActivity.this, LoginActivity.class));
                                 finish();
                             }
