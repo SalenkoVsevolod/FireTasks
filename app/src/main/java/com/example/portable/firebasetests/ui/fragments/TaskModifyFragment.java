@@ -29,10 +29,9 @@ import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseManager;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
 
@@ -40,6 +39,7 @@ import static android.R.string.cancel;
 import static android.R.string.ok;
 
 public class TaskModifyFragment extends Fragment {
+    public static final String TASK_MODIFY_TAG = "modify";
     private static final String TASK_ARG = "task";
     private EditText descriptionEdit;
     private Button okButton, addSubTaskButton;
@@ -87,9 +87,7 @@ public class TaskModifyFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (task.getId() == null) {
-            task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
-        } else {
+        if (task.getId() != null) {
             descriptionEdit.setText(task.getDescription());
             if (task.isTimeSpecified()) {
                 timeTextView.setText(task.getTimeString());
@@ -170,29 +168,15 @@ public class TaskModifyFragment extends Fragment {
     }
 
     private void saveTask() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-        DatabaseReference myRef = database.getReference("users")
-                .child(Preferences.getInstance().readUserId())
-                .child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR));
-
+        task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
         if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
             Notifier.removeAlarm((int) task.getTimeStamp());
             Notifier.setAlarm(task);
         }
-        myRef.child(task.getId()).setValue(task);
-        for (SubTask subTask : task.getSubTasks()) {
-            myRef = database.getReference("users")
-                    .child(Preferences.getInstance().readUserId())
-                    .child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR))
-                    .child(task.getId())
-                    .child("subTasks")
-                    .child(subTask.getId());
-
-            myRef.setValue(subTask);
-        }
+        FirebaseManager.getInstance().saveTask(task);
     }
+
 
     private void openAddSubTaskDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -206,7 +190,7 @@ public class TaskModifyFragment extends Fragment {
                     SubTask subtask = new SubTask(editText.getText().toString());
                     subtask.setId(task.getId() + "_subtask_" + System.currentTimeMillis());
                     task.getSubTasks().add(subtask);
-                    subTasksRecycleView.getAdapter().notifyDataSetChanged();
+                    subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(subtask));
                 }
             }
         });
@@ -221,17 +205,10 @@ public class TaskModifyFragment extends Fragment {
         builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("users")
-                        .child(Preferences.getInstance().readUserId())
-                        .child("" + task.getCalendar().get(Calendar.WEEK_OF_YEAR))
-                        .child(task.getId())
-                        .child("subTasks")
-                        .child(subTask.getId());
-
-                myRef.setValue(null);
+                FirebaseManager.getInstance().deleteSubtask(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), subTask.getId());
+                int pos = task.getSubTasks().indexOf(subTask);
                 task.getSubTasks().remove(subTask);
-                subTasksRecycleView.getAdapter().notifyDataSetChanged();
+                subTasksRecycleView.getAdapter().notifyItemRemoved(pos);
             }
         });
         builder.setCancelable(true);
@@ -259,7 +236,7 @@ public class TaskModifyFragment extends Fragment {
     }
 
     private void initSubtasksRecyclerView() {
-        final SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskClickListener() {
+        SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskClickListener() {
             @Override
             public void onClick(SubTask subTask) {
                 openSubtaskDeleteDialog(subTask);
@@ -267,8 +244,5 @@ public class TaskModifyFragment extends Fragment {
         });
         subTasksRecycleView.setAdapter(subTaskAdapter);
         subTasksRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
     }
-
-
 }

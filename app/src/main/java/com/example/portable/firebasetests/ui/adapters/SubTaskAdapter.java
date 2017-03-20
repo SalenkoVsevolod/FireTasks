@@ -9,10 +9,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.ui.OnListItemClickListener;
 import com.example.portable.firebasetests.model.SubTask;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -25,7 +22,7 @@ public class SubTaskAdapter extends RecyclerView.Adapter<SubTaskAdapter.ViewHold
     private OnSubTaskClickListener subTaskClickListener;
     private OnSubTaskCheckBoxCliCkListener subTaskCheckBoxCliCkListener;
 
-    public SubTaskAdapter(ArrayList<SubTask> subTasks) {
+    private SubTaskAdapter(ArrayList<SubTask> subTasks) {
         this.subTasks = subTasks;
 
     }
@@ -51,18 +48,13 @@ public class SubTaskAdapter extends RecyclerView.Adapter<SubTaskAdapter.ViewHold
         holder.index = holder.getAdapterPosition();
         holder.checkBox.setText(subTasks.get(position).getDescription());
         holder.checkBox.setChecked(subTasks.get(position).isDone());
+        holder.textView.setText(subTasks.get(position).getDescription());
     }
 
     @Override
     public int getItemCount() {
         return subTasks.size();
     }
-
-
-    public SubTask getItem(int index) {
-        return subTasks.get(index);
-    }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public int index;

@@ -1,5 +1,6 @@
 package com.example.portable.firebasetests.ui.activities;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 
 import com.example.portable.firebasetests.R;
@@ -15,7 +16,7 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.ui.fragments.TaskDisplayFragment;
 import com.example.portable.firebasetests.ui.fragments.TaskModifyFragment;
 
-public class TaskCreateActivity extends AppCompatActivity {
+public class TaskCreateActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String TASK_ARG = "task";
     private Task task;
 
@@ -32,32 +33,55 @@ public class TaskCreateActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitle(getString(R.string.app_name));
         toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.titleText));
+        findViewById(R.id.edit_item).setOnClickListener(this);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (task.getId() != null) {
-            getFragmentManager().beginTransaction().replace(R.id.task_fragment_container, TaskDisplayFragment.newInstance(task)).commit();
-            findViewById(R.id.edit_item).setVisibility(View.VISIBLE);
+        if (savedInstanceState != null) {
+            resumeFragment();
+        } else if (task.getId() == null) {
+            putModifyFragment(null);
         } else {
-            getFragmentManager().beginTransaction().replace(R.id.task_fragment_container, TaskModifyFragment.newInstance(task)).commit();
-            findViewById(R.id.edit_item).setVisibility(View.GONE);
+            putDisplayFragment(null);
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
+    private void putDisplayFragment(Fragment fragment) {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.task_fragment_container, fragment == null ? TaskDisplayFragment.newInstance(task) : fragment, TaskDisplayFragment.TASK_DISPLAY_TAG)
+                .commit();
+        findViewById(R.id.edit_item).setVisibility(View.VISIBLE);
+    }
+
+    private void putModifyFragment(Fragment fragment) {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.task_fragment_container, fragment == null ? TaskModifyFragment.newInstance(task) : fragment, TaskModifyFragment.TASK_MODIFY_TAG)
+                .commit();
+        findViewById(R.id.edit_item).setVisibility(View.GONE);
+    }
+
+    private void resumeFragment() {
+        Fragment fragment;
+        if ((fragment = getFragmentManager().findFragmentByTag(TaskModifyFragment.TASK_MODIFY_TAG)) != null) {
+            putModifyFragment(fragment);
+        } else if ((fragment = getFragmentManager().findFragmentByTag(TaskDisplayFragment.TASK_DISPLAY_TAG)) != null) {
+            putDisplayFragment(fragment);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    //TODO move all listeners here
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.edit_item:
+                putModifyFragment(null);
+                break;
+        }
     }
 }

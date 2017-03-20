@@ -29,7 +29,7 @@ public class FirebaseManager {
         return instance;
     }
 
-    public DatabaseReference getWeekReference(int week) {
+    DatabaseReference getWeekReference(int week) {
         return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("" + week);
     }
 
@@ -59,5 +59,9 @@ public class FirebaseManager {
                     .child(subTask.getId());
             ref.setValue(subTask);
         }
+    }
+
+    public void setSubTaskDone(int week, String taskId, SubTask subTask) {
+        getWeekReference(week).child(taskId).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
     }
 }

@@ -1,8 +1,8 @@
 package com.example.portable.firebasetests.ui.fragments;
 
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,9 +16,13 @@ import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseManager;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 
+import java.util.Calendar;
+
 public class TaskDisplayFragment extends Fragment {
+    public static final String TASK_DISPLAY_TAG = "display";
     private TextView description, tag, time;
     private static final String TASK_ARG = "task";
     private CardView tagCardView;
@@ -56,6 +60,7 @@ public class TaskDisplayFragment extends Fragment {
             @Override
             public void onClick(SubTask subTask, boolean checked) {
                 subTask.setDone(checked);
+                FirebaseManager.getInstance().setSubTaskDone(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), subTask);
             }
         });
         subtasksRecyclerView.setAdapter(adapter);
