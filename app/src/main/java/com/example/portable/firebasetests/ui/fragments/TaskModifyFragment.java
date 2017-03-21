@@ -41,7 +41,7 @@ import static android.R.string.ok;
 public class TaskModifyFragment extends Fragment {
     public static final String TASK_MODIFY_TAG = "modify";
     private static final String TASK_ARG = "task";
-    private EditText descriptionEdit;
+    private EditText descriptionEdit, nameEdit;
     private Button okButton, addSubTaskButton;
     private TextView timeTextView;
     private Spinner tagSpinner;
@@ -73,6 +73,7 @@ public class TaskModifyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_task_modify, container, false);
+        nameEdit = (EditText) rootView.findViewById(R.id.nameET);
         descriptionEdit = (EditText) rootView.findViewById(R.id.taskDescriptionEdit);
         tagSpinner = (Spinner) rootView.findViewById(R.id.tagSpinner);
         timeTextView = (TextView) rootView.findViewById(R.id.timeTextView);
@@ -89,6 +90,7 @@ public class TaskModifyFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         if (task.getId() != null) {
             descriptionEdit.setText(task.getDescription());
+            nameEdit.setText(task.getName());
             if (task.isTimeSpecified()) {
                 timeTextView.setText(task.getTimeString());
             }
@@ -99,6 +101,7 @@ public class TaskModifyFragment extends Fragment {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                task.setName(nameEdit.getText().toString());
                 task.setDescription(descriptionEdit.getText().toString());
                 if (canComplete()) {
                     saveTask();
@@ -188,7 +191,7 @@ public class TaskModifyFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 if (editText.getText().toString().length() > 0) {
                     SubTask subtask = new SubTask(editText.getText().toString());
-                    subtask.setId(task.getId() + "_subtask_" + System.currentTimeMillis());
+                    subtask.setId("" + System.currentTimeMillis());
                     task.getSubTasks().add(subtask);
                     subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(subtask));
                 }
@@ -223,6 +226,10 @@ public class TaskModifyFragment extends Fragment {
     }
 
     private boolean canComplete() {
+        if (task.getName().length() == 0) {
+            showErrorToast("name");
+            return false;
+        }
         if (task.getDescription().length() == 0) {
             showErrorToast("description");
             return false;

@@ -15,9 +15,9 @@ import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
-import com.example.portable.firebasetests.ui.fragments.TasksWeekFragment;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
+import com.example.portable.firebasetests.ui.fragments.TasksWeekFragment;
 
 import java.util.List;
 
@@ -84,7 +84,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
     public void onBindChildViewHolder(TaskChildViewHolder childViewHolder, final int i, Object o) {
         final Task task = (Task) o;
         childViewHolder.taskCardView.setCardBackgroundColor(getTaskColor(task));
-        childViewHolder.description.setText(task.getDescription());
+        childViewHolder.name.setText(task.getName());
         childViewHolder.time.setText(task.isTimeSpecified() ? task.getTimeString() : "");
         childViewHolder.tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
         childViewHolder.tagCardView.setCardBackgroundColor(TagsColors.getTags().get((int) task.getTagIndex()).getColor());
@@ -140,15 +140,19 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
         this.onTaskLongClickListener = onTaskLongClickListener;
     }
 
+    public interface OnTaskClickListener {
+        void onClick(Task task);
+    }
+
     public class TaskChildViewHolder extends ChildViewHolder {
         public CardView taskCardView, tagCardView;
-        public TextView description, time, tag;
+        public TextView name, time, tag;
 
         public TaskChildViewHolder(View itemView) {
             super(itemView);
             taskCardView = (CardView) itemView.findViewById(R.id.ItemTaskCardView);
             tagCardView = (CardView) itemView.findViewById(R.id.itemTaskTagCardView);
-            description = (TextView) itemView.findViewById(R.id.itemTaskDescriptionView);
+            name = (TextView) itemView.findViewById(R.id.itemTaskDescriptionView);
             time = (TextView) itemView.findViewById(R.id.itemTaskTimeView);
             tag = (TextView) itemView.findViewById(R.id.itemTaskTagTextView);
         }
@@ -167,9 +171,5 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
             dateNameTextView = (TextView) itemView.findViewById(R.id.groupDateTextView);
             plusImageView = (ImageView) itemView.findViewById(R.id.groupTasksImageView);
         }
-    }
-
-    public interface OnTaskClickListener {
-        void onClick(Task task);
     }
 }

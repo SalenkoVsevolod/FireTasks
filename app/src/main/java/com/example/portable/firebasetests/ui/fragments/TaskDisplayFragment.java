@@ -23,8 +23,8 @@ import java.util.Calendar;
 
 public class TaskDisplayFragment extends Fragment {
     public static final String TASK_DISPLAY_TAG = "display";
-    private TextView description, tag, time;
     private static final String TASK_ARG = "task";
+    private TextView name, description, tag, time;
     private CardView tagCardView;
     private Task task;
     private RecyclerView subtasksRecyclerView;
@@ -52,6 +52,7 @@ public class TaskDisplayFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        name.setText(task.getName());
         description.setText(task.getDescription());
         time.setText(task.getTimeString());
         tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
@@ -71,6 +72,7 @@ public class TaskDisplayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_task_display, container, false);
+        name = (TextView) rootView.findViewById(R.id.name_tv);
         description = (TextView) rootView.findViewById(R.id.description_display);
         subtasksRecyclerView = (RecyclerView) rootView.findViewById(R.id.subTasksRecyclerView);
         time = (TextView) rootView.findViewById(R.id.timeTextView);

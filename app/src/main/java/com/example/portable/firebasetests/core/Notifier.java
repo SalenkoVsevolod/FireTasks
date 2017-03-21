@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
+import com.example.portable.firebasetests.model.Task;
 
 import java.util.Calendar;
 
@@ -24,7 +24,6 @@ public class Notifier {
         AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
         calendar.setTimeInMillis(task.getTimeStamp());
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);

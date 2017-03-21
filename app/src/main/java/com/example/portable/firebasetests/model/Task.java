@@ -16,7 +16,7 @@ import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class Task implements Serializable {
-    private String description;
+    private String name, description;
     private boolean timeSpecified;
     private ArrayList<SubTask> subTasks;
     private String id;
@@ -25,12 +25,14 @@ public class Task implements Serializable {
 
     public Task() {
         description = "";
+        name = "";
         subTasks = new ArrayList<>();
         calendar = Calendar.getInstance();
     }
 
     public Task(HashMap<String, Object> map) {
         this();
+        name = (String) map.get("name");
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
         timeSpecified = (boolean) map.get("timeSpecified");
@@ -122,5 +124,13 @@ public class Task implements Serializable {
 
     public void setTagIndex(int tagIndex) {
         this.tagIndex = tagIndex;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
