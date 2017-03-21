@@ -171,7 +171,9 @@ public class TaskModifyFragment extends Fragment {
     }
 
     private void saveTask() {
-        task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
+        if (task.getId() == null) {
+            task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
+        }
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
         if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
             Notifier.removeAlarm((int) task.getTimeStamp());
