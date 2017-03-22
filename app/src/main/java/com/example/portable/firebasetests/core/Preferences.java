@@ -2,6 +2,7 @@ package com.example.portable.firebasetests.core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
@@ -9,8 +10,8 @@ import android.util.Log;
  */
 
 public class Preferences {
+    private static final String PREFERENCES = "prefs", USER_ID = "userId", LAST_RINGTONE = "ringtone";
     private static Preferences instance;
-    private static final String PREFERENCES = "prefs", USER_ID = "userId";
     private SharedPreferences preferences;
 
     private Preferences() {
@@ -38,6 +39,17 @@ public class Preferences {
     public void logout() {
         SharedPreferences.Editor ed = preferences.edit();
         ed.remove(USER_ID);
+        ed.apply();
+    }
+
+    @Nullable
+    public String readLastRingtone() {
+        return preferences.getString(LAST_RINGTONE, null);
+    }
+
+    public void writeLastRingtone(String ringtone) {
+        SharedPreferences.Editor ed = preferences.edit();
+        ed.putString(LAST_RINGTONE, ringtone);
         ed.apply();
     }
 
