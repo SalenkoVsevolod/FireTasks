@@ -13,15 +13,17 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -50,9 +52,11 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
     private Button okButton, addSubTaskButton;
     private Spinner tagSpinner;
     private RecyclerView subTasksRecycleView, remindersRecyclerView;
+    private CheckBox vibro;
     private Task task;
-    private ImageView addReminder;
-    private ArrayList<Remind> reminds;
+    private TimePicker reminderTime;
+    private TextView soundTV;
+    private Uri sound;
 
     public TaskModifyFragment() {
         // Required empty public constructor
@@ -85,7 +89,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         subTasksRecycleView = (RecyclerView) rootView.findViewById(R.id.subTasksRecyclerView);
         addSubTaskButton = (Button) rootView.findViewById(R.id.addSubTaskButton);
         remindersRecyclerView = (RecyclerView) rootView.findViewById(R.id.reminder_recycler);
-        addReminder = (ImageView) rootView.findViewById(R.id.add_reminder_imv);
+        rootView.findViewById(R.id.add_reminder_imv).setOnClickListener(this);
         configViewsForClosingKeyBord(rootView);
         return rootView;
     }
@@ -94,9 +98,6 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        reminds = new ArrayList<>();
-       /* reminds.add(new Remind(14, 88));
-        reminds.add(new Remind(4, 20));*/
         if (task.getId() != null) {
             descriptionEdit.setText(task.getDescription());
             nameEdit.setText(task.getName());
@@ -121,7 +122,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 openAddSubTaskDialog();
             }
         });
-        remindersRecyclerView.setAdapter(new ReminderAdapter(reminds));
+        remindersRecyclerView.setAdapter(new ReminderAdapter(task.getReminds()));
         remindersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -152,34 +153,16 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    private void showTimePickerDialog() {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                calendar.setTimeInMillis(task.getTimeStamp());
-                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                calendar.set(Calendar.MINUTE, minute);
-                task.setTimeStamp(calendar.getTimeInMillis());
-                task.setTimeSpecified();
-            }
-        };
-        calendar.setTimeInMillis(task.getTimeStamp());
-        new TimePickerDialog(getActivity(), listener,
-                calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
-    }
 
     private void saveTask() {
         if (task.getId() == null) {
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
-        if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
-            Notifier.removeAlarm((int) task.getTimeStamp());
-            Notifier.setAlarm(task);
-        }
+            Notifier.setAlarms(task);
+
         FirebaseManager.getInstance().saveTask(task);
+
     }
 
 
@@ -259,7 +242,50 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.add_reminder_imv:
+                showReminderAddDialog();
+                break;
+            case R.id.sound_tv:
+                chooseSound();
+                break;
         }
+    }
+
+    private void showReminderAddDialog() {
+        final Remind remind = new Remind();
+        remind.setTimeStamp(task.getTimeStamp());
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.reminder_add, null);
+        soundTV = (TextView) view.findViewById(R.id.sound_tv);
+        soundTV.setOnClickListener(this);
+        reminderTime = (TimePicker) view.findViewById(R.id.reminder_time_picker);
+        reminderTime.setIs24HourView(true);
+        reminderTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker timePicker, int i, int i1) {
+                remind.getCalendar().set(Calendar.HOUR_OF_DAY, i);
+                remind.getCalendar().set(Calendar.MINUTE, i1);
+            }
+        });
+
+        vibro = (CheckBox) view.findViewById(R.id.reminder_vibro);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(view);
+        builder.setCancelable(true);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d("rem", task.getReminds().toString());
+            if(sound!=null)
+                remind.setSound(sound.toString());
+                remind.setVibro(vibro.isChecked());
+                task.getReminds().add(remind);
+                remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
+            }
+        });
+        builder.setNegativeButton(cancel, null);
+        builder.show();
     }
 
     private void chooseSound() {
@@ -273,13 +299,16 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         this.startActivityForResult(intent, 5);
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == 5) {
             Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             if (uri != null) {
-                Preferences.getInstance().writeLastRingtone(uri.toString());
+                sound = uri;
+                soundTV.setText(RingtoneManager.getRingtone(getActivity(), sound).getTitle(getActivity()));
+                // Preferences.getInstance().writeLastRingtone(uri.toString());
                 // soundTextView.setText(RingtoneManager.getRingtone(getActivity(), uri).getTitle(getActivity()));
             }
         }

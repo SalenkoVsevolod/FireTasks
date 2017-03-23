@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
+import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Task;
 
 import java.util.Calendar;
@@ -17,21 +18,23 @@ import java.util.Calendar;
 
 public class Notifier {
 
-    public static void setAlarm(Task task) {
+    public static void setAlarms(Task task) {
         Intent notificationIntent = new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class);
         notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_TAG, task);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) task.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(task.getTimeStamp());
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        for (int i = 0; i < task.getReminds().size(); i++) {
+            if (task.getReminds().get(i).getTimeStamp() > System.currentTimeMillis()) {
+                task.getReminds().get(i).round();
+                notificationIntent.putExtra(NotificationsBroadcastReceiver.INDEX, i);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) task.getReminds().get(i).getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).getTimeStamp(), pendingIntent);
+                } else {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).getTimeStamp(), pendingIntent);
+                }
+            }
         }
+
     }
 
 

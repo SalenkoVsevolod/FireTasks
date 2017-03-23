@@ -3,60 +3,38 @@ package com.example.portable.firebasetests.model;
 import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
+import java.util.Calendar;
 import java.util.HashMap;
 
 /**
  * Created by Salenko Vsevolod on 21.03.2017.
  */
 
-public class Remind {
-    private String id;
-    private int hour, minute;
+public class Remind implements Serializable {
+
     private String sound;
     private boolean vibro;
+    private Calendar calendar;
 
     public Remind() {
         sound = "";
-    }
-
-    public Remind(int hour, int minute) {
-        this.hour = hour;
-        this.minute = minute;
+        calendar = Calendar.getInstance();
     }
 
     public Remind(HashMap<String, Object> map) {
         this();
-        //TODO add time here
-        sound = (String) map.get("sound");
+        calendar.setTimeInMillis((long) map.get("timeStamp"));
         vibro = (boolean) map.get("vibro");
 
     }
 
+
+    public long getTimeStamp() {
+        return calendar.getTimeInMillis();
+    }
+
     @Exclude
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public int getHour() {
-        return hour;
-    }
-
-    public void setHour(int hour) {
-        this.hour = hour;
-    }
-
-    public int getMinute() {
-        return minute;
-    }
-
-    public void setMinute(int minute) {
-        this.minute = minute;
-    }
-
     public String getSound() {
         return sound;
     }
@@ -73,8 +51,23 @@ public class Remind {
         this.vibro = vibro;
     }
 
+    public void setTimeStamp(long timeStamp) {
+        calendar.setTimeInMillis(timeStamp);
+    }
+
+    @Exclude
+    public Calendar getCalendar() {
+        return calendar;
+    }
+
+    @Exclude
     @Override
     public String toString() {
-        return StringUtils.formatNumber(hour) + ":" + StringUtils.formatNumber(minute);
+        return StringUtils.formatNumber(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + StringUtils.formatNumber(calendar.get(Calendar.MINUTE));
+    }
+
+    public void round() {
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
     }
 }

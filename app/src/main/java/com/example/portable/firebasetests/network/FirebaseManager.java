@@ -3,6 +3,7 @@ package com.example.portable.firebasetests.network;
 import android.util.SparseArray;
 
 import com.example.portable.firebasetests.core.Preferences;
+import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -54,11 +55,15 @@ public class FirebaseManager {
     public void saveTask(Task task) {
         int week = task.getCalendar().get(Calendar.WEEK_OF_YEAR);
         getWeekReference(week).child(task.getId()).setValue(task);
+        for (Remind r : task.getReminds()) {
+            getWeekReference(week).child(task.getId()).child("reminds").child("" + r.getTimeStamp()).setValue("" + r.isVibro());
+        }
         for (SubTask subTask : task.getSubTasks()) {
             DatabaseReference ref = getWeekReference(week).child(task.getId()).child("subTasks")
                     .child(subTask.getId());
             ref.setValue(subTask);
         }
+
     }
 
     public void setSubTaskDone(int week, String taskId, SubTask subTask) {

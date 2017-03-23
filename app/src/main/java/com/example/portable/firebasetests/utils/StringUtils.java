@@ -6,6 +6,8 @@ import android.provider.OpenableColumns;
 
 import com.example.portable.firebasetests.core.FireTasksApp;
 
+import java.util.Calendar;
+
 /**
  * Created by Salenko Vsevolod on 15.02.2017.
  */
@@ -47,5 +49,9 @@ public class StringUtils {
             result = result.substring(0, result.lastIndexOf("."));
         }
         return result;
+    }
+
+    public String getTimeString(int hour, int minute) {
+        return formatNumber(hour) + ":" + formatNumber(minute);
     }
 }

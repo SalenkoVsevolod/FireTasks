@@ -85,7 +85,6 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
         final Task task = (Task) o;
         childViewHolder.taskCardView.setCardBackgroundColor(getTaskColor(task));
         childViewHolder.name.setText(task.getName());
-        childViewHolder.time.setText(task.isTimeSpecified() ? task.getTimeString() : "");
         childViewHolder.tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
         childViewHolder.tagCardView.setCardBackgroundColor(TagsColors.getTags().get((int) task.getTagIndex()).getColor());
         childViewHolder.taskCardView.setOnClickListener(new View.OnClickListener() {
@@ -146,14 +145,13 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
 
     public class TaskChildViewHolder extends ChildViewHolder {
         public CardView taskCardView, tagCardView;
-        public TextView name, time, tag;
+        public TextView name, tag;
 
         public TaskChildViewHolder(View itemView) {
             super(itemView);
             taskCardView = (CardView) itemView.findViewById(R.id.ItemTaskCardView);
             tagCardView = (CardView) itemView.findViewById(R.id.itemTaskTagCardView);
             name = (TextView) itemView.findViewById(R.id.itemTaskDescriptionView);
-            time = (TextView) itemView.findViewById(R.id.itemTaskTimeView);
             tag = (TextView) itemView.findViewById(R.id.itemTaskTagTextView);
         }
     }

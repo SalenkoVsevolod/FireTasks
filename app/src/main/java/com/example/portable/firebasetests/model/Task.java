@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -17,15 +18,16 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class Task implements Serializable {
     private String name, description;
-    private boolean timeSpecified;
     private ArrayList<SubTask> subTasks;
     private String id;
     private long tagIndex;
     private Calendar calendar;
+    private ArrayList<Remind> reminds;
 
     public Task() {
         description = "";
         name = "";
+        reminds = new ArrayList<>();
         subTasks = new ArrayList<>();
         calendar = Calendar.getInstance();
     }
@@ -35,9 +37,9 @@ public class Task implements Serializable {
         name = (String) map.get("name");
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
-        timeSpecified = (boolean) map.get("timeSpecified");
         tagIndex = (long) map.get("tagIndex");
         subTasks = getSubTasks((HashMap<String, Object>) map.get("subTasks"));
+        reminds = getReminders((HashMap<String, Object>) map.get("reminds"));
     }
 
     private ArrayList<SubTask> getSubTasks(HashMap<String, Object> map) {
@@ -52,6 +54,21 @@ public class Task implements Serializable {
             subTasks.add(subTask);
         }
         return subTasks;
+    }
+
+    private ArrayList<Remind> getReminders(HashMap<String, Object> map) {
+        if (map == null) {
+            map = new HashMap<>();
+        }
+        ArrayList<Remind> res = new ArrayList<>();
+        Set<String> keys = map.keySet();
+        for (String key : keys) {
+            Remind remind = new Remind();
+            remind.setTimeStamp(Long.parseLong(key));
+            remind.setVibro(Boolean.parseBoolean(map.get(key).toString()));
+            res.add(remind);
+        }
+        return res;
     }
 
     @Exclude
@@ -92,20 +109,9 @@ public class Task implements Serializable {
         return StringUtils.formatNumber(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + StringUtils.formatNumber(calendar.get(Calendar.MINUTE));
     }
 
-    public boolean isTimeSpecified() {
-        return timeSpecified;
-    }
-
-    public void setTimeSpecified() {
-        this.timeSpecified = true;
-    }
 
     public long getTimeStamp() {
         return calendar.getTimeInMillis();
-    }
-
-    public void setTimeStamp(long timeStamp) {
-        calendar.setTimeInMillis(timeStamp);
     }
 
     @Exclude
@@ -132,5 +138,14 @@ public class Task implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Exclude
+    public ArrayList<Remind> getReminds() {
+        return reminds;
+    }
+
+    public void setReminds(ArrayList<Remind> reminds) {
+        this.reminds = reminds;
     }
 }

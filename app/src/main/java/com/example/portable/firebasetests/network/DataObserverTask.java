@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.core.FireTasksApp;
+import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.core.Notifier;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +26,7 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     private int week;
     private int currentYear;
 
-    public DataObserverTask( int week, DataChangingListener listener) {
+    public DataObserverTask(int week, DataChangingListener listener) {
         this.week = week;
         dataChangingListener = listener;
         Calendar calendar = Calendar.getInstance();
@@ -67,8 +68,10 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
         for (String key : keys) {
             Task task = new Task((HashMap<String, Object>) map.get(key));
             task.setId(key);
-            if (task.isTimeSpecified() && task.getTimeStamp() > System.currentTimeMillis()) {
-                Notifier.setAlarm(task);
+            for (int i = 0; i < task.getReminds().size(); i++) {
+                if (task.getReminds().get(i).getTimeStamp() > System.currentTimeMillis()) {
+                    Notifier.setAlarms(task);
+                }
             }
             res.add(task);
 
