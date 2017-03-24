@@ -6,11 +6,29 @@
     tools:context="com.example.portable.firebasetests.ui.fragments.TaskDisplayFragment">
 
     <TextView
+        android:id="@id/name_n_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nameN" />
+
+    <TextView
+        android:id="@id/name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@id/name_n_tv"
+        android:layout_toRightOf="@id/name_n_tv"
+        android:hint="@string/name" />
+
+    <TextView
         android:id="@+id/description_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/name_n_tv"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:text="@string/descriptionName" />
 
     <TextView

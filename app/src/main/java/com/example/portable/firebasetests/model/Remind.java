@@ -34,6 +34,10 @@ public class Remind implements Serializable {
         return calendar.getTimeInMillis();
     }
 
+    public void setTimeStamp(long timeStamp) {
+        calendar.setTimeInMillis(timeStamp);
+    }
+
     @Exclude
     public String getSound() {
         return sound;
@@ -51,10 +55,6 @@ public class Remind implements Serializable {
         this.vibro = vibro;
     }
 
-    public void setTimeStamp(long timeStamp) {
-        calendar.setTimeInMillis(timeStamp);
-    }
-
     @Exclude
     public Calendar getCalendar() {
         return calendar;
@@ -66,8 +66,11 @@ public class Remind implements Serializable {
         return StringUtils.formatNumber(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + StringUtils.formatNumber(calendar.get(Calendar.MINUTE));
     }
 
-    public void round() {
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
+    public long round() {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(calendar.getTimeInMillis());
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTimeInMillis();
     }
 }

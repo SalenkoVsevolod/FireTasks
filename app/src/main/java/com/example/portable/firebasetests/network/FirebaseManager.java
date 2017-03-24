@@ -49,24 +49,32 @@ public class FirebaseManager {
     }
 
     public void deleteSubtask(int week, String taskId, String subtaskId) {
-        getWeekReference(week).child(taskId).child("subTasks").child(subtaskId).setValue(null);
+        getTaskReference(week, taskId).child("subTasks").child(subtaskId).setValue(null);
     }
 
     public void saveTask(Task task) {
         int week = task.getCalendar().get(Calendar.WEEK_OF_YEAR);
-        getWeekReference(week).child(task.getId()).setValue(task);
+        getTaskReference(week, task.getId()).setValue(task);
         for (Remind r : task.getReminds()) {
-            getWeekReference(week).child(task.getId()).child("reminds").child("" + r.getTimeStamp()).setValue("" + r.isVibro());
+            getTaskReference(week, task.getId()).child("reminds").child("" + r.getTimeStamp()).setValue("" + r.isVibro());
         }
         for (SubTask subTask : task.getSubTasks()) {
-            DatabaseReference ref = getWeekReference(week).child(task.getId()).child("subTasks")
+            DatabaseReference ref = getTaskReference(week, task.getId()).child("subTasks")
                     .child(subTask.getId());
             ref.setValue(subTask);
         }
 
     }
 
+    private DatabaseReference getTaskReference(int week, String taskId) {
+        return getWeekReference(week).child(taskId);
+    }
+
     public void setSubTaskDone(int week, String taskId, SubTask subTask) {
-        getWeekReference(week).child(taskId).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
+        getTaskReference(week, taskId).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
+    }
+
+    public void removeReminder(int week, String taskId, Remind remind) {
+        getTaskReference(week, taskId).child("reminds").child(remind.getTimeStamp() + "").setValue(null);
     }
 }

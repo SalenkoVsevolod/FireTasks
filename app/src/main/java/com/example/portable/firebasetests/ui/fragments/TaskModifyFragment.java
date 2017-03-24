@@ -2,7 +2,6 @@ package com.example.portable.firebasetests.ui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -39,7 +38,6 @@ import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.R.string.cancel;
@@ -159,7 +157,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
-            Notifier.setAlarms(task);
+        Notifier.setAlarms(task);
 
         FirebaseManager.getInstance().saveTask(task);
 
@@ -254,12 +252,15 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
     private void showReminderAddDialog() {
         final Remind remind = new Remind();
         remind.setTimeStamp(task.getTimeStamp());
+        remind.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString());
 
         View view = getActivity().getLayoutInflater().inflate(R.layout.reminder_add, null);
         soundTV = (TextView) view.findViewById(R.id.sound_tv);
         soundTV.setOnClickListener(this);
+        soundTV.setText(RingtoneManager.getRingtone(getActivity(), Uri.parse(remind.getSound())).getTitle(getActivity()));
         reminderTime = (TimePicker) view.findViewById(R.id.reminder_time_picker);
         reminderTime.setIs24HourView(true);
+
         reminderTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int i, int i1) {
@@ -277,8 +278,9 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Log.d("rem", task.getReminds().toString());
-            if(sound!=null)
-                remind.setSound(sound.toString());
+                if (sound != null) {
+                    remind.setSound(sound.toString());
+                }
                 remind.setVibro(vibro.isChecked());
                 task.getReminds().add(remind);
                 remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
@@ -310,7 +312,14 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 soundTV.setText(RingtoneManager.getRingtone(getActivity(), sound).getTitle(getActivity()));
                 // Preferences.getInstance().writeLastRingtone(uri.toString());
                 // soundTextView.setText(RingtoneManager.getRingtone(getActivity(), uri).getTitle(getActivity()));
+            } else {
+                soundTV.setText("No sound");
             }
         }
     }
+
+    private void sort() {
+
+    }
+
 }

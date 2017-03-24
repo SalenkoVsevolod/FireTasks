@@ -4,9 +4,8 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.core.FireTasksApp;
-import com.example.portable.firebasetests.model.Remind;
-import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.core.Notifier;
+import com.example.portable.firebasetests.model.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -68,11 +67,7 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
         for (String key : keys) {
             Task task = new Task((HashMap<String, Object>) map.get(key));
             task.setId(key);
-            for (int i = 0; i < task.getReminds().size(); i++) {
-                if (task.getReminds().get(i).getTimeStamp() > System.currentTimeMillis()) {
-                    Notifier.setAlarms(task);
-                }
-            }
+            Notifier.setAlarms(task);
             res.add(task);
 
         }
