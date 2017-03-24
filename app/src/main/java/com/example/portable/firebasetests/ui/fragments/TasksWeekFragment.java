@@ -135,7 +135,7 @@ public class TasksWeekFragment extends Fragment {
         builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Notifier.removeAlarm((int) task.getTimeStamp());
+                Notifier.removeAlarms(task);
                 FirebaseManager.getInstance().deleteTask(weekOfYear, task.getId());
             }
         });

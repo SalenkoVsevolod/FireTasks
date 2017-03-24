@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -120,7 +121,12 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 openAddSubTaskDialog();
             }
         });
-        remindersRecyclerView.setAdapter(new ReminderAdapter(task.getReminds()));
+        remindersRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), new ReminderAdapter.OnRemindClickListener() {
+            @Override
+            public void onClick(Remind remind) {
+                showReminderAddDialog(remind);
+            }
+        }));
         remindersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -157,10 +163,9 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
+        Notifier.removeAlarms(task);
         Notifier.setAlarms(task);
-
         FirebaseManager.getInstance().saveTask(task);
-
     }
 
 
@@ -241,7 +246,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.add_reminder_imv:
-                showReminderAddDialog();
+                showReminderAddDialog(null);
                 break;
             case R.id.sound_tv:
                 chooseSound();
@@ -249,18 +254,38 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    private void showReminderAddDialog() {
+    private void showReminderAddDialog(final Remind r) {
         final Remind remind = new Remind();
-        remind.setTimeStamp(task.getTimeStamp());
-        remind.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString());
-
         View view = getActivity().getLayoutInflater().inflate(R.layout.reminder_add, null);
         soundTV = (TextView) view.findViewById(R.id.sound_tv);
         soundTV.setOnClickListener(this);
-        soundTV.setText(RingtoneManager.getRingtone(getActivity(), Uri.parse(remind.getSound())).getTitle(getActivity()));
         reminderTime = (TimePicker) view.findViewById(R.id.reminder_time_picker);
         reminderTime.setIs24HourView(true);
+        vibro = (CheckBox) view.findViewById(R.id.reminder_vibro);
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(view);
+        builder.setCancelable(true);
+        final int index = task.getReminds().indexOf(r);
+        if (r == null) {
+            remind.setTimeStamp(task.getTimeStamp());
+            remind.setId("reminder_" + remind.getTimeStamp());
+            remind.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString());
+        } else {
+            remind.setId(r.getId());
+            remind.setSound(r.getSound());
+            remind.setTimeStamp(r.getTimeStamp());
+            remind.setVibro(r.isVibro());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                reminderTime.setHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
+                reminderTime.setMinute(remind.getCalendar().get(Calendar.MINUTE));
+            } else {
+                reminderTime.setCurrentHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
+                reminderTime.setCurrentMinute(remind.getCalendar().get(Calendar.MINUTE));
+            }
+        }
+        soundTV.setText(RingtoneManager.getRingtone(getActivity(), Uri.parse(remind.getSound())).getTitle(getActivity()));
+        vibro.setChecked(remind.isVibro());
         reminderTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int i, int i1) {
@@ -268,11 +293,6 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 remind.getCalendar().set(Calendar.MINUTE, i1);
             }
         });
-
-        vibro = (CheckBox) view.findViewById(R.id.reminder_vibro);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(view);
-        builder.setCancelable(true);
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -282,8 +302,13 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                     remind.setSound(sound.toString());
                 }
                 remind.setVibro(vibro.isChecked());
-                task.getReminds().add(remind);
-                remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
+                if (r == null) {
+                    task.getReminds().add(remind);
+                    remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
+                } else {
+                    task.getReminds().set(index, remind);
+                    remindersRecyclerView.getAdapter().notifyItemChanged(index);
+                }
             }
         });
         builder.setNegativeButton(cancel, null);
@@ -317,9 +342,4 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             }
         }
     }
-
-    private void sort() {
-
-    }
-
 }

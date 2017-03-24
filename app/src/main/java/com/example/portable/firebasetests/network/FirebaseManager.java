@@ -56,7 +56,7 @@ public class FirebaseManager {
         int week = task.getCalendar().get(Calendar.WEEK_OF_YEAR);
         getTaskReference(week, task.getId()).setValue(task);
         for (Remind r : task.getReminds()) {
-            getTaskReference(week, task.getId()).child("reminds").child("" + r.getTimeStamp()).setValue("" + r.isVibro());
+            getTaskReference(week, task.getId()).child("reminds").child(r.getId()).setValue(r);
         }
         for (SubTask subTask : task.getSubTasks()) {
             DatabaseReference ref = getTaskReference(week, task.getId()).child("subTasks")

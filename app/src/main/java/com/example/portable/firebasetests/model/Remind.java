@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 
 public class Remind implements Serializable {
-
+    private String id;
     private String sound;
     private boolean vibro;
     private Calendar calendar;
@@ -26,7 +26,7 @@ public class Remind implements Serializable {
         this();
         calendar.setTimeInMillis((long) map.get("timeStamp"));
         vibro = (boolean) map.get("vibro");
-
+        sound = (String) map.get("sound");
     }
 
 
@@ -38,7 +38,6 @@ public class Remind implements Serializable {
         calendar.setTimeInMillis(timeStamp);
     }
 
-    @Exclude
     public String getSound() {
         return sound;
     }
@@ -72,5 +71,14 @@ public class Remind implements Serializable {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         return c.getTimeInMillis();
+    }
+
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

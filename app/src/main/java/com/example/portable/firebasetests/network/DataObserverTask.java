@@ -69,11 +69,9 @@ public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
             task.setId(key);
             Notifier.setAlarms(task);
             res.add(task);
-
         }
         return res;
     }
-
 
     @Override
     protected void onCancelled(Void aVoid) {

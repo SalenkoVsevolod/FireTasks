@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -63,9 +62,8 @@ public class Task implements Serializable {
         ArrayList<Remind> res = new ArrayList<>();
         Set<String> keys = map.keySet();
         for (String key : keys) {
-            Remind remind = new Remind();
-            remind.setTimeStamp(Long.parseLong(key));
-            remind.setVibro(Boolean.parseBoolean(map.get(key).toString()));
+            Remind remind = new Remind((HashMap<String, Object>) map.get(key));
+            remind.setId(key);
             res.add(remind);
         }
         return res;

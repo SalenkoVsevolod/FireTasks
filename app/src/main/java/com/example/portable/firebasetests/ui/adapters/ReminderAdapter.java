@@ -17,9 +17,11 @@ import java.util.ArrayList;
 
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ReminderViewHolder> {
     private ArrayList<Remind> reminds;
+    private OnRemindClickListener listener;
 
-    public ReminderAdapter(ArrayList<Remind> reminds) {
+    public ReminderAdapter(ArrayList<Remind> reminds, OnRemindClickListener listener) {
         this.reminds = reminds;
+        this.listener = listener;
     }
 
     @Override
@@ -37,12 +39,23 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         return reminds.size();
     }
 
+    public interface OnRemindClickListener {
+        void onClick(Remind remind);
+    }
+
     class ReminderViewHolder extends RecyclerView.ViewHolder {
         private TextView time;
 
         public ReminderViewHolder(View item) {
             super(item);
             time = (TextView) item.findViewById(R.id.tagTextView);
+            item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(reminds.get(getAdapterPosition()));
+                }
+            });
         }
     }
 }
+
