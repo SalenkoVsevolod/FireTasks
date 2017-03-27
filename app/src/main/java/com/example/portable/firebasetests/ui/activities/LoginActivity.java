@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.network.LoginTask;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
