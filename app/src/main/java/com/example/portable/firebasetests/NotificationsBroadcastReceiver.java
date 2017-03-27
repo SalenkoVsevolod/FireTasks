@@ -38,7 +38,10 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setContentText(task.getName());
         Log.i("snd", task.getReminds().toString() + ":" + task.getReminds().get(index).getSound());
-        builder.setSound(Uri.parse(task.getReminds().get(index).getSound()));
+        String sound = task.getReminds().get(index).getSound();
+        if (sound != null) {
+            builder.setSound(Uri.parse(sound));
+        }
         if (task.getReminds().get(index).isVibro()) {
             builder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
         }

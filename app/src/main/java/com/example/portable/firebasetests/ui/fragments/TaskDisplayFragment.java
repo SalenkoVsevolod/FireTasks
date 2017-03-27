@@ -56,6 +56,7 @@ public class TaskDisplayFragment extends Fragment {
         name.setText(task.getName());
         description.setText(task.getDescription());
         tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
+        view.findViewById(R.id.reminder_tv).setVisibility(task.getReminds().size() > 0 ? View.VISIBLE : View.GONE);
         remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
         remindsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         tagCardView.setCardBackgroundColor(TagsColors.getTagColor((int) task.getTagIndex()));
