@@ -36,4 +36,16 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Vibro" />
+
+    <Button
+        android:id="@+id/delete_reminder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/reminder_vibro"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/holo_red_light"
+        android:text="delete"
+        android:visibility="gone" />
+
 </RelativeLayout>

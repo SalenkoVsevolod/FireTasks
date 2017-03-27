@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
-import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
 
@@ -40,11 +39,9 @@ public class Notifier {
     }
 
 
-    public static void removeAlarms(Task task) {
+    public static void removeAlarm(int code) {
         AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
-        for (Remind r : task.getReminds()) {
-            alarmManager.cancel(PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) r.getTimeStamp(), new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT));
-        }
-
+        alarmManager.cancel(PendingIntent.getBroadcast(FireTasksApp.getInstance(), code, new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT));
     }
 }
+

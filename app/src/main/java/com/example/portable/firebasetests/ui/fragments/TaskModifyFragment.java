@@ -214,12 +214,14 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         reminderTime = (TimePicker) view.findViewById(R.id.reminder_time_picker);
         reminderTime.setIs24HourView(true);
         vibro = (CheckBox) view.findViewById(R.id.reminder_vibro);
+        Button delete = (Button) view.findViewById(R.id.delete_reminder);
         final Remind reminder = r == null ? new Remind() : r;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);
         builder.setCancelable(true);
 
         if (r != null) {
+            delete.setVisibility(View.VISIBLE);
             soundTV.setText(RingtoneManager.getRingtone(getActivity(), Uri.parse(r.getSound())).getTitle(getActivity()));
             vibro.setChecked(r.isVibro());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -270,7 +272,18 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             }
         });
         builder.setNegativeButton(cancel, null);
-        builder.show();
+        final AlertDialog alertDialog = builder.show();
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int index = task.getReminds().indexOf(r);
+                task.getReminds().remove(index);
+                remindersRecyclerView.getAdapter().notifyItemRemoved(index);
+                Notifier.removeAlarm((int) r.getTimeStamp());
+                alertDialog.dismiss();
+            }
+        });
     }
 
     private void chooseSound() {
@@ -357,7 +370,9 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             Log.i("remind", r.getId() + ":" + r);
         }
         task.setTagIndex(tagSpinner.getSelectedItemPosition());
-        Notifier.removeAlarms(task);
+        for (int i = 0; i < task.getReminds().size(); i++) {
+            Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
+        }
         Notifier.setAlarms(task);
         FirebaseManager.getInstance().saveTask(task);
     }

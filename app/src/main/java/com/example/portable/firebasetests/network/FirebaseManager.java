@@ -75,6 +75,6 @@ public class FirebaseManager {
     }
 
     public void removeReminder(int week, String taskId, Remind remind) {
-        getTaskReference(week, taskId).child("reminds").child(remind.getTimeStamp() + "").setValue(null);
+        getTaskReference(week, taskId).child("reminds").child(remind.getId()).setValue(null);
     }
 }
