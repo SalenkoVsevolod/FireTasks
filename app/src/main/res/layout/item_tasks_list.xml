@@ -18,7 +18,7 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/itemTaskTimeView"
+            android:id="@+id/task_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

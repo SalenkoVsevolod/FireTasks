@@ -15,6 +15,7 @@ import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.TagsColors;
+import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
 import com.example.portable.firebasetests.ui.fragments.TasksWeekFragment;
@@ -80,11 +81,24 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
         });
     }
 
+    private int getProgress(Task t) {
+        float done = 0;
+        float sum = 0;
+        for (SubTask s : t.getSubTasks()) {
+            sum += s.getPriority();
+            if (s.isDone()) {
+                done += s.getPriority();
+            }
+        }
+        return (int) ((done / sum) * 100);
+    }
+
     @Override
     public void onBindChildViewHolder(TaskChildViewHolder childViewHolder, final int i, Object o) {
         final Task task = (Task) o;
         childViewHolder.taskCardView.setCardBackgroundColor(getTaskColor(task));
         childViewHolder.name.setText(task.getName());
+        childViewHolder.progress.setText(getProgress(task) + "%");
         childViewHolder.tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
         childViewHolder.tagCardView.setCardBackgroundColor(TagsColors.getTags().get((int) task.getTagIndex()).getColor());
         childViewHolder.taskCardView.setOnClickListener(new View.OnClickListener() {
@@ -145,12 +159,13 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
 
     public class TaskChildViewHolder extends ChildViewHolder {
         public CardView taskCardView, tagCardView;
-        public TextView name, tag;
+        public TextView name, tag, progress;
 
         public TaskChildViewHolder(View itemView) {
             super(itemView);
             taskCardView = (CardView) itemView.findViewById(R.id.ItemTaskCardView);
             tagCardView = (CardView) itemView.findViewById(R.id.itemTaskTagCardView);
+            progress = (TextView) itemView.findViewById(R.id.task_progress);
             name = (TextView) itemView.findViewById(R.id.itemTaskDescriptionView);
             tag = (TextView) itemView.findViewById(R.id.itemTaskTagTextView);
         }
