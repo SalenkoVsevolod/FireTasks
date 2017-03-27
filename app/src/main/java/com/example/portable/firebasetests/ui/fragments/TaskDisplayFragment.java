@@ -17,6 +17,7 @@ import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 
 import java.util.Calendar;
@@ -24,10 +25,10 @@ import java.util.Calendar;
 public class TaskDisplayFragment extends Fragment {
     public static final String TASK_DISPLAY_TAG = "display";
     private static final String TASK_ARG = "task";
-    private TextView name, description, tag, time;
+    private TextView name, description, tag;
     private CardView tagCardView;
     private Task task;
-    private RecyclerView subtasksRecyclerView;
+    private RecyclerView subtasksRecyclerView, remindsRecyclerView;
 
     public TaskDisplayFragment() {
     }
@@ -54,8 +55,9 @@ public class TaskDisplayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         name.setText(task.getName());
         description.setText(task.getDescription());
-        time.setText(task.getTimeString());
         tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
+        remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
+        remindsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         tagCardView.setCardBackgroundColor(TagsColors.getTagColor((int) task.getTagIndex()));
         SubTaskAdapter adapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskCheckBoxCliCkListener() {
             @Override
@@ -74,8 +76,8 @@ public class TaskDisplayFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_task_display, container, false);
         name = (TextView) rootView.findViewById(R.id.name_tv);
         description = (TextView) rootView.findViewById(R.id.description_display);
+        remindsRecyclerView = (RecyclerView) rootView.findViewById(R.id.reminder_recycler);
         subtasksRecyclerView = (RecyclerView) rootView.findViewById(R.id.subTasksRecyclerView);
-        time = (TextView) rootView.findViewById(R.id.timeTextView);
         tag = (TextView) rootView.findViewById(R.id.tag_display);
         tagCardView = (CardView) rootView.findViewById(R.id.tag_cardview);
         return rootView;

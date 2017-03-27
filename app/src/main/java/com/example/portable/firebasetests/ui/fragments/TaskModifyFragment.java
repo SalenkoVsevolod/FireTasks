@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -39,14 +40,16 @@ import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import static android.R.string.cancel;
-import static android.R.string.ok;
 
 public class TaskModifyFragment extends Fragment implements View.OnClickListener {
     public static final String TASK_MODIFY_TAG = "modify";
     private static final String TASK_ARG = "task";
+    private static final List<String> PRIORITIES = Arrays.asList("Law", "Normal", "High", "Urgent");
     private EditText descriptionEdit, nameEdit;
     private Button okButton, addSubTaskButton;
     private Spinner tagSpinner;
@@ -118,7 +121,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         addSubTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openAddSubTaskDialog();
+                editSubtask(null);
             }
         });
         remindersRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), new ReminderAdapter.OnRemindClickListener() {
@@ -157,56 +160,6 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         }
     }
 
-
-    private void saveTask() {
-        if (task.getId() == null) {
-            task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
-        }
-        task.setTagIndex(tagSpinner.getSelectedItemPosition());
-        Notifier.removeAlarms(task);
-        Notifier.setAlarms(task);
-        FirebaseManager.getInstance().saveTask(task);
-    }
-
-
-    private void openAddSubTaskDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final EditText editText = new EditText(getActivity());
-        builder.setView(editText);
-        builder.setMessage("Subtask's description:");
-        builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (editText.getText().toString().length() > 0) {
-                    SubTask subtask = new SubTask(editText.getText().toString());
-                    subtask.setId("" + System.currentTimeMillis());
-                    task.getSubTasks().add(subtask);
-                    subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(subtask));
-                }
-            }
-        });
-        builder.setNegativeButton(cancel, null);
-        builder.setCancelable(true);
-        builder.show();
-    }
-
-    private void openSubtaskDeleteDialog(final SubTask subTask) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Delete \"" + subTask.getDescription() + "\" subtask?");
-        builder.setPositiveButton(ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                FirebaseManager.getInstance().deleteSubtask(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), subTask.getId());
-                int pos = task.getSubTasks().indexOf(subTask);
-                task.getSubTasks().remove(subTask);
-                subTasksRecycleView.getAdapter().notifyItemRemoved(pos);
-            }
-        });
-        builder.setCancelable(true);
-        builder.setNegativeButton(cancel, null);
-        builder.show();
-    }
-
     private void showErrorToast(String cause) {
         Toast toast = Toast.makeText(getActivity(), "You should choose " + cause, Toast.LENGTH_LONG);
         toast.getView().setBackgroundColor(Color.RED);
@@ -234,7 +187,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskClickListener() {
             @Override
             public void onClick(SubTask subTask) {
-                openSubtaskDeleteDialog(subTask);
+                editSubtask(subTask);
             }
         });
         subTasksRecycleView.setAdapter(subTaskAdapter);
@@ -269,7 +222,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         final int index = task.getReminds().indexOf(r);
         if (r == null) {
             remind.setTimeStamp(task.getTimeStamp());
-            remind.setId("reminder_" + remind.getTimeStamp());
+            remind.setId("reminder_" + System.currentTimeMillis());
             remind.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString());
         } else {
             remind.setId(r.getId());
@@ -298,16 +251,20 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Log.d("rem", task.getReminds().toString());
-                if (sound != null) {
-                    remind.setSound(sound.toString());
-                }
-                remind.setVibro(vibro.isChecked());
-                if (r == null) {
-                    task.getReminds().add(remind);
-                    remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
+                if (remind.getTimeStamp() > System.currentTimeMillis()) {
+                    if (sound != null) {
+                        remind.setSound(sound.toString());
+                    }
+                    remind.setVibro(vibro.isChecked());
+                    if (r == null) {
+                        task.getReminds().add(remind);
+                        remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
+                    } else {
+                        task.getReminds().set(index, remind);
+                        remindersRecyclerView.getAdapter().notifyItemChanged(index);
+                    }
                 } else {
-                    task.getReminds().set(index, remind);
-                    remindersRecyclerView.getAdapter().notifyItemChanged(index);
+                    showErrorToast("time in future");
                 }
             }
         });
@@ -326,6 +283,54 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         this.startActivityForResult(intent, 5);
     }
 
+    private void editSubtask(final SubTask subTask) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View view = getActivity().getLayoutInflater().inflate(R.layout.subtask_editor, null);
+        final EditText editText = (EditText) view.findViewById(R.id.subtask_name);
+        Spinner spinner = (Spinner) view.findViewById(R.id.priority_spinner);
+        spinner.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, PRIORITIES));
+        Button button = (Button) view.findViewById(R.id.delete_subtask);
+        if (subTask != null) {
+            button.setVisibility(View.VISIBLE);
+            editText.setText(subTask.getDescription());
+            //TODO set priority here
+        }
+        builder.setView(view);
+        builder.setCancelable(true);
+        builder.setNegativeButton(android.R.string.cancel, null);
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (editText.getText().toString().length() > 0) {
+                    if (subTask == null) {
+                        SubTask s = new SubTask();
+                        s.setDescription(editText.getText().toString());
+                        s.setId("" + System.currentTimeMillis());
+                        task.getSubTasks().add(s);
+                        subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(s));
+                        //TODO priority
+                    } else {
+                        int index = task.getSubTasks().indexOf(subTask);
+                        subTask.setDescription(editText.getText().toString());
+                        //TODO priority
+                        task.getSubTasks().set(index, subTask);
+                        subTasksRecycleView.getAdapter().notifyItemChanged(index);
+                    }
+                }
+            }
+        });
+        final AlertDialog dialog = builder.show();
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pos = task.getSubTasks().indexOf(subTask);
+                task.getSubTasks().remove(subTask);
+                subTasksRecycleView.getAdapter().notifyItemRemoved(pos);
+                dialog.dismiss();
+            }
+        });
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -341,5 +346,18 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 soundTV.setText("No sound");
             }
         }
+    }
+
+    private void saveTask() {
+        if (task.getId() == null) {
+            task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
+        }
+        for (Remind r : task.getReminds()) {
+            Log.i("reminders", r.getId() + ":" + r);
+        }
+        task.setTagIndex(tagSpinner.getSelectedItemPosition());
+        Notifier.removeAlarms(task);
+        Notifier.setAlarms(task);
+        FirebaseManager.getInstance().saveTask(task);
     }
 }

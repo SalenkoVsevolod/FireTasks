@@ -88,18 +88,20 @@
         android:layout_toRightOf="@id/subtasks_name" />
 
     <TextView
-        android:id="@+id/timeNameTextView"
+        android:id="@+id/reminder_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/subtasks_name"
+        android:layout_below="@id/subTasksRecyclerView"
         android:layout_marginTop="8dp"
-        android:text="@string/timeName" />
+        android:text="@string/remind" />
 
-    <TextView
-        android:id="@+id/timeTextView"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/reminder_recycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/timeNameTextView"
-        android:layout_toEndOf="@id/timeNameTextView"
-        android:layout_toRightOf="@id/timeNameTextView" />
+        android:layout_alignTop="@id/reminder_tv"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@id/reminder_tv"
+        android:layout_toRightOf="@id/reminder_tv" />
 </RelativeLayout>

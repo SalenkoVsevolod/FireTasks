@@ -49,12 +49,14 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         public ReminderViewHolder(View item) {
             super(item);
             time = (TextView) item.findViewById(R.id.tagTextView);
-            item.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onClick(reminds.get(getAdapterPosition()));
-                }
-            });
+            if (listener != null) {
+                item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onClick(reminds.get(getAdapterPosition()));
+                    }
+                });
+            }
         }
     }
 }

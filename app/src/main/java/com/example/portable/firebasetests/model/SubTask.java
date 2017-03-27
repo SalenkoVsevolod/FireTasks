@@ -19,9 +19,7 @@ public class SubTask implements Serializable {
         description = (String) map.get("description");
     }
 
-    public SubTask(String description) {
-        this.description = description;
-        done = false;
+    public SubTask() {
     }
 
     public boolean isDone() {
@@ -47,5 +45,10 @@ public class SubTask implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }
