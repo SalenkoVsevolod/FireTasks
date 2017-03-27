@@ -40,16 +40,14 @@ import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
 import static android.R.string.cancel;
+import static com.example.portable.firebasetests.model.SubTask.PRIORITIES;
 
 public class TaskModifyFragment extends Fragment implements View.OnClickListener {
     public static final String TASK_MODIFY_TAG = "modify";
     private static final String TASK_ARG = "task";
-    private static final List<String> PRIORITIES = Arrays.asList("Law", "Normal", "High", "Urgent");
     private EditText descriptionEdit, nameEdit;
     private Button okButton, addSubTaskButton;
     private Spinner tagSpinner;
@@ -301,13 +299,13 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.subtask_editor, null);
         final EditText editText = (EditText) view.findViewById(R.id.subtask_name);
-        Spinner spinner = (Spinner) view.findViewById(R.id.priority_spinner);
+        final Spinner spinner = (Spinner) view.findViewById(R.id.priority_spinner);
         spinner.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, PRIORITIES));
         Button button = (Button) view.findViewById(R.id.delete_subtask);
         if (subTask != null) {
             button.setVisibility(View.VISIBLE);
             editText.setText(subTask.getDescription());
-            //TODO set priority here
+            spinner.setSelection((int) subTask.getPriority() - 1);
         }
         builder.setView(view);
         builder.setCancelable(true);
@@ -320,13 +318,13 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                         SubTask s = new SubTask();
                         s.setDescription(editText.getText().toString());
                         s.setId("" + System.currentTimeMillis());
+                        s.setPriority(spinner.getSelectedItemId() + 1);
                         task.getSubTasks().add(s);
                         subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(s));
-                        //TODO priority
                     } else {
                         int index = task.getSubTasks().indexOf(subTask);
                         subTask.setDescription(editText.getText().toString());
-                        //TODO priority
+                        subTask.setPriority(spinner.getSelectedItemId() + 1);
                         task.getSubTasks().set(index, subTask);
                         subTasksRecycleView.getAdapter().notifyItemChanged(index);
                     }

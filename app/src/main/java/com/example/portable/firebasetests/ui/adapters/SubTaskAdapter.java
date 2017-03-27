@@ -49,6 +49,7 @@ public class SubTaskAdapter extends RecyclerView.Adapter<SubTaskAdapter.ViewHold
         holder.checkBox.setText(subTasks.get(position).getDescription());
         holder.checkBox.setChecked(subTasks.get(position).isDone());
         holder.textView.setText(subTasks.get(position).getDescription());
+        holder.priority.setText(SubTask.PRIORITIES.get((int) subTasks.get(position).getPriority() - 1));
     }
 
     @Override
@@ -56,15 +57,25 @@ public class SubTaskAdapter extends RecyclerView.Adapter<SubTaskAdapter.ViewHold
         return subTasks.size();
     }
 
+    public interface OnSubTaskClickListener {
+        void onClick(SubTask subTask);
+    }
+
+    public interface OnSubTaskCheckBoxCliCkListener {
+        void onClick(SubTask subTask, boolean checked);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public int index;
         public CheckBox checkBox;
         public TextView textView;
+        public TextView priority;
 
         private ViewHolder(View rootView) {
             super(rootView);
             checkBox = (CheckBox) rootView.findViewById(R.id.subtask_checkbox);
             textView = (TextView) rootView.findViewById(R.id.subtask_tv);
+            priority = (TextView) rootView.findViewById(R.id.subtask_priority);
         }
 
         public ViewHolder(View rootView, final OnSubTaskClickListener subTaskClickListener) {
@@ -90,13 +101,5 @@ public class SubTaskAdapter extends RecyclerView.Adapter<SubTaskAdapter.ViewHold
             checkBox.setVisibility(View.VISIBLE);
             textView.setVisibility(View.GONE);
         }
-    }
-
-    public interface OnSubTaskClickListener {
-        void onClick(SubTask subTask);
-    }
-
-    public interface OnSubTaskCheckBoxCliCkListener {
-        void onClick(SubTask subTask, boolean checked);
     }
 }
