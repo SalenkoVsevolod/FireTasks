@@ -231,6 +231,8 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 reminderTime.setCurrentHour(r.getCalendar().get(Calendar.HOUR_OF_DAY));
                 reminderTime.setCurrentMinute(r.getCalendar().get(Calendar.MINUTE));
             }
+        } else {
+            soundTV.setText("No sound");
         }
 
         final int index = task.getReminds().indexOf(r);
@@ -254,7 +256,8 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                     if (sound != null) {
                         reminder.setSound(sound.toString());
                     } else {
-                        reminder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString());
+                        reminder.setSound(null);
+                        soundTV.setText("No sound");
                     }
                     reminder.setVibro(vibro.isChecked());
                     if (r == null) {
@@ -290,10 +293,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
-        String ringtone = Preferences.getInstance().readLastRingtone();
-        if (ringtone != null) {
-            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(ringtone));
-        }
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, sound);
         this.startActivityForResult(intent, 5);
     }
 
