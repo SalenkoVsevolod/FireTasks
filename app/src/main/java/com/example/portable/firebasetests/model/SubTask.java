@@ -12,7 +12,7 @@ import java.util.List;
  */
 
 public class SubTask implements Serializable {
-    public static final List<String> PRIORITIES = Arrays.asList("Law", "Normal", "High", "Urgent");
+    public static final List<String> PRIORITIES = Arrays.asList("Low", "Normal", "High", "Urgent");
     private String description;
     private boolean done;
     private long priority;

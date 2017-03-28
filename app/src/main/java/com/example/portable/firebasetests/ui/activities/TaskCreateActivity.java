@@ -4,19 +4,20 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.ui.fragments.TaskDisplayFragment;
 import com.example.portable.firebasetests.ui.fragments.TaskModifyFragment;
+import com.jrummyapps.android.colorpicker.ColorPickerDialogListener;
 
-public class TaskCreateActivity extends AppCompatActivity implements View.OnClickListener {
+public class TaskCreateActivity extends AppCompatActivity implements View.OnClickListener, ColorPickerDialogListener {
     public static final String TASK_ARG = "task";
     private Task task;
 
@@ -83,5 +84,15 @@ public class TaskCreateActivity extends AppCompatActivity implements View.OnClic
                 putModifyFragment(null);
                 break;
         }
+    }
+
+    @Override
+    public void onColorSelected(int dialogId, @ColorInt int color) {
+
+    }
+
+    @Override
+    public void onDialogDismissed(int dialogId) {
+
     }
 }

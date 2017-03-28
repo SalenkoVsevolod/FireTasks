@@ -19,13 +19,13 @@ import java.util.Set;
  * Created by Portable on 25.01.2017.
  */
 @SuppressWarnings("unchecked")
-public class DataObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
+public class WeekObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     private DataChangingListener dataChangingListener;
     private ValueEventListener listener;
     private int week;
     private int currentYear;
 
-    public DataObserverTask(int week, DataChangingListener listener) {
+    public WeekObserverTask(int week, DataChangingListener listener) {
         this.week = week;
         dataChangingListener = listener;
         Calendar calendar = Calendar.getInstance();

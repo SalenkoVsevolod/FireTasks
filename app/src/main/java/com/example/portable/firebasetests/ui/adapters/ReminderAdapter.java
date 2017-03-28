@@ -26,7 +26,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
 
     @Override
     public ReminderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ReminderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tags_list, parent, false));
+        return new ReminderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tag, parent, false));
     }
 
     @Override

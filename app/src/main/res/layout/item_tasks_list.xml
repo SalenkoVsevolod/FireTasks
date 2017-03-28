@@ -27,17 +27,8 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/itemTaskTagCardView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/itemTaskTagTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAlignment="center"
-                android:textSize="20sp" />
-        </android.support.v7.widget.CardView>
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
 
     </LinearLayout>
 

@@ -19,7 +19,7 @@ public class Task implements Serializable {
     private String name, description;
     private ArrayList<SubTask> subTasks;
     private String id;
-    private long tagIndex;
+    private String tagId;
     private Calendar calendar;
     private ArrayList<Remind> reminds;
 
@@ -36,7 +36,7 @@ public class Task implements Serializable {
         name = (String) map.get("name");
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
-        tagIndex = (long) map.get("tagIndex");
+        tagId = (String) map.get("tagId");
         subTasks = getSubTasks((HashMap<String, Object>) map.get("subTasks"));
         reminds = getReminders((HashMap<String, Object>) map.get("reminds"));
     }
@@ -122,14 +122,6 @@ public class Task implements Serializable {
         return description;
     }
 
-    public long getTagIndex() {
-        return tagIndex;
-    }
-
-    public void setTagIndex(int tagIndex) {
-        this.tagIndex = tagIndex;
-    }
-
     public String getName() {
         return name;
     }
@@ -145,5 +137,13 @@ public class Task implements Serializable {
 
     public void setReminds(ArrayList<Remind> reminds) {
         this.reminds = reminds;
+    }
+
+    public String getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
     }
 }

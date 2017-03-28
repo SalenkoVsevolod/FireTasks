@@ -13,10 +13,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.model.SubTask;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.TagSingleGetter;
 import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 
@@ -25,7 +26,7 @@ import java.util.Calendar;
 public class TaskDisplayFragment extends Fragment {
     public static final String TASK_DISPLAY_TAG = "display";
     private static final String TASK_ARG = "task";
-    private TextView name, description, tag;
+    private TextView name, description, tagTV;
     private CardView tagCardView;
     private Task task;
     private RecyclerView subtasksRecyclerView, remindsRecyclerView;
@@ -55,11 +56,18 @@ public class TaskDisplayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         name.setText(task.getName());
         description.setText(task.getDescription());
-        tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
+        FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {
+            @Override
+            public void onGet(Tag tag) {
+                tagTV.setText(tag.getName());
+                tagCardView.setCardBackgroundColor((int) tag.getColor());
+            }
+        });
+
         view.findViewById(R.id.reminder_tv).setVisibility(task.getReminds().size() > 0 ? View.VISIBLE : View.GONE);
         remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
         remindsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        tagCardView.setCardBackgroundColor(TagsColors.getTagColor((int) task.getTagIndex()));
+
         SubTaskAdapter adapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskCheckBoxCliCkListener() {
             @Override
             public void onClick(SubTask subTask, boolean checked) {
@@ -69,6 +77,7 @@ public class TaskDisplayFragment extends Fragment {
         });
         subtasksRecyclerView.setAdapter(adapter);
         subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
     }
 
     @Override
@@ -79,7 +88,7 @@ public class TaskDisplayFragment extends Fragment {
         description = (TextView) rootView.findViewById(R.id.description_display);
         remindsRecyclerView = (RecyclerView) rootView.findViewById(R.id.reminder_recycler);
         subtasksRecyclerView = (RecyclerView) rootView.findViewById(R.id.subTasksRecyclerView);
-        tag = (TextView) rootView.findViewById(R.id.tag_display);
+        tagTV = (TextView) rootView.findViewById(R.id.tagTextView);
         tagCardView = (CardView) rootView.findViewById(R.id.tag_cardview);
         return rootView;
     }

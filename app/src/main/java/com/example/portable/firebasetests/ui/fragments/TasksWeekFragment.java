@@ -17,8 +17,8 @@ import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
-import com.example.portable.firebasetests.network.DataObserverTask;
 import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.WeekObserverTask;
 import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
 import com.example.portable.firebasetests.ui.adapters.TasksExpandableAdapter;
 import com.example.portable.firebasetests.utils.TimeUtils;
@@ -68,7 +68,6 @@ public class TasksWeekFragment extends Fragment {
     }
 
     private TasksExpandableAdapter initExpandableListViewAdapter(List<ParentObject> parents) {
-
         TasksExpandableAdapter tasksExpandableAdapter = new TasksExpandableAdapter(getActivity(), parents);
         tasksExpandableAdapter.setOnGroupClickListener(new OnDateIdentifiedListener() {
             @Override
@@ -94,7 +93,7 @@ public class TasksWeekFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        DataObserverTask.DataChangingListener listener = new DataObserverTask.DataChangingListener() {
+        WeekObserverTask.DataChangingListener listener = new WeekObserverTask.DataChangingListener() {
 
             @Override
             public void onDataChanged(ArrayList<Task> tasks) {

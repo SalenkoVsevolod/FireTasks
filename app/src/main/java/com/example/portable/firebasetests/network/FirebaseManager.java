@@ -5,6 +5,7 @@ import android.util.SparseArray;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -17,7 +18,8 @@ import java.util.Calendar;
 
 public class FirebaseManager {
     private static FirebaseManager instance;
-    private SparseArray<DataObserverTask> tasks;
+    private SparseArray<WeekObserverTask> tasks;
+    private TagsObserverTask tagsObserverTask;
 
     private FirebaseManager() {
         tasks = new SparseArray<>();
@@ -31,25 +33,37 @@ public class FirebaseManager {
     }
 
     DatabaseReference getWeekReference(int week) {
-        return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("" + week);
+        return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("weeks").child("" + week);
     }
 
-    public void setWeekListener(int week, DataObserverTask.DataChangingListener listener) {
-        DataObserverTask task = new DataObserverTask(week, listener);
+    public void setWeekListener(int week, WeekObserverTask.DataChangingListener listener) {
+        WeekObserverTask task = new WeekObserverTask(week, listener);
         tasks.put(week, task);
         task.execute();
     }
 
+    public void setTagsListener(TagsObserverTask.OnTagsSyncListener listener) {
+        tagsObserverTask = new TagsObserverTask(listener);
+        tagsObserverTask.execute();
+    }
+
+    public void removeTagsListener() {
+        if (tagsObserverTask != null) {
+            tagsObserverTask.cancel(true);
+        }
+    }
+
+    public void setTagSingleListener(String tagId, TagSingleGetter.OnTagGetListener listener) {
+        TagSingleGetter getter = new TagSingleGetter(tagId, listener);
+        getter.execute();
+    }
+
     public void deleteTask(int week, String taskId) {
-        FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("" + week).child(taskId).setValue(null);
+        getTaskReference(week, taskId).setValue(null);
     }
 
     public void removeWeekListener(int week) {
         tasks.get(week).cancel(true);
-    }
-
-    public void deleteSubtask(int week, String taskId, String subtaskId) {
-        getTaskReference(week, taskId).child("subTasks").child(subtaskId).setValue(null);
     }
 
     public void saveTask(Task task) {
@@ -76,5 +90,17 @@ public class FirebaseManager {
 
     public void removeReminder(int week, String taskId, Remind remind) {
         getTaskReference(week, taskId).child("reminds").child(remind.getId()).setValue(null);
+    }
+
+    public DatabaseReference getTagsReference() {
+        return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("tags");
+    }
+
+    public void addTag(Tag tag) {
+        getTagsReference().child(tag.getId()).setValue(tag);
+    }
+
+    public void removeTag(Tag tag) {
+        getTagsReference().child(tag.getId()).setValue(null);
     }
 }

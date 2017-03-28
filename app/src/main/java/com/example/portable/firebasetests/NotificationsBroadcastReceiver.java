@@ -34,7 +34,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
 
     private Notification buildNotification(Task task, int index, Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setContentTitle(TagsColors.getTags().get((int) task.getTagIndex()).getName() + " task");
+        //TODO builder.setContentTitle(TagsColors.getTags().get((int) task.getTagIndex()).getName() + " task");
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setContentText(task.getName());
         Log.i("snd", task.getReminds().toString() + ":" + task.getReminds().get(index).getSound());

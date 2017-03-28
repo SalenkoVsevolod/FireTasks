@@ -14,10 +14,12 @@ import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.model.SubTask;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
+import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.TagSingleGetter;
 import com.example.portable.firebasetests.ui.fragments.TasksWeekFragment;
 
 import java.util.List;
@@ -29,7 +31,6 @@ import static com.example.portable.firebasetests.utils.TimeUtils.isInPast;
  */
 
 public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpandableAdapter.TaskParentViewHolder, TasksExpandableAdapter.TaskChildViewHolder> {
-
     private LayoutInflater inflater;
     private Context context;
     private TasksWeekFragment.OnDateIdentifiedListener onGroupClickListener;
@@ -94,13 +95,17 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
     }
 
     @Override
-    public void onBindChildViewHolder(TaskChildViewHolder childViewHolder, final int i, Object o) {
+    public void onBindChildViewHolder(final TaskChildViewHolder childViewHolder, final int i, Object o) {
         final Task task = (Task) o;
         childViewHolder.taskCardView.setCardBackgroundColor(getTaskColor(task));
         childViewHolder.name.setText(task.getName());
         childViewHolder.progress.setText(getProgress(task) + "%");
-        childViewHolder.tag.setText(TagsColors.getTags().get((int) task.getTagIndex()).getName());
-        childViewHolder.tagCardView.setCardBackgroundColor(TagsColors.getTags().get((int) task.getTagIndex()).getColor());
+        FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {
+            @Override
+            public void onGet(Tag tag) {
+                childViewHolder.tagCardView.setCardBackgroundColor((int) tag.getColor());
+            }
+        });
         childViewHolder.taskCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -159,7 +164,7 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
 
     public class TaskChildViewHolder extends ChildViewHolder {
         public CardView taskCardView, tagCardView;
-        public TextView name, tag, progress;
+        public TextView name, progress;
 
         public TaskChildViewHolder(View itemView) {
             super(itemView);
@@ -167,7 +172,6 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
             tagCardView = (CardView) itemView.findViewById(R.id.itemTaskTagCardView);
             progress = (TextView) itemView.findViewById(R.id.task_progress);
             name = (TextView) itemView.findViewById(R.id.itemTaskDescriptionView);
-            tag = (TextView) itemView.findViewById(R.id.itemTaskTagTextView);
         }
     }
 

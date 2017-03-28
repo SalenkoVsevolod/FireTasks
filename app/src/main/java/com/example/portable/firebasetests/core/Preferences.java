@@ -52,5 +52,4 @@ public class Preferences {
         ed.putString(LAST_RINGTONE, ringtone);
         ed.apply();
     }
-
 }

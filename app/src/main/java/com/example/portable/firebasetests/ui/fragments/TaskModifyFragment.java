@@ -23,23 +23,27 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.TagsColors;
 import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.TagsObserverTask;
+import com.example.portable.firebasetests.ui.activities.TagEditorActivity;
 import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.R.string.cancel;
@@ -48,6 +52,7 @@ import static com.example.portable.firebasetests.model.SubTask.PRIORITIES;
 public class TaskModifyFragment extends Fragment implements View.OnClickListener {
     public static final String TASK_MODIFY_TAG = "modify";
     private static final String TASK_ARG = "task";
+    private static final int SOUND_CODE = 5;
     private EditText descriptionEdit, nameEdit;
     private Button okButton, addSubTaskButton;
     private Spinner tagSpinner;
@@ -57,6 +62,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
     private TimePicker reminderTime;
     private TextView soundTV;
     private Uri sound;
+    private ImageView editTag;
 
     public TaskModifyFragment() {
         // Required empty public constructor
@@ -89,6 +95,9 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         subTasksRecycleView = (RecyclerView) rootView.findViewById(R.id.subTasksRecyclerView);
         addSubTaskButton = (Button) rootView.findViewById(R.id.addSubTaskButton);
         remindersRecyclerView = (RecyclerView) rootView.findViewById(R.id.reminder_recycler);
+        editTag = (ImageView) rootView.findViewById(R.id.edit_tag_imv);
+        editTag.setOnClickListener(this);
+        rootView.findViewById(R.id.add_tag_imv).setOnClickListener(this);
         rootView.findViewById(R.id.add_reminder_imv).setOnClickListener(this);
         configViewsForClosingKeyBord(rootView);
         return rootView;
@@ -102,9 +111,30 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             descriptionEdit.setText(task.getDescription());
             nameEdit.setText(task.getName());
         }
-        tagSpinner.setAdapter(new TagAdapter(getActivity(), TagsColors.getTags()));
+
+        FirebaseManager.getInstance().setTagsListener(new TagsObserverTask.OnTagsSyncListener() {
+            @Override
+            public void onSync(ArrayList<Tag> tags) {
+                if (tags.size() == 0) {
+                    tagSpinner.setVisibility(View.GONE);
+                    editTag.setVisibility(View.GONE);
+                } else {
+                    tagSpinner.setVisibility(View.VISIBLE);
+                    editTag.setVisibility(View.VISIBLE);
+                    tagSpinner.setAdapter(new TagAdapter(getActivity(), tags));
+                    int pos = -1;
+                    for (int i = 0; i < tags.size(); i++) {
+                        if (tags.get(i).getId().equals(task.getTagId())) {
+                            pos = i;
+                            break;
+                        }
+                    }
+                    tagSpinner.setSelection(pos);
+                }
+
+            }
+        });
         initSubtasksRecyclerView();
-        tagSpinner.setSelection((int) task.getTagIndex());
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,6 +159,12 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             }
         }));
         remindersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        FirebaseManager.getInstance().removeTagsListener();
     }
 
     private void configViewsForClosingKeyBord(View rootView) {
@@ -201,6 +237,12 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 break;
             case R.id.sound_tv:
                 chooseSound();
+                break;
+            case R.id.add_tag_imv:
+                TagEditorActivity.start(getActivity(), null);
+                break;
+            case R.id.edit_tag_imv:
+                TagEditorActivity.start(getActivity(), (Tag) tagSpinner.getSelectedItem());
                 break;
         }
     }
@@ -292,7 +334,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, sound);
-        this.startActivityForResult(intent, 5);
+        this.startActivityForResult(intent, SOUND_CODE);
     }
 
     private void editSubtask(final SubTask subTask) {
@@ -344,22 +386,6 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
 
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == 5) {
-            Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-            if (uri != null) {
-                sound = uri;
-                soundTV.setText(RingtoneManager.getRingtone(getActivity(), sound).getTitle(getActivity()));
-                // Preferences.getInstance().writeLastRingtone(uri.toString());
-                // soundTextView.setText(RingtoneManager.getRingtone(getActivity(), uri).getTitle(getActivity()));
-            } else {
-                soundTV.setText("No sound");
-            }
-        }
-    }
-
     private void saveTask() {
         if (task.getId() == null) {
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
@@ -367,11 +393,31 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         for (Remind r : task.getReminds()) {
             Log.i("remind", r.getId() + ":" + r);
         }
-        task.setTagIndex(tagSpinner.getSelectedItemPosition());
+        task.setTagId(((Tag) tagSpinner.getSelectedItem()).getId());
         for (int i = 0; i < task.getReminds().size(); i++) {
             Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
         }
         Notifier.setAlarms(task);
         FirebaseManager.getInstance().saveTask(task);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case SOUND_CODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                    if (uri != null) {
+                        sound = uri;
+                        soundTV.setText(RingtoneManager.getRingtone(getActivity(), sound).getTitle(getActivity()));
+                        // Preferences.getInstance().writeLastRingtone(uri.toString());
+                        // soundTextView.setText(RingtoneManager.getRingtone(getActivity(), uri).getTitle(getActivity()));
+                    } else {
+                        soundTV.setText("No sound");
+                    }
+                }
+                break;
+        }
     }
 }
