@@ -26,7 +26,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
 
     @Override
     public ReminderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ReminderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tag, parent, false));
+        return new ReminderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reminder, parent, false));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
 
         public ReminderViewHolder(View item) {
             super(item);
-            time = (TextView) item.findViewById(R.id.tagTextView);
+            time = (TextView) item.findViewById(R.id.reminder_time_tv);
             if (listener != null) {
                 item.setOnClickListener(new View.OnClickListener() {
                     @Override

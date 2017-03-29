@@ -63,6 +63,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
     private TextView soundTV;
     private Uri sound;
     private ImageView editTag;
+    private ArrayList<Tag> tags;
 
     public TaskModifyFragment() {
         // Required empty public constructor
@@ -118,18 +119,25 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 if (tags.size() == 0) {
                     tagSpinner.setVisibility(View.GONE);
                     editTag.setVisibility(View.GONE);
+                    task.setTagId(null);
                 } else {
                     tagSpinner.setVisibility(View.VISIBLE);
                     editTag.setVisibility(View.VISIBLE);
+                    TaskModifyFragment.this.tags = tags;
                     tagSpinner.setAdapter(new TagAdapter(getActivity(), tags));
-                    int pos = -1;
-                    for (int i = 0; i < tags.size(); i++) {
-                        if (tags.get(i).getId().equals(task.getTagId())) {
-                            pos = i;
-                            break;
+                    if (task.getTagId() != null) {
+                        int pos = -1;
+                        for (int i = 0; i < tags.size(); i++) {
+                            if (tags.get(i).getId().equals(task.getTagId())) {
+                                pos = i;
+                                break;
+                            }
                         }
+                        tagSpinner.setSelection(pos);
+                    } else {
+                        tagSpinner.setSelection(0);
                     }
-                    tagSpinner.setSelection(pos);
+
                 }
 
             }
@@ -140,25 +148,39 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             public void onClick(View v) {
                 task.setName(nameEdit.getText().toString());
                 task.setDescription(descriptionEdit.getText().toString());
+                if (tagSpinner.getVisibility() == View.VISIBLE) {
+                    task.setTagId(((Tag) tagSpinner.getSelectedItem()).getId());
+                } else {
+                    task.setTagId(null);
+                }
+
                 if (canComplete()) {
                     saveTask();
                     getActivity().onBackPressed();
                 }
             }
         });
-        addSubTaskButton.setOnClickListener(new View.OnClickListener() {
+        addSubTaskButton.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
             public void onClick(View v) {
                 editSubtask(null);
             }
         });
-        remindersRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), new ReminderAdapter.OnRemindClickListener() {
+        remindersRecyclerView.setAdapter(new
+
+                ReminderAdapter(task.getReminds(), new ReminderAdapter.OnRemindClickListener()
+
+        {
             @Override
             public void onClick(Remind remind) {
                 showReminderAddDialog(remind);
             }
         }));
-        remindersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        remindersRecyclerView.setLayoutManager(new
+
+                LinearLayoutManager(getActivity()));
     }
 
     @Override
@@ -209,6 +231,10 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             showErrorToast("description");
             return false;
         }
+        if (task.getTagId() == null) {
+            showErrorToast("tag");
+            return false;
+        }
         if (task.getSubTasks().size() == 0) {
             showErrorToast("subtasks");
             return false;
@@ -239,10 +265,10 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 chooseSound();
                 break;
             case R.id.add_tag_imv:
-                TagEditorActivity.start(getActivity(), null);
+                TagEditorActivity.start(getActivity(), tags, null);
                 break;
             case R.id.edit_tag_imv:
-                TagEditorActivity.start(getActivity(), (Tag) tagSpinner.getSelectedItem());
+                TagEditorActivity.start(getActivity(), tags, (Tag) tagSpinner.getSelectedItem());
                 break;
         }
     }
@@ -262,7 +288,7 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
 
         if (r != null) {
             delete.setVisibility(View.VISIBLE);
-            soundTV.setText(RingtoneManager.getRingtone(getActivity(), Uri.parse(r.getSound())).getTitle(getActivity()));
+            soundTV.setText(r.getSound() == null ? "No sound" : RingtoneManager.getRingtone(getActivity(), Uri.parse(r.getSound())).getTitle(getActivity()));
             vibro.setChecked(r.isVibro());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 reminderTime.setHour(r.getCalendar().get(Calendar.HOUR_OF_DAY));
@@ -280,7 +306,6 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 reminder.setTimeStamp(task.getTimeStamp());
-                Log.i("remind", "task timestamp set: " + reminder.getId() + ":" + reminder.getCalendar());
                 int hour, minute;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     hour = reminderTime.getHour();
@@ -393,7 +418,6 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
         for (Remind r : task.getReminds()) {
             Log.i("remind", r.getId() + ":" + r);
         }
-        task.setTagId(((Tag) tagSpinner.getSelectedItem()).getId());
         for (int i = 0; i < task.getReminds().size(); i++) {
             Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
         }
@@ -420,4 +444,5 @@ public class TaskModifyFragment extends Fragment implements View.OnClickListener
                 break;
         }
     }
+
 }

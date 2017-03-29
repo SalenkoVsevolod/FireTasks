@@ -59,8 +59,11 @@ public class TaskDisplayFragment extends Fragment {
         FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {
             @Override
             public void onGet(Tag tag) {
-                tagTV.setText(tag.getName());
-                tagCardView.setCardBackgroundColor((int) tag.getColor());
+                if (tag != null) {
+                    tagTV.setText(tag.getName());
+                    tagCardView.setCardBackgroundColor((int) tag.getColor());
+                    tagCardView.setVisibility(View.VISIBLE);
+                }
             }
         });
 

@@ -29,11 +29,12 @@ public class TagSingleGetter extends AsyncTask<Void, Void, Void> {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 HashMap<String, Object> map = (HashMap<String, Object>) dataSnapshot.getValue();
                 if (map == null) {
-                    map = new HashMap<>();
+                    listener.onGet(null);
+                } else {
+                    Tag tag = new Tag(map);
+                    tag.setId(tagId);
+                    listener.onGet(tag);
                 }
-                Tag tag = new Tag(map);
-                tag.setId(tagId);
-                listener.onGet(tag);
             }
 
             @Override

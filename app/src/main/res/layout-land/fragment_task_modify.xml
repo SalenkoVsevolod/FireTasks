@@ -60,6 +60,25 @@
         app:layout_constraintLeft_toLeftOf="@+id/taskDescriptionEdit"
         app:layout_constraintTop_toBottomOf="@+id/taskDescriptionEdit" />
 
+    <ImageView
+        android:id="@+id/edit_tag_imv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit_black_24dp"
+        android:tint="@android:color/holo_orange_light"
+        android:visibility="gone"
+        app:layout_constraintLeft_toRightOf="@id/tagSpinner"
+        app:layout_constraintTop_toTopOf="@id/tagTextView" />
+
+    <ImageView
+        android:id="@+id/add_tag_imv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/ic_control_point_black_24dp"
+        app:layout_constraintLeft_toRightOf="@id/edit_tag_imv"
+        app:layout_constraintTop_toTopOf="@id/tagTextView" />
+
     <TextView
         android:id="@+id/subTasksTextView"
         android:layout_width="wrap_content"

@@ -103,7 +103,10 @@ public class TasksExpandableAdapter extends ExpandableRecyclerAdapter<TasksExpan
         FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {
             @Override
             public void onGet(Tag tag) {
-                childViewHolder.tagCardView.setCardBackgroundColor((int) tag.getColor());
+                if (tag != null) {
+                    childViewHolder.tagCardView.setVisibility(View.VISIBLE);
+                    childViewHolder.tagCardView.setCardBackgroundColor((int) tag.getColor());
+                }
             }
         });
         childViewHolder.taskCardView.setOnClickListener(new View.OnClickListener() {

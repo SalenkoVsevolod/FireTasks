@@ -99,8 +99,4 @@ public class FirebaseManager {
     public void addTag(Tag tag) {
         getTagsReference().child(tag.getId()).setValue(tag);
     }
-
-    public void removeTag(Tag tag) {
-        getTagsReference().child(tag.getId()).setValue(null);
-    }
 }

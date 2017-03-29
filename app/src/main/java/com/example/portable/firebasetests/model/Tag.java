@@ -47,4 +47,10 @@ public class Tag implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        Tag t = (Tag) obj;
+        return t.getColor() == color && t.getName().equals(name);
+    }
 }

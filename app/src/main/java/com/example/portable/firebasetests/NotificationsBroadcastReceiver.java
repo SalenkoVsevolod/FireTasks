@@ -1,6 +1,5 @@
 package com.example.portable.firebasetests;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -10,8 +9,10 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.TagSingleGetter;
 import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
 
 import java.util.Calendar;
@@ -28,13 +29,12 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Task task = (Task) intent.getSerializableExtra(TASK_TAG);
         int index = intent.getIntExtra(INDEX, -1);
-        mNotificationManager.notify(1, buildNotification(task, index, context));
+        showNotification(mNotificationManager, task, index, context);
         FirebaseManager.getInstance().removeReminder(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), task.getReminds().get(index));
     }
 
-    private Notification buildNotification(Task task, int index, Context context) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        //TODO builder.setContentTitle(TagsColors.getTags().get((int) task.getTagIndex()).getName() + " task");
+    private void showNotification(final NotificationManager manager, Task task, int index, Context context) {
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setContentText(task.getName());
         Log.i("snd", task.getReminds().toString() + ":" + task.getReminds().get(index).getSound());
@@ -49,6 +49,12 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         intent.putExtra(TaskCreateActivity.TASK_ARG, task);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
-        return builder.build();
+        FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {
+            @Override
+            public void onGet(Tag tag) {
+                builder.setContentTitle(tag.getName() + " task");
+                manager.notify(1, builder.build());
+            }
+        });
     }
 }
