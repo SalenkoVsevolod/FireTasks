@@ -55,6 +55,9 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         findViewById(R.id.save_button).setOnClickListener(this);
         tag = (Tag) getIntent().getSerializableExtra(TAG);
         allTags = (ArrayList<Tag>) getIntent().getSerializableExtra(ALL_TAGS);
+        if (allTags == null) {
+            allTags = new ArrayList<>();
+        }
         if (tag == null) {
             tag = new Tag();
         } else {
@@ -127,6 +130,7 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         if (tag.getId() == null) {
             tag.setId("tag" + System.currentTimeMillis());
         }
+
         if (!allTags.contains(tag)) {
             FirebaseManager.getInstance().addTag(tag);
             finish();
