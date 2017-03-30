@@ -17,10 +17,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.utils.StringUtils;
+import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.ui.adapters.WeeksPagerAdapter;
+import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,7 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Calendar;
 
-public class TasksActivity extends AppCompatActivity {
+public class WeeksActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;
     private TextView weekBoundsTextView;
 
@@ -156,7 +156,7 @@ public class TasksActivity extends AppCompatActivity {
                         public void onResult(@NonNull Status status) {
                             if (status.isSuccess()) {
                                 Preferences.getInstance().logout();
-                                startActivity(new Intent(TasksActivity.this, LoginActivity.class));
+                                startActivity(new Intent(WeeksActivity.this, LoginActivity.class));
                                 finish();
                             }
                         }
@@ -166,7 +166,7 @@ public class TasksActivity extends AppCompatActivity {
 
             @Override
             public void onConnectionSuspended(int i) {
-                Toast.makeText(TasksActivity.this, "connection suspended", Toast.LENGTH_LONG).show();
+                Toast.makeText(WeeksActivity.this, "connection suspended", Toast.LENGTH_LONG).show();
             }
         });
     }

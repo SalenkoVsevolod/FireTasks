@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.TasksActivity" />
+        <activity android:name=".ui.activities.WeeksActivity" />
 
         <receiver
             android:name=".NotificationsBroadcastReceiver"
@@ -29,8 +29,10 @@
 
         <activity
             android:name=".ui.activities.TaskCreateActivity"
-            android:parentActivityName=".ui.activities.TasksActivity" />
-        <activity android:name=".ui.activities.TagEditorActivity"></activity>
+            android:parentActivityName=".ui.activities.WeeksActivity" />
+        <activity android:name=".ui.activities.TagEditorActivity" />
+        <activity android:name=".ui.activities.TaskDisplayActivity" />
+        <activity android:name=".ui.activities.TaskModifyActivity"></activity>
     </application>
 
 </manifest>

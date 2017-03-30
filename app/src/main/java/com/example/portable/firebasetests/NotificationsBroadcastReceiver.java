@@ -13,7 +13,7 @@ import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
 import com.example.portable.firebasetests.network.TagSingleGetter;
-import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
+import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 
 import java.util.Calendar;
 
@@ -45,8 +45,8 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         if (task.getReminds().get(index).isVibro()) {
             builder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
         }
-        Intent intent = new Intent(context, TaskCreateActivity.class);
-        intent.putExtra(TaskCreateActivity.TASK_ARG, task);
+        Intent intent = new Intent(context, TaskDisplayActivity.class);
+        intent.putExtra(TaskDisplayActivity.TASK_ARG, task);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
         FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {

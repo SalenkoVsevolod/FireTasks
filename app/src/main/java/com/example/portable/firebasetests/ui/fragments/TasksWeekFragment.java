@@ -19,7 +19,8 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.model.TasksDay;
 import com.example.portable.firebasetests.network.FirebaseManager;
 import com.example.portable.firebasetests.network.WeekObserverTask;
-import com.example.portable.firebasetests.ui.activities.TaskCreateActivity;
+import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
+import com.example.portable.firebasetests.ui.activities.TaskModifyActivity;
 import com.example.portable.firebasetests.ui.adapters.TasksExpandableAdapter;
 import com.example.portable.firebasetests.utils.TimeUtils;
 
@@ -84,7 +85,7 @@ public class TasksWeekFragment extends Fragment {
         tasksExpandableAdapter.setOnTaskClickListener(new TasksExpandableAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
-                TaskCreateActivity.start(getActivity(), task);
+                TaskDisplayActivity.start(getActivity(), task);
             }
         });
         return tasksExpandableAdapter;
@@ -120,7 +121,7 @@ public class TasksWeekFragment extends Fragment {
         task.getCalendar().set(Calendar.DAY_OF_WEEK, day);
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, week);
         task.getCalendar().set(Calendar.YEAR, year);
-        TaskCreateActivity.start(getActivity(), task);
+        TaskModifyActivity.start(getActivity(), task);
     }
 
     private void showList() {
