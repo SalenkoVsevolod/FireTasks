@@ -361,11 +361,17 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onContextItemSelected(item);
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Warning");
+        builder.setMessage("All unsaved data will be removed");
+        builder.setPositiveButton("quit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder.setNegativeButton("cancel", null);
+        builder.show();
     }
 }
