@@ -42,44 +42,53 @@
         app:layout_constraintBaseline_toBaselineOf="@id/descriptionTextView"
         app:layout_constraintLeft_toRightOf="@+id/descriptionTextView" />
 
-    <TextView
-        android:id="@+id/tagTextView"
+    <LinearLayout
+        android:id="@+id/tag_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:text="@string/tagName"
-        app:layout_constraintBottom_toBottomOf="@+id/tagSpinner"
-        app:layout_constraintRight_toLeftOf="@+id/tagSpinner"
-        app:layout_constraintTop_toTopOf="@+id/tagSpinner" />
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="@id/descriptionTextView"
+        app:layout_constraintTop_toBottomOf="@+id/taskDescriptionEdit">
 
-    <Spinner
-        android:id="@+id/tagSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:spinnerMode="dropdown"
-        app:layout_constraintLeft_toLeftOf="@+id/taskDescriptionEdit"
-        app:layout_constraintTop_toBottomOf="@+id/taskDescriptionEdit" />
+        <TextView
+            android:id="@+id/tagTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="@string/tagName" />
 
-    <ImageView
-        android:id="@+id/edit_tag_imv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_edit_black_24dp"
-        android:tint="@android:color/holo_orange_light"
-        android:visibility="gone"
-        app:layout_constraintLeft_toRightOf="@id/tagSpinner"
-        app:layout_constraintTop_toTopOf="@id/tagTextView" />
+        <Spinner
+            android:id="@+id/tagSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="16dp"
+            android:spinnerMode="dropdown" />
 
-    <ImageView
-        android:id="@+id/add_tag_imv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:src="@drawable/ic_control_point_black_24dp"
-        app:layout_constraintLeft_toRightOf="@id/edit_tag_imv"
-        app:layout_constraintTop_toTopOf="@id/tagTextView" />
+        <ImageView
+            android:id="@+id/edit_tag_imv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:src="@drawable/ic_edit_black_24dp"
+            android:tint="@android:color/holo_orange_light"
+            android:visibility="gone"
+            app:layout_constraintLeft_toRightOf="@id/tagSpinner"
+            app:layout_constraintTop_toTopOf="@id/tagTextView" />
+
+        <ImageView
+            android:id="@+id/add_tag_imv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/ic_control_point_black_24dp"
+            app:layout_constraintLeft_toRightOf="@id/edit_tag_imv"
+            app:layout_constraintTop_toTopOf="@id/tagTextView" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/subTasksTextView"
@@ -106,7 +115,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/remind"
-        app:layout_constraintTop_toBottomOf="@id/tagTextView" />
+        app:layout_constraintTop_toBottomOf="@id/tag_container" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@id/reminder_recycler"
@@ -132,7 +141,7 @@
         android:id="@+id/addTaskButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@android:string/ok"
+        android:text="SAVE"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
