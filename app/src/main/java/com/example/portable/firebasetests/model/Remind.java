@@ -81,4 +81,10 @@ public class Remind implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        Remind r = (Remind) obj;
+        return r.getId().equals(id);
+    }
 }

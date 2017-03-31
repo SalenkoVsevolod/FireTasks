@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,12 +17,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
@@ -42,24 +36,17 @@ import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import static android.R.string.cancel;
 import static com.example.portable.firebasetests.model.SubTask.PRIORITIES;
 
 public class TaskModifyActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TASK_ARG = "task";
-    private static final int SOUND_CODE = 5;
     private EditText descriptionEdit, nameEdit;
     private Button okButton, addSubTaskButton;
     private Spinner tagSpinner;
     private RecyclerView subTasksRecycleView, remindersRecyclerView;
-    private CheckBox vibro;
     private Task task;
-    private TimePicker reminderTime;
-    private TextView soundTV;
-    private Uri sound;
     private ImageView editTag;
     private ArrayList<Tag> tags;
 
@@ -117,19 +104,14 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                 editSubtask(null);
             }
         });
-        remindersRecyclerView.setAdapter(new
-
-                ReminderAdapter(task.getReminds(), new ReminderAdapter.OnRemindClickListener()
-
-        {
+        remindersRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), new ReminderAdapter.OnRemindClickListener() {
             @Override
             public void onClick(Remind remind) {
-                showReminderAddDialog(remind);
+                startActivityForResult(ReminderEditorActivity
+                        .getStarterIntent(TaskModifyActivity.this, remind, task.getTimeStamp()), 36);
             }
         }));
-        remindersRecyclerView.setLayoutManager(new
-
-                LinearLayoutManager(this));
+        remindersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -246,10 +228,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.add_reminder_imv:
-                showReminderAddDialog(null);
-                break;
-            case R.id.sound_tv:
-                chooseSound();
+                startActivityForResult(ReminderEditorActivity.getStarterIntent(this, null, task.getTimeStamp()), 36);
                 break;
             case R.id.add_tag_imv:
                 TagEditorActivity.start(this, tags, null);
@@ -260,94 +239,6 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    private void showReminderAddDialog(final Remind r) {
-        View view = getLayoutInflater().inflate(R.layout.reminder_add, null);
-        soundTV = (TextView) view.findViewById(R.id.sound_tv);
-        soundTV.setOnClickListener(this);
-        reminderTime = (TimePicker) view.findViewById(R.id.reminder_time_picker);
-        reminderTime.setIs24HourView(true);
-        vibro = (CheckBox) view.findViewById(R.id.reminder_vibro);
-        Button delete = (Button) view.findViewById(R.id.delete_reminder);
-        final Remind reminder = r == null ? new Remind() : r;
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(view);
-        builder.setCancelable(true);
-
-        if (r != null) {
-            delete.setVisibility(View.VISIBLE);
-            soundTV.setText(r.getSound() == null ? "No sound" : RingtoneManager.getRingtone(this, Uri.parse(r.getSound())).getTitle(this));
-            vibro.setChecked(r.isVibro());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                reminderTime.setHour(r.getCalendar().get(Calendar.HOUR_OF_DAY));
-                reminderTime.setMinute(r.getCalendar().get(Calendar.MINUTE));
-            } else {
-                reminderTime.setCurrentHour(r.getCalendar().get(Calendar.HOUR_OF_DAY));
-                reminderTime.setCurrentMinute(r.getCalendar().get(Calendar.MINUTE));
-            }
-        } else {
-            soundTV.setText("No sound");
-        }
-
-        final int index = task.getReminds().indexOf(r);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                reminder.setTimeStamp(task.getTimeStamp());
-                int hour, minute;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    hour = reminderTime.getHour();
-                    minute = reminderTime.getMinute();
-                } else {
-                    hour = reminderTime.getCurrentHour();
-                    minute = reminderTime.getCurrentMinute();
-                }
-                reminder.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
-                reminder.getCalendar().set(Calendar.MINUTE, minute);
-                Log.i("remind", "hour and minute set: " + reminder.getId() + ":" + reminder.getCalendar());
-                if (reminder.getTimeStamp() > System.currentTimeMillis()) {
-                    if (sound != null) {
-                        reminder.setSound(sound.toString());
-                    } else {
-                        reminder.setSound(null);
-                        soundTV.setText("No sound");
-                    }
-                    reminder.setVibro(vibro.isChecked());
-                    if (r == null) {
-                        reminder.setId("reminder_" + System.currentTimeMillis());
-                        task.getReminds().add(reminder);
-                        remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
-                    } else {
-                        task.getReminds().set(index, reminder);
-                        remindersRecyclerView.getAdapter().notifyItemChanged(index);
-                    }
-                    Log.i("remind", "on done: " + reminder.getId() + ":" + reminder.getCalendar());
-                } else {
-                    showErrorToast("time in future");
-                }
-            }
-        });
-        builder.setNegativeButton(cancel, null);
-        final AlertDialog alertDialog = builder.show();
-
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int index = task.getReminds().indexOf(r);
-                task.getReminds().remove(index);
-                remindersRecyclerView.getAdapter().notifyItemRemoved(index);
-                Notifier.removeAlarm((int) r.getTimeStamp());
-                alertDialog.dismiss();
-            }
-        });
-    }
-
-    private void chooseSound() {
-        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, sound);
-        this.startActivityForResult(intent, SOUND_CODE);
-    }
 
     private void editSubtask(final SubTask subTask) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -413,21 +304,42 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case SOUND_CODE:
-                if (resultCode == Activity.RESULT_OK) {
-                    Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-                    if (uri != null) {
-                        sound = uri;
-                        soundTV.setText(RingtoneManager.getRingtone(this, sound).getTitle(this));
-                        // Preferences.getInstance().writeLastRingtone(uri.toString());
-                        // soundTextView.setText(RingtoneManager.getRingtone(getActivity(), uri).getTitle(getActivity()));
-                    } else {
-                        soundTV.setText("No sound");
-                    }
+            case 36:
+                handleRemindResult(resultCode, data == null ? null : (Remind) data.getSerializableExtra(ReminderEditorActivity.REMINDER));
+                break;
+        }
+    }
+
+    private void handleRemindResult(int result, Remind remind) {
+        switch (result) {
+            case ReminderEditorActivity.CANCEL:
+                //TODO
+                break;
+            case ReminderEditorActivity.CREATE:
+                if (remind.getTimeStamp() > System.currentTimeMillis()) {
+                    task.getReminds().add(remind);
+                    remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
+                } else {
+                    showErrorToast("time in future");
                 }
+                break;
+            case ReminderEditorActivity.UPDATE:
+                if (remind.getTimeStamp() > System.currentTimeMillis()) {
+                    final int index = task.getReminds().indexOf(remind);
+                    task.getReminds().set(index, remind);
+                    remindersRecyclerView.getAdapter().notifyItemChanged(index);
+                } else {
+                    showErrorToast("time in future");
+                }
+                break;
+            case ReminderEditorActivity.DELETE:
+                int i = task.getReminds().indexOf(remind);
+                task.getReminds().remove(i);
+                remindersRecyclerView.getAdapter().notifyItemRemoved(i);
+                Notifier.removeAlarm((int) remind.getTimeStamp());
                 break;
         }
     }

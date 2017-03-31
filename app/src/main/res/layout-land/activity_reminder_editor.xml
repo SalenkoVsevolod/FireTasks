@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <TimePicker
+        android:id="@+id/reminder_time_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/sound_n_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@id/reminder_time_picker"
+        android:layout_toRightOf="@id/reminder_time_picker"
+        android:text="Sound:" />
+
+    <TextView
+        android:id="@+id/sound_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/sound_n_tv"
+        android:layout_alignStart="@id/sound_n_tv"
+        android:layout_below="@id/sound_n_tv"
+        android:layout_marginTop="9dp"
+        android:background="@android:color/darker_gray"
+        android:text="sound..." />
+
+    <CheckBox
+        android:id="@+id/reminder_vibro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/sound_tv"
+        android:layout_alignStart="@id/sound_tv"
+        android:layout_below="@id/sound_tv"
+        android:layout_marginTop="8dp"
+        android:text="Vibro" />
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/reminder_time_picker"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:text="SAVE" />
+
+    <Button
+        android:id="@+id/delete_reminder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@id/save_button"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@android:color/holo_red_light"
+        android:text="delete"
+        android:visibility="gone" />
+</RelativeLayout>

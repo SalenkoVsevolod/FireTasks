@@ -92,9 +92,10 @@ public class TaskDisplayActivity extends AppCompatActivity implements View.OnCli
         switch (view.getId()) {
             case R.id.edit_item:
                 TaskModifyActivity.start(this, task);
+                finish();
                 break;
             case android.R.id.home:
-                onBackPressed();
+                finish();
                 break;
         }
     }
