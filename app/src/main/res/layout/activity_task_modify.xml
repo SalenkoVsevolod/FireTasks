@@ -24,7 +24,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <View
             android:layout_width="0px"
             android:layout_height="0px"
             android:focusable="true"
@@ -104,32 +104,41 @@
                 android:src="@drawable/ic_control_point_black_24dp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/reminder_tv"
+        <LinearLayout
+            android:id="@+id/reminders_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Reminders:"
-            app:layout_constraintTop_toBottomOf="@id/tag_container" />
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tag_container">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/reminder_recycler"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintLeft_toRightOf="@+id/reminder_tv"
-            app:layout_constraintTop_toTopOf="@+id/reminder_tv" />
+            <TextView
+                android:id="@+id/reminder_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
 
-        <ImageView
-            android:id="@+id/add_reminder_imv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_control_point_black_24dp"
-            app:layout_constraintLeft_toRightOf="@+id/reminder_recycler"
-            app:layout_constraintTop_toTopOf="@+id/reminder_recycler" />
+                android:text="Reminders:" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/reminder_recycler"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintLeft_toRightOf="@+id/reminder_tv"
+                app:layout_constraintTop_toTopOf="@+id/reminder_tv" />
+
+            <ImageView
+                android:id="@+id/add_reminder_imv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_control_point_black_24dp"
+                app:layout_constraintLeft_toRightOf="@+id/reminder_recycler"
+                app:layout_constraintTop_toTopOf="@+id/reminder_recycler" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/subTasksTextView"
@@ -138,7 +147,7 @@
             android:layout_marginTop="32dp"
             android:text="@string/subtasks_name"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/reminder_recycler" />
+            app:layout_constraintTop_toBottomOf="@+id/reminders_container" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/subTasksRecyclerView"

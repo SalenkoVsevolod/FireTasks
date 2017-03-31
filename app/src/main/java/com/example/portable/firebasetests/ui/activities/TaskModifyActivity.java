@@ -37,6 +37,7 @@ import com.example.portable.firebasetests.network.TagsObserverTask;
 import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
+import com.example.portable.firebasetests.utils.TimeUtils;
 
 import java.util.ArrayList;
 
@@ -121,6 +122,9 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        if (TimeUtils.isInPast(task.getCalendar().getTimeInMillis())) {
+            findViewById(R.id.reminders_container).setVisibility(View.GONE);
         }
     }
 
