@@ -21,7 +21,7 @@ import java.util.Calendar;
 
 public class ReminderEditorActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String REMINDER = "remind";
-    public static final int CREATE = 1, UPDATE = 2, CANCEL = 3, DELETE = 4;
+    public static final int CREATE = 1, UPDATE = 2, DELETE = 4;
     private static final String TIMESTAMP = "timestamp";
     private static final int SOUND_CODE = 5;
     private Remind remind;

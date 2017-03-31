@@ -53,7 +53,9 @@ public class LoginActivity extends AppCompatActivity {
                 Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (pendingResult.isDone()) {
             login(pendingResult.get().getSignInAccount());
+            setButtonVisibility(false);
         } else {
+            setButtonVisibility(true);
             pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(@NonNull GoogleSignInResult result) {
@@ -69,7 +71,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startTasksActivity() {
-
         startActivity(new Intent(this, WeeksActivity.class));
         finish();
     }
@@ -94,7 +95,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(final String tokenId) {
         LoginTask task = new LoginTask(this, tokenId);
-        setButtonVisibility(false);
         task.setOnLoginListener(new OnLoginListener() {
             @Override
             public void onLogin(int resultCode) {

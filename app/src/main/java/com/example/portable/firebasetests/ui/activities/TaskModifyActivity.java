@@ -325,9 +325,6 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
 
     private void handleRemindResult(int result, Remind remind) {
         switch (result) {
-            case ReminderEditorActivity.CANCEL:
-                //TODO
-                break;
             case ReminderEditorActivity.CREATE:
                 if (remind.getTimeStamp() > System.currentTimeMillis()) {
                     task.getReminds().add(remind);
