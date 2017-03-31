@@ -3,11 +3,11 @@ package com.example.portable.firebasetests.ui.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -55,8 +55,7 @@ public class WeeksActivity extends AppCompatActivity {
         weekBoundsTextView.setText(getWeekBoundsString(getCurrentWeekOfYearPosition()));
         pager.addOnPageChangeListener(getOnPageChangeListener());
         Toolbar toolbar = (Toolbar) findViewById(R.id.tasksActivityToolbar);
-        toolbar.setTitle(getString(R.string.app_name));
-        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.titleText));
+        toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
     }
 

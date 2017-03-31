@@ -2,14 +2,16 @@ package com.example.portable.firebasetests.ui.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,7 +26,7 @@ import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 
 import java.util.Calendar;
 
-public class TaskDisplayActivity extends AppCompatActivity implements View.OnClickListener {
+public class TaskDisplayActivity extends AppCompatActivity {
     public static final String TASK_ARG = "task";
     private TextView name, description, tagTV;
     private CardView tagCardView;
@@ -77,9 +79,7 @@ public class TaskDisplayActivity extends AppCompatActivity implements View.OnCli
         subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
-        toolbar.setTitle(getString(R.string.app_name));
-        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.titleText));
-        findViewById(R.id.edit_item).setOnClickListener(this);
+        toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -88,15 +88,19 @@ public class TaskDisplayActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.edit_toolbar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.edit_item:
                 TaskModifyActivity.start(this, task);
                 finish();
                 break;
-            case android.R.id.home:
-                finish();
-                break;
         }
+        return super.onOptionsItemSelected(item);
     }
 }

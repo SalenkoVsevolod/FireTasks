@@ -2,12 +2,16 @@ package com.example.portable.firebasetests.ui.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,7 +54,13 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         colorPreview.setOnClickListener(this);
         tagPreviewCardView = (CardView) findViewById(R.id.tag_cardview);
         tagPreviewTextView = (TextView) findViewById(R.id.tagTextView);
-
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tag_editor_toolbat);
+        toolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
         previewContainer = findViewById(R.id.preview_container);
         findViewById(R.id.save_button).setOnClickListener(this);
         tag = (Tag) getIntent().getSerializableExtra(TAG);
@@ -137,5 +147,14 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         } else {
             Toast.makeText(this, "tag allready exists", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
