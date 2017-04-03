@@ -4,32 +4,32 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.example.portable.firebasetests.ui.fragments.TasksWeekFragment;
+import com.example.portable.firebasetests.ui.fragments.DayNumberFragment;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Salenko Vsevolod on 16.02.2017.
  */
 
 public class WeeksPagerAdapter extends FragmentPagerAdapter {
-    private ArrayList<Fragment> fragments;
+    private int days;
 
-    public WeeksPagerAdapter(FragmentManager fm) {
-        super(fm);
-        fragments = new ArrayList<>();
-        for (int i = 1; i <= 52; i++) {
-            fragments.add(TasksWeekFragment.newInstance(i));
-        }
+
+    public WeeksPagerAdapter(FragmentManager fragmentManager) {
+        super(fragmentManager);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        days = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
     }
 
     @Override
     public Fragment getItem(int position) {
-        return fragments.get(position);
+        return DayNumberFragment.newInstance(position);
     }
 
     @Override
     public int getCount() {
-        return fragments.size();
+        return days;
     }
 }

@@ -14,13 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.ui.adapters.WeeksPagerAdapter;
-import com.example.portable.firebasetests.utils.StringUtils;
+import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,7 +31,6 @@ import java.util.Calendar;
 
 public class WeeksActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;
-    private TextView weekBoundsTextView;
 
     @SuppressWarnings("all")
     @Override
@@ -41,18 +39,16 @@ public class WeeksActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tasks);
         final ViewPager pager = (ViewPager) findViewById(R.id.tasksViewPager);
         pager.setAdapter(new WeeksPagerAdapter(getSupportFragmentManager()));
-        pager.setCurrentItem(getCurrentWeekOfYearPosition());
+        pager.setCurrentItem(getCurrentDayOfYear());
         floatingActionButton = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
         floatingActionButton.hide();
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pager.setCurrentItem(getCurrentWeekOfYearPosition());
+                pager.setCurrentItem(getCurrentDayOfYear());
             }
         });
-        weekBoundsTextView = (TextView) findViewById(R.id.weekBoundsTextView);
-        String currentWeekBounds = "" + getCurrentWeekOfYearPosition();
-        weekBoundsTextView.setText(getWeekBoundsString(getCurrentWeekOfYearPosition()));
+
         pager.addOnPageChangeListener(getOnPageChangeListener());
         Toolbar toolbar = (Toolbar) findViewById(R.id.tasksActivityToolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -68,12 +64,12 @@ public class WeeksActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if (position == getCurrentWeekOfYearPosition()) {
+                if (position == getCurrentDayOfYear()) {
                     floatingActionButton.hide();
                 } else {
                     floatingActionButton.show();
                 }
-                weekBoundsTextView.setText(getWeekBoundsString(position));
+                putNewFragment(position);
             }
 
             @Override
@@ -82,25 +78,19 @@ public class WeeksActivity extends AppCompatActivity {
             }
         };
 
-
     }
 
-    private int getCurrentWeekOfYearPosition() {
+    private void putNewFragment(int dayOfYear) {
+        //TODO show progressbar
+        getFragmentManager().beginTransaction()
+                .replace(R.id.day_of_week_container, DayFragment.newInstance(dayOfYear))
+                .commit();
+    }
+
+    private int getCurrentDayOfYear() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        return calendar.get(Calendar.WEEK_OF_YEAR) - 1;
-    }
-
-    private String getWeekBoundsString(int weekOfYear) {
-        weekOfYear++;
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
-        String firstDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        calendar.set(Calendar.WEEK_OF_YEAR, weekOfYear);
-        String lastDay = StringUtils.formatDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1);
-        return firstDay + "-" + lastDay;
+        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 
     @Override
