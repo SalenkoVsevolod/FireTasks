@@ -35,9 +35,7 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
 import com.example.portable.firebasetests.network.TagsObserverTask;
 import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
-import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
-import com.example.portable.firebasetests.utils.TimeUtils;
 
 import java.util.ArrayList;
 
@@ -123,9 +121,10 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        if (TimeUtils.isInPast(task.getCalendar().getTimeInMillis())) {
+        //TODO don't show reminders in past
+        /*if (TimeUtils.isInPast(task.getCalendar().getTimeInMillis())) {
             findViewById(R.id.reminders_container).setVisibility(View.GONE);
-        }
+        }*/
     }
 
     @Override
@@ -227,14 +226,14 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initSubtasksRecyclerView() {
-        SubTaskAdapter subTaskAdapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskClickListener() {
+/*        SubTaskPreviewAdapter subTaskPreviewAdapter = new SubTaskPreviewAdapter(task.getSubTasks(), new SubTaskPreviewAdapter.OnSubTaskClickListener() {
             @Override
             public void onClick(SubTask subTask) {
                 editSubtask(subTask);
             }
         });
-        subTasksRecycleView.setAdapter(subTaskAdapter);
-        subTasksRecycleView.setLayoutManager(new LinearLayoutManager(this));
+        subTasksRecycleView.setAdapter(subTaskPreviewAdapter);
+        subTasksRecycleView.setLayoutManager(new LinearLayoutManager(this));*/
     }
 
 

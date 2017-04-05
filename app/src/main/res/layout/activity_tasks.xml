@@ -14,21 +14,44 @@
         android:theme="?attr/actionBarTheme"
         android:title="@string/app_name" />
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/tasksViewPager"
+    <LinearLayout
+        android:id="@+id/days_tabs_container"
         android:layout_width="match_parent"
-        android:layout_height="128dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tasksActivityToolbar"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp" />
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/left_imv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_chevron_left_black_24dp"
+            android:tint="@color/gray_inactive" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/days_tabs"
+            android:layout_width="wrap_content"
+            android:layout_height="88dp"
+            android:layout_weight="10"
+            app:tabIndicatorColor="@android:color/transparent"
+            app:tabMode="scrollable" />
+
+        <ImageView
+            android:id="@+id/right_imv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_chevron_right_black_24dp"
+            android:tint="@color/gray_inactive" />
+    </LinearLayout>
+
 
     <FrameLayout
         android:id="@+id/day_of_week_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tasksViewPager" />
+        android:layout_below="@id/days_tabs_container" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/homeFloatingActionButton"
@@ -40,6 +63,6 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
         android:clickable="true"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/ic_home" />
+        android:scaleType="center"
+        app:fabSize="normal" />
 </RelativeLayout>

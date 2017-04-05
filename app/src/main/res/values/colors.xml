@@ -3,7 +3,7 @@
     <color name="colorPrimary">#00c7d4</color>
     <color name="colorPrimaryDark">#00c7d4</color>
     <color name="colorAccent">#00c7d4</color>
-    <color name="yellow">#ffd400</color>
+    <color name="yellow">#ffd300</color>
     <color name="blue_background">#00c7d4</color>
     <color name="doneTask">#79ff4d</color>
     <color name="failedTask">#ff3333</color>
@@ -13,4 +13,5 @@
     <color name="emptyDay">#aeadad</color>
     <color name="undoneDay">#ffff96</color>
     <color name="titleText">#ffffff</color>
+    <color name="gray_inactive">#CFCFCF</color>
 </resources>

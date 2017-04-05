@@ -1,19 +1,16 @@
 package com.example.portable.firebasetests.utils;
 
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.OpenableColumns;
-
-import com.example.portable.firebasetests.core.FireTasksApp;
-
-import java.util.Calendar;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Salenko Vsevolod on 15.02.2017.
  */
 
 public class StringUtils {
-    public static String formatNumber(int num) {
+    private static final List<String> DAYS_OF_WEEK = Arrays.asList("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN");
+
+    private static String formatNumber(int num) {
         return (num < 10 ? "0" : "") + num;
     }
 
@@ -26,32 +23,11 @@ public class StringUtils {
         return builder.toString();
     }
 
-    public static String getFileName(Uri uri) {
-        String result = null;
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = FireTasksApp.getInstance().getContentResolver().query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
-        }
-        if (result.contains(".")) {
-            result = result.substring(0, result.lastIndexOf("."));
-        }
-        return result;
+    public static String getTimeString(int hour, int minute) {
+        return formatNumber(hour) + ":" + formatNumber(minute);
     }
 
-    public String getTimeString(int hour, int minute) {
-        return formatNumber(hour) + ":" + formatNumber(minute);
+    public static String getDayOfWeekName(int dayOfWeek) {
+        return DAYS_OF_WEEK.get(TimeUtils.realToAdapter(dayOfWeek));
     }
 }

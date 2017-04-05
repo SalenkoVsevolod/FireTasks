@@ -16,15 +16,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseManager;
 import com.example.portable.firebasetests.network.TagSingleGetter;
 import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
-import com.example.portable.firebasetests.ui.adapters.SubTaskAdapter;
-
-import java.util.Calendar;
 
 public class TaskDisplayActivity extends AppCompatActivity {
     public static final String TASK_ARG = "task";
@@ -67,8 +63,8 @@ public class TaskDisplayActivity extends AppCompatActivity {
         findViewById(R.id.reminder_tv).setVisibility(task.getReminds().size() > 0 ? View.VISIBLE : View.GONE);
         remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
         remindsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        SubTaskAdapter adapter = new SubTaskAdapter(task.getSubTasks(), new SubTaskAdapter.OnSubTaskCheckBoxCliCkListener() {
+/*
+        SubTaskPreviewAdapter adapter = new SubTaskPreviewAdapter(task.getSubTasks(), new SubTaskPreviewAdapter.OnSubTaskCheckBoxCliCkListener() {
             @Override
             public void onClick(SubTask subTask, boolean checked) {
                 subTask.setDone(checked);
@@ -76,7 +72,7 @@ public class TaskDisplayActivity extends AppCompatActivity {
             }
         });
         subtasksRecyclerView.setAdapter(adapter);
-        subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));*/
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitleTextColor(Color.WHITE);

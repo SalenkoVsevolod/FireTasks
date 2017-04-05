@@ -62,7 +62,7 @@ public class Remind implements Serializable {
     @Exclude
     @Override
     public String toString() {
-        return StringUtils.formatNumber(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + StringUtils.formatNumber(calendar.get(Calendar.MINUTE));
+        return StringUtils.getTimeString(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
     }
 
     public long round() {

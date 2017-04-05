@@ -1,7 +1,6 @@
 package com.example.portable.firebasetests.model;
 
 
-import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
@@ -101,13 +100,6 @@ public class Task implements Serializable {
         }
         return true;
     }
-
-    @Exclude
-    public String getTimeString() {
-        return StringUtils.formatNumber(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + StringUtils.formatNumber(calendar.get(Calendar.MINUTE));
-    }
-
-
     public long getTimeStamp() {
         return calendar.getTimeInMillis();
     }

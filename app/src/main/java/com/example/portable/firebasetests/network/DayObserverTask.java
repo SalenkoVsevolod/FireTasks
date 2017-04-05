@@ -19,14 +19,14 @@ import java.util.Set;
  * Created by Portable on 25.01.2017.
  */
 @SuppressWarnings("unchecked")
-public class WeekObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
+public class DayObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     private DataChangingListener dataChangingListener;
     private ValueEventListener listener;
-    private int week;
+    private int day;
     private int currentYear;
 
-    public WeekObserverTask(int week, DataChangingListener listener) {
-        this.week = week;
+    DayObserverTask(int week, DataChangingListener listener) {
+        this.day = week;
         dataChangingListener = listener;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -46,7 +46,7 @@ public class WeekObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
                 ArrayList<Task> taskArrayList = getTasks(tasks);
                 for (Task t : taskArrayList) {
                     if (t.getCalendar().get(Calendar.YEAR) < currentYear) {
-                        FirebaseManager.getInstance().deleteTask(week, t.getId());
+                        FirebaseManager.getInstance().deleteTask(day, t.getId());
                     }
                 }
                 publishProgress(taskArrayList);
@@ -57,7 +57,7 @@ public class WeekObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
                 Toast.makeText(FireTasksApp.getInstance(), "connection cancelled", Toast.LENGTH_LONG).show();
             }
         };
-        FirebaseManager.getInstance().getWeekReference(week).addValueEventListener(listener);
+        FirebaseManager.getInstance().getDayReference(day).addValueEventListener(listener);
         return null;
     }
 
@@ -76,7 +76,7 @@ public class WeekObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     @Override
     protected void onCancelled(Void aVoid) {
         super.onCancelled(aVoid);
-        FirebaseManager.getInstance().getWeekReference(week).removeEventListener(listener);
+        FirebaseManager.getInstance().getDayReference(day).removeEventListener(listener);
     }
 
     @Override
