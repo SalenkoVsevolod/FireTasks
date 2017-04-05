@@ -18,6 +18,8 @@ import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 import com.example.portable.firebasetests.ui.adapters.TasksDayRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class DayFragment extends Fragment {
     private static final String DAY_OF_YEAR = "dayOfYear";
@@ -25,6 +27,7 @@ public class DayFragment extends Fragment {
     private ProgressBar progressBar;
     private int dayOfYear;
     private ArrayList<Task> tasks;
+    private String sortingTagId;
 
     public DayFragment() {
         // Required empty public constructor
@@ -73,10 +76,33 @@ public class DayFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
                 tasks.clear();
                 tasks.addAll(tasksArray);
+                if (sortingTagId != null) {
+                    sortTasks();
+                }
                 tasksRecycler.getAdapter().notifyDataSetChanged();
                 tasksRecycler.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    public void setSortingTagIdAndSort(String tagId) {
+        sortingTagId = tagId;
+        sortTasks();
+    }
+
+    public void sortTasks() {
+        Collections.sort(tasks, new Comparator<Task>() {
+            @Override
+            public int compare(Task o1, Task o2) {
+                if (o1.getTagId().equals(sortingTagId)) {
+                    return -1;
+                } else if (o2.getTagId().equals(sortingTagId)) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+        tasksRecycler.getAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -84,5 +110,4 @@ public class DayFragment extends Fragment {
         super.onDestroyView();
         FirebaseListenersManager.getInstance().removeDayListener(dayOfYear);
     }
-
 }

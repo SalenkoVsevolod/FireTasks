@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startTasksActivity() {
-        startActivity(new Intent(this, WeeksActivity.class));
+        startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 

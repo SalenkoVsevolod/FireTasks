@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,12 +41,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class WeeksActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private FloatingActionButton floatingActionButton;
     private ArrayList<Tag> tags;
     private Spinner tagSpinner;
     private TagAdapter tagAdapter;
+    private DayFragment currentFragment;
 
     @SuppressWarnings("all")
     @Override
@@ -89,7 +91,7 @@ public class WeeksActivity extends AppCompatActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        tabLayout.getTabAt(getCurrentDayOfYear()).select();
+                        tabLayout.getTabAt(getSelectionDay()).select();
                     }
                 }, 100);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -97,6 +99,8 @@ public class WeeksActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 setTabViewSelected(tab, true);
                 putNewFragment(tab.getPosition());
+                Preferences.getInstance().writeWhenLastOpened(getCurrentDayOfYear());
+                Preferences.getInstance().writeLastOpenedDay(tab.getPosition());
             }
 
             @Override
@@ -109,7 +113,31 @@ public class WeeksActivity extends AppCompatActivity {
 
             }
         });
+        tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (currentFragment != null) {
+                    currentFragment.setSortingTagIdAndSort(((Tag) tagAdapter.getItem(position)).getId());
+                }
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private int getSelectionDay() {
+        int lastOpenedDay = Preferences.getInstance().readLastOpenedDay();
+        int lastOpened = Preferences.getInstance().readWhenLastOpened();
+        if (lastOpenedDay != -1 && lastOpened == getCurrentDayOfYear()) {
+            return lastOpenedDay;
+        } else {
+            Preferences.getInstance().writeLastOpenedDay(getCurrentDayOfYear());
+            Preferences.getInstance().writeWhenLastOpened(getCurrentDayOfYear());
+            return getCurrentDayOfYear();
+        }
     }
 
     @Override
@@ -119,8 +147,9 @@ public class WeeksActivity extends AppCompatActivity {
     }
 
     private void putNewFragment(int dayOfYear) {
+        currentFragment = DayFragment.newInstance(dayOfYear + 1);
         getFragmentManager().beginTransaction()
-                .replace(R.id.day_of_week_container, DayFragment.newInstance(dayOfYear + 1))
+                .replace(R.id.day_of_week_container, currentFragment)
                 .commit();
     }
 
@@ -182,7 +211,7 @@ public class WeeksActivity extends AppCompatActivity {
                         public void onResult(@NonNull Status status) {
                             if (status.isSuccess()) {
                                 Preferences.getInstance().logout();
-                                startActivity(new Intent(WeeksActivity.this, LoginActivity.class));
+                                startActivity(new Intent(MainActivity.this, LoginActivity.class));
                                 finish();
                             }
                         }
@@ -192,7 +221,7 @@ public class WeeksActivity extends AppCompatActivity {
 
             @Override
             public void onConnectionSuspended(int i) {
-                Toast.makeText(WeeksActivity.this, "connection suspended", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "connection suspended", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -210,7 +239,7 @@ public class WeeksActivity extends AppCompatActivity {
     }
 
     private View inflateDay(int dayOfMonth, int dayOfWeek) {
-        View v = getLayoutInflater().inflate(R.layout.day_number_item, null);
+        View v = getLayoutInflater().inflate(R.layout.item_day_number, null);
         TextView dayOfMonthText = (TextView) v.findViewById(R.id.day_of_month);
         TextView dayOfWeekText = (TextView) v.findViewById(R.id.day_of_week);
         dayOfMonthText.setText(dayOfMonth + "");
@@ -226,7 +255,7 @@ public class WeeksActivity extends AppCompatActivity {
         task.getCalendar().set(Calendar.DAY_OF_WEEK, calendar.get(Calendar.DAY_OF_WEEK));
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR));
         task.getCalendar().set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-        TaskModifyActivity.start(WeeksActivity.this, task);
+        TaskModifyActivity.start(MainActivity.this, task);
     }
 
     private void setTabViewSelected(TabLayout.Tab tab, boolean selected) {
@@ -238,6 +267,6 @@ public class WeeksActivity extends AppCompatActivity {
     }
 
     private int getTabColor(boolean selected) {
-        return selected ? Color.BLACK : ContextCompat.getColor(WeeksActivity.this, R.color.gray_inactive);
+        return selected ? Color.BLACK : ContextCompat.getColor(MainActivity.this, R.color.gray_inactive);
     }
 }

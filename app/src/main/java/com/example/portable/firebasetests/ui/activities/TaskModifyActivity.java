@@ -258,7 +258,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
 
     private void editSubtask(final SubTask subTask) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.subtask_editor, null);
+        View view = getLayoutInflater().inflate(R.layout.dialog_subtask_editor, null);
         final EditText editText = (EditText) view.findViewById(R.id.subtask_name);
         final Spinner spinner = (Spinner) view.findViewById(R.id.priority_spinner);
         spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PRIORITIES));

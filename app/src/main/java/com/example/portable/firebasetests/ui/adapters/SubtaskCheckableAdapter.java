@@ -28,7 +28,7 @@ public class SubtaskCheckableAdapter extends RecyclerView.Adapter<SubtaskCheckab
 
     @Override
     public CheckableVH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new CheckableVH(LayoutInflater.from(parent.getContext()).inflate(R.layout.subtask_checkout_item, parent, false));
+        return new CheckableVH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_subtask_checkablet, parent, false));
     }
 
     @Override

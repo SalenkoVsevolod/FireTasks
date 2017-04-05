@@ -10,7 +10,8 @@ import android.util.Log;
  */
 
 public class Preferences {
-    private static final String PREFERENCES = "prefs", USER_ID = "userId", LAST_RINGTONE = "ringtone";
+    private static final String PREFERENCES = "prefs", USER_ID = "userId", LAST_RINGTONE = "ringtone",
+            LAST_OPENED = "lastOpened", DAY = "day";
     private static Preferences instance;
     private SharedPreferences preferences;
 
@@ -51,5 +52,25 @@ public class Preferences {
         SharedPreferences.Editor ed = preferences.edit();
         ed.putString(LAST_RINGTONE, ringtone);
         ed.apply();
+    }
+
+    public void writeLastOpenedDay(int dayOfYear) {
+        SharedPreferences.Editor ed = preferences.edit();
+        ed.putInt(DAY, dayOfYear);
+        ed.apply();
+    }
+
+    public void writeWhenLastOpened(int timestamp) {
+        SharedPreferences.Editor ed = preferences.edit();
+        ed.putInt(LAST_OPENED, timestamp);
+        ed.apply();
+    }
+
+    public int readLastOpenedDay() {
+        return preferences.getInt(DAY, -1);
+    }
+
+    public int readWhenLastOpened() {
+        return preferences.getInt(LAST_OPENED, -1);
     }
 }

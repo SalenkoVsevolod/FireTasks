@@ -78,7 +78,9 @@ public class DayFirebaseListener extends AsyncTask<Void, ArrayList<Task>, Void> 
     @Override
     protected void onCancelled(Void aVoid) {
         super.onCancelled(aVoid);
-        FirebaseListenersManager.getInstance().getDayReference(day).removeEventListener(listener);
+        if (listener != null) {
+            FirebaseListenersManager.getInstance().getDayReference(day).removeEventListener(listener);
+        }
     }
 
     @Override

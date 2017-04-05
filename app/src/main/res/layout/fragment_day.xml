@@ -4,13 +4,16 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="16dp"
     tools:context="com.example.portable.firebasetests.ui.fragments.DayFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/day_tasks_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
         android:background="@color/main_background"
         android:visibility="gone" />
 
