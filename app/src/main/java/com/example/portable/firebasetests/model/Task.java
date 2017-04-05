@@ -100,6 +100,7 @@ public class Task implements Serializable {
         }
         return true;
     }
+
     public long getTimeStamp() {
         return calendar.getTimeInMillis();
     }
@@ -137,5 +138,18 @@ public class Task implements Serializable {
 
     public void setTagId(String tagId) {
         this.tagId = tagId;
+    }
+
+    @Exclude
+    public int getProgress() {
+        float done = 0;
+        float sum = 0;
+        for (SubTask s : getSubTasks()) {
+            sum += s.getPriority();
+            if (s.isDone()) {
+                done += s.getPriority();
+            }
+        }
+        return (int) ((done / sum) * 100);
     }
 }

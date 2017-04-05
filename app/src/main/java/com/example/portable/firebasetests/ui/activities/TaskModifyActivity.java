@@ -278,13 +278,13 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                         s.setId("" + System.currentTimeMillis());
                         s.setPriority(spinner.getSelectedItemId() + 1);
                         task.getSubTasks().add(s);
-                        subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(s));
+//  TODO                      subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(s));
                     } else {
                         int index = task.getSubTasks().indexOf(subTask);
                         subTask.setDescription(editText.getText().toString());
                         subTask.setPriority(spinner.getSelectedItemId() + 1);
                         task.getSubTasks().set(index, subTask);
-                        subTasksRecycleView.getAdapter().notifyItemChanged(index);
+                        //    TODO                  subTasksRecycleView.getAdapter().notifyItemChanged(index);
                     }
                 }
             }

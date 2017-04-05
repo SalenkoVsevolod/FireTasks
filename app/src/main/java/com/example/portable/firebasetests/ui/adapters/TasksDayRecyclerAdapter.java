@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
  */
 
 public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecyclerAdapter.DayTaskViewHolder> {
-    private static final int MAX_SUBTASKS_DISPLAYING = 5;
+    private static final int MAX_SUBTASKS_DISPLAYING = 3;
     private ArrayList<Task> tasks;
 
     public TasksDayRecyclerAdapter(ArrayList<Task> tasks) {
@@ -60,6 +61,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             subTaskPreviewAdapter = new SubTaskPreviewAdapter(tasks.get(position).getSubTasks());
         }
         holder.subtasksRecycler.setAdapter(subTaskPreviewAdapter);
+        holder.progressBar.setProgress(tasks.get(position).getProgress());
     }
 
     @Override
@@ -71,6 +73,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         TextView tagTextView, nameTextView;
         RecyclerView subtasksRecycler;
         ImageView moreDots;
+        ProgressBar progressBar;
 
         DayTaskViewHolder(View itemView) {
             super(itemView);
@@ -78,6 +81,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             nameTextView = (TextView) itemView.findViewById(R.id.task_name_tv);
             subtasksRecycler = (RecyclerView) itemView.findViewById(R.id.subTasksRecyclerView);
             moreDots = (ImageView) itemView.findViewById(R.id.more_dots_tv);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
         }
     }
 }
