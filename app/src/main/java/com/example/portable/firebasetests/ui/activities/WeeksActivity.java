@@ -17,12 +17,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.Preferences;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
+import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.android.gms.auth.api.Auth;
@@ -32,11 +37,15 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class WeeksActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private FloatingActionButton floatingActionButton;
+    private ArrayList<Tag> tags;
+    private Spinner tagSpinner;
+    private TagAdapter tagAdapter;
 
     @SuppressWarnings("all")
     @Override
@@ -59,30 +68,21 @@ public class WeeksActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         inflateDays(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
+        tags = new ArrayList<>();
+        tagAdapter = new TagAdapter(this, tags);
+        tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
+        tagSpinner.setAdapter(tagAdapter);
+    }
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                View v = tab.getCustomView();
-                TextView week = (TextView) v.findViewById(R.id.day_of_week);
-                TextView month = (TextView) v.findViewById(R.id.day_of_month);
-                week.setTextColor(Color.BLACK);
-                month.setTextColor(Color.BLACK);
-                putNewFragment(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                View v = tab.getCustomView();
-                TextView week = (TextView) v.findViewById(R.id.day_of_week);
-                TextView month = (TextView) v.findViewById(R.id.day_of_month);
-                week.setTextColor(ContextCompat.getColor(WeeksActivity.this, R.color.gray_inactive));
-                month.setTextColor(ContextCompat.getColor(WeeksActivity.this, R.color.gray_inactive));
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
+            public void onSync(ArrayList<Tag> tagsArray) {
+                tags.clear();
+                tags.addAll(tagsArray);
+                tagAdapter.notifyDataSetChanged();
             }
         });
         new Handler().postDelayed(
@@ -92,6 +92,30 @@ public class WeeksActivity extends AppCompatActivity {
                         tabLayout.getTabAt(getCurrentDayOfYear()).select();
                     }
                 }, 100);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                setTabViewSelected(tab, true);
+                putNewFragment(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                setTabViewSelected(tab, false);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseListenersManager.getInstance().removeAllTagsListener();
     }
 
     private void putNewFragment(int dayOfYear) {
@@ -203,5 +227,17 @@ public class WeeksActivity extends AppCompatActivity {
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR));
         task.getCalendar().set(Calendar.YEAR, calendar.get(Calendar.YEAR));
         TaskModifyActivity.start(WeeksActivity.this, task);
+    }
+
+    private void setTabViewSelected(TabLayout.Tab tab, boolean selected) {
+        View v = tab.getCustomView();
+        TextView week = (TextView) v.findViewById(R.id.day_of_week);
+        TextView month = (TextView) v.findViewById(R.id.day_of_month);
+        week.setTextColor(getTabColor(selected));
+        month.setTextColor(getTabColor(selected));
+    }
+
+    private int getTabColor(boolean selected) {
+        return selected ? Color.BLACK : ContextCompat.getColor(WeeksActivity.this, R.color.gray_inactive);
     }
 }

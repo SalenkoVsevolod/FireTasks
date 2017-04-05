@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.network;
+package com.example.portable.firebasetests.network.listeners;
 
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -6,6 +6,8 @@ import android.widget.Toast;
 import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -19,13 +21,13 @@ import java.util.Set;
  * Created by Portable on 25.01.2017.
  */
 @SuppressWarnings("unchecked")
-public class DayObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
+public class DayFirebaseListener extends AsyncTask<Void, ArrayList<Task>, Void> {
     private DataChangingListener dataChangingListener;
     private ValueEventListener listener;
     private int day;
     private int currentYear;
 
-    DayObserverTask(int week, DataChangingListener listener) {
+    public DayFirebaseListener(int week, DataChangingListener listener) {
         this.day = week;
         dataChangingListener = listener;
         Calendar calendar = Calendar.getInstance();
@@ -46,7 +48,7 @@ public class DayObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
                 ArrayList<Task> taskArrayList = getTasks(tasks);
                 for (Task t : taskArrayList) {
                     if (t.getCalendar().get(Calendar.YEAR) < currentYear) {
-                        FirebaseManager.getInstance().deleteTask(day, t.getId());
+                        FirebaseUtils.getInstance().deleteTask(day, t.getId());
                     }
                 }
                 publishProgress(taskArrayList);
@@ -57,7 +59,7 @@ public class DayObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
                 Toast.makeText(FireTasksApp.getInstance(), "connection cancelled", Toast.LENGTH_LONG).show();
             }
         };
-        FirebaseManager.getInstance().getDayReference(day).addValueEventListener(listener);
+        FirebaseUtils.getInstance().getDayReference(day).addValueEventListener(listener);
         return null;
     }
 
@@ -76,7 +78,7 @@ public class DayObserverTask extends AsyncTask<Void, ArrayList<Task>, Void> {
     @Override
     protected void onCancelled(Void aVoid) {
         super.onCancelled(aVoid);
-        FirebaseManager.getInstance().getDayReference(day).removeEventListener(listener);
+        FirebaseListenersManager.getInstance().getDayReference(day).removeEventListener(listener);
     }
 
     @Override

@@ -13,8 +13,9 @@
             android:id="@+id/tag_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/yellow"
-            android:visibility="invisible" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
 
         <TextView
             android:id="@+id/task_name_tv"
@@ -22,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tag_tv"
             android:layout_margin="8dp"
-            android:textSize="16sp" />
+            android:textSize="20sp" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/subTasksRecyclerView"

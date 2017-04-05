@@ -9,10 +9,8 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseManager;
-import com.example.portable.firebasetests.network.TagSingleGetter;
+import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 
 import java.util.Calendar;
@@ -30,7 +28,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         Task task = (Task) intent.getSerializableExtra(TASK_TAG);
         int index = intent.getIntExtra(INDEX, -1);
         showNotification(mNotificationManager, task, index, context);
-        FirebaseManager.getInstance().removeReminder(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), task.getReminds().get(index));
+        FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(index));
     }
 
     private void showNotification(final NotificationManager manager, Task task, int index, Context context) {
@@ -49,12 +47,8 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         intent.putExtra(TaskDisplayActivity.TASK_ARG, task);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
-        FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {
-            @Override
-            public void onGet(Tag tag) {
-                builder.setContentTitle(tag.getName() + " task");
-                manager.notify(1, builder.build());
-            }
-        });
+        builder.setContentTitle(task.getName());
+        builder.setContentText(task.getDescription());
+        manager.notify(1, builder.build());
     }
 }

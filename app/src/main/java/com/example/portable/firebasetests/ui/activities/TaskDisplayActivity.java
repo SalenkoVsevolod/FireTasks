@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,16 +15,20 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseManager;
-import com.example.portable.firebasetests.network.TagSingleGetter;
+import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
 import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
+import com.example.portable.firebasetests.ui.adapters.SubtaskCheckableAdapter;
+
+import java.util.Calendar;
 
 public class TaskDisplayActivity extends AppCompatActivity {
-    public static final String TASK_ARG = "task";
+    public static final String TASK_ARG = "task", TAGS_ARG = "tags";
     private TextView name, description, tagTV;
-    private CardView tagCardView;
     private Task task;
     private RecyclerView subtasksRecyclerView, remindsRecyclerView;
 
@@ -39,40 +42,28 @@ public class TaskDisplayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_display);
-
         name = (TextView) findViewById(R.id.name_tv);
         description = (TextView) findViewById(R.id.description_display);
         remindsRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
         subtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         tagTV = (TextView) findViewById(R.id.tagTextView);
-        tagCardView = (CardView) findViewById(R.id.tag_cardview);
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
         name.setText(task.getName());
         description.setText(task.getDescription());
-        FirebaseManager.getInstance().setTagSingleListener(task.getTagId(), new TagSingleGetter.OnTagGetListener() {
-            @Override
-            public void onGet(Tag tag) {
-                if (tag != null) {
-                    tagTV.setText(tag.getName());
-                    tagCardView.setCardBackgroundColor((int) tag.getColor());
-                    tagCardView.setVisibility(View.VISIBLE);
-                }
-            }
-        });
 
         findViewById(R.id.reminder_tv).setVisibility(task.getReminds().size() > 0 ? View.VISIBLE : View.GONE);
         remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
         remindsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-/*
-        SubTaskPreviewAdapter adapter = new SubTaskPreviewAdapter(task.getSubTasks(), new SubTaskPreviewAdapter.OnSubTaskCheckBoxCliCkListener() {
+
+        SubtaskCheckableAdapter adapter = new SubtaskCheckableAdapter(task.getSubTasks(), new SubtaskCheckableAdapter.OnSubtaskCheckListener() {
             @Override
-            public void onClick(SubTask subTask, boolean checked) {
+            public void onCheck(SubTask subTask, boolean checked) {
                 subTask.setDone(checked);
-                FirebaseManager.getInstance().setSubTaskDone(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), subTask);
+                FirebaseUtils.getInstance().setSubTaskDone(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), subTask);
             }
         });
         subtasksRecyclerView.setAdapter(adapter);
-        subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));*/
+        subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -81,6 +72,24 @@ public class TaskDisplayActivity extends AppCompatActivity {
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseListenersManager.getInstance().setTagListener(task.getTagId(), new TagFirebaseListener.OnTagGetListener() {
+            @Override
+            public void onGet(Tag tag) {
+                tagTV.setText(tag.getName());
+                tagTV.setTextColor((int) tag.getColor());
+            }
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseListenersManager.getInstance().removeTagListener();
     }
 
     @Override

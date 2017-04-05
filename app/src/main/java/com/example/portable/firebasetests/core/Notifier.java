@@ -8,7 +8,7 @@ import android.os.Build;
 
 import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.FirebaseUtils;
 
 import java.util.Calendar;
 
@@ -32,7 +32,7 @@ public class Notifier {
                     alarmManager.set(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).round(), pendingIntent);
                 }
             } else {
-                FirebaseManager.getInstance().removeReminder(task.getCalendar().get(Calendar.WEEK_OF_YEAR), task.getId(), task.getReminds().get(i));
+                FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(i));
             }
         }
 

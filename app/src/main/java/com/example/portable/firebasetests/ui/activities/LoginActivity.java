@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.Preferences;
-import com.example.portable.firebasetests.network.LoginTask;
+import com.example.portable.firebasetests.network.listeners.FirebaseLoginListener;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -94,11 +94,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(final String tokenId) {
-        LoginTask task = new LoginTask(this, tokenId);
+        FirebaseLoginListener task = new FirebaseLoginListener(this, tokenId);
         task.setOnLoginListener(new OnLoginListener() {
             @Override
             public void onLogin(int resultCode) {
-                if (resultCode == LoginTask.DONE) {
+                if (resultCode == FirebaseLoginListener.DONE) {
                     startTasksActivity();
                 } else {
                     Toast.makeText(LoginActivity.this, "Authentication failed.",

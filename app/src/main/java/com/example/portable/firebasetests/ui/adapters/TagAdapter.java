@@ -1,7 +1,6 @@
 package com.example.portable.firebasetests.ui.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,8 +49,7 @@ public class TagAdapter extends BaseAdapter {
         }
         final Tag tag = (Tag) getItem(position);
         TextView item = (TextView) view.findViewById(R.id.tagTextView);
-        CardView background = (CardView) view.findViewById(R.id.tag_cardview);
-        background.setCardBackgroundColor((int) tag.getColor());
+        item.setTextColor((int) tag.getColor());
         item.setText(tag.getName());
         return view;
     }

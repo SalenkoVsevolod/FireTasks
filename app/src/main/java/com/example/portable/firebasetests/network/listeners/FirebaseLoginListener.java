@@ -1,9 +1,8 @@
-package com.example.portable.firebasetests.network;
+package com.example.portable.firebasetests.network.listeners;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.portable.firebasetests.ui.activities.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,7 +16,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
  * Created by Salenko Vsevolod on 22.02.2017.
  */
 
-public class LoginTask extends AsyncTask<Void, Void, Void> {
+public class FirebaseLoginListener extends AsyncTask<Void, Void, Void> {
     public static final int DONE = 0;
     private LoginActivity.OnLoginListener onLoginListener;
     private FirebaseAuth mAuth;
@@ -25,7 +24,7 @@ public class LoginTask extends AsyncTask<Void, Void, Void> {
     private Activity activity;
     private int resultCode;
 
-    public LoginTask(Activity activity, String tokenId) {
+    public FirebaseLoginListener(Activity activity, String tokenId) {
         this.activity = activity;
         mAuth = FirebaseAuth.getInstance();
         this.tokenId = tokenId;

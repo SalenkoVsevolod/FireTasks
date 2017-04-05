@@ -32,10 +32,13 @@ import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseManager;
-import com.example.portable.firebasetests.network.TagsObserverTask;
+import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
 import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
+import com.example.portable.firebasetests.ui.adapters.SubtaskClickableAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
+import com.example.portable.firebasetests.utils.TimeUtils;
 
 import java.util.ArrayList;
 
@@ -45,8 +48,9 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
 
     private static final String TASK_ARG = "task";
     private EditText descriptionEdit, nameEdit;
-    private Button okButton, addSubTaskButton;
+    private Button saveButton;
     private Spinner tagSpinner;
+    private TagAdapter tagAdapter;
     private RecyclerView subTasksRecycleView, remindersRecyclerView;
     private Task task;
     private ImageView editTag;
@@ -66,9 +70,12 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         nameEdit = (EditText) findViewById(R.id.nameET);
         descriptionEdit = (EditText) findViewById(R.id.taskDescriptionEdit);
         tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
-        okButton = (Button) findViewById(R.id.addTaskButton);
+        tags = new ArrayList<>();
+        tagAdapter = new TagAdapter(this, tags);
+        tagSpinner.setAdapter(tagAdapter);
+        saveButton = (Button) findViewById(R.id.addTaskButton);
         subTasksRecycleView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
-        addSubTaskButton = (Button) findViewById(R.id.addSubTaskButton);
+        Button addSubTaskButton = (Button) findViewById(R.id.addSubTaskButton);
         remindersRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
         editTag = (ImageView) findViewById(R.id.edit_tag_imv);
         editTag.setOnClickListener(this);
@@ -81,7 +88,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         }
 
         initSubtasksRecyclerView();
-        okButton.setOnClickListener(new View.OnClickListener() {
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 task.setName(nameEdit.getText().toString());
@@ -121,30 +128,29 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        //TODO don't show reminders in past
-        /*if (TimeUtils.isInPast(task.getCalendar().getTimeInMillis())) {
+
+        if (TimeUtils.isInPast(task.getCalendar().getTimeInMillis())) {
             findViewById(R.id.reminders_container).setVisibility(View.GONE);
-        }*/
+        }
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i("tagsedit", "task modify start");
-        FirebaseManager.getInstance().setTagsListener(new TagsObserverTask.OnTagsSyncListener() {
+        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
             @Override
-            public void onSync(ArrayList<Tag> tags) {
-                if (tags.size() == 0) {
-                    Log.i("tagsedit", "sync, set invisible");
+            public void onSync(ArrayList<Tag> tagsArray) {
+                if (tagsArray.size() == 0) {
                     tagSpinner.setVisibility(View.GONE);
                     editTag.setVisibility(View.GONE);
                     task.setTagId(null);
                 } else {
-                    Log.i("tagsedit", "sync, set visible");
                     tagSpinner.setVisibility(View.VISIBLE);
                     editTag.setVisibility(View.VISIBLE);
-                    TaskModifyActivity.this.tags = tags;
-                    tagSpinner.setAdapter(new TagAdapter(TaskModifyActivity.this, tags));
+                    tags.clear();
+                    tags.addAll(tagsArray);
+                    tagAdapter.notifyDataSetChanged();
                     if (task.getTagId() != null) {
                         int pos = -1;
                         for (int i = 0; i < tags.size(); i++) {
@@ -157,7 +163,6 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                     } else {
                         tagSpinner.setSelection(0);
                     }
-
                 }
 
             }
@@ -167,8 +172,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i("tagsedit", "modify stop");
-        FirebaseManager.getInstance().removeTagsListener();
+        FirebaseListenersManager.getInstance().removeAllTagsListener();
     }
 
     private void configViewsForClosingKeyBord(View rootView) {
@@ -226,14 +230,13 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initSubtasksRecyclerView() {
-/*        SubTaskPreviewAdapter subTaskPreviewAdapter = new SubTaskPreviewAdapter(task.getSubTasks(), new SubTaskPreviewAdapter.OnSubTaskClickListener() {
+        subTasksRecycleView.setAdapter(new SubtaskClickableAdapter(task.getSubTasks(), new SubtaskClickableAdapter.OnSubtaskClickListener() {
             @Override
             public void onClick(SubTask subTask) {
                 editSubtask(subTask);
             }
-        });
-        subTasksRecycleView.setAdapter(subTaskPreviewAdapter);
-        subTasksRecycleView.setLayoutManager(new LinearLayoutManager(this));*/
+        }));
+        subTasksRecycleView.setLayoutManager(new LinearLayoutManager(this));
     }
 
 
@@ -263,7 +266,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         if (subTask != null) {
             button.setVisibility(View.VISIBLE);
             editText.setText(subTask.getDescription());
-            spinner.setSelection((int) subTask.getPriority() - 1);
+            spinner.setSelection((int) subTask.getPriority());
         }
         builder.setView(view);
         builder.setCancelable(true);
@@ -276,15 +279,15 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                         SubTask s = new SubTask();
                         s.setDescription(editText.getText().toString());
                         s.setId("" + System.currentTimeMillis());
-                        s.setPriority(spinner.getSelectedItemId() + 1);
+                        s.setPriority(spinner.getSelectedItemId());
                         task.getSubTasks().add(s);
-//  TODO                      subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(s));
+                        subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(s));
                     } else {
                         int index = task.getSubTasks().indexOf(subTask);
                         subTask.setDescription(editText.getText().toString());
-                        subTask.setPriority(spinner.getSelectedItemId() + 1);
+                        subTask.setPriority(spinner.getSelectedItemId());
                         task.getSubTasks().set(index, subTask);
-                        //    TODO                  subTasksRecycleView.getAdapter().notifyItemChanged(index);
+                        subTasksRecycleView.getAdapter().notifyItemChanged(index);
                     }
                 }
             }
@@ -313,7 +316,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
             Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
         }
         Notifier.setAlarms(task);
-        FirebaseManager.getInstance().saveTask(task);
+        FirebaseUtils.getInstance().saveTask(task);
     }
 
     @Override

@@ -14,8 +14,8 @@ import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseManager;
-import com.example.portable.firebasetests.network.TagSingleGetter;
+import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
 
 import java.util.ArrayList;
 
@@ -26,9 +26,11 @@ import java.util.ArrayList;
 public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecyclerAdapter.DayTaskViewHolder> {
     private static final int MAX_SUBTASKS_DISPLAYING = 3;
     private ArrayList<Task> tasks;
+    private OnTaskClickListener listener;
 
-    public TasksDayRecyclerAdapter(ArrayList<Task> tasks) {
+    public TasksDayRecyclerAdapter(ArrayList<Task> tasks, OnTaskClickListener listener) {
         this.tasks = tasks;
+        this.listener = listener;
     }
 
     @Override
@@ -38,35 +40,39 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
 
     @Override
     public void onBindViewHolder(final DayTaskViewHolder holder, int position) {
-        holder.nameTextView.setText(tasks.get(position).getName());
-        FirebaseManager.getInstance().setTagSingleListener(tasks.get(position).getTagId(), new TagSingleGetter.OnTagGetListener() {
+        Task t = tasks.get(position);
+        holder.nameTextView.setText(t.getName());
+        FirebaseListenersManager.getInstance().setTagListener(t.getTagId(), new TagFirebaseListener.OnTagGetListener() {
             @Override
             public void onGet(Tag tag) {
-                holder.tagTextView.setVisibility(View.VISIBLE);
                 holder.tagTextView.setText(tag.getName());
                 holder.tagTextView.setTextColor((int) tag.getColor());
             }
         });
         holder.subtasksRecycler.setLayoutManager(new LinearLayoutManager(FireTasksApp.getInstance()));
         SubTaskPreviewAdapter subTaskPreviewAdapter;
-        if (tasks.get(position).getSubTasks().size() > MAX_SUBTASKS_DISPLAYING) {
+        if (t.getSubTasks().size() > MAX_SUBTASKS_DISPLAYING) {
             ArrayList<SubTask> newSubTasks = new ArrayList<>();
             for (int i = 0; i < MAX_SUBTASKS_DISPLAYING; i++) {
-                newSubTasks.add(tasks.get(position).getSubTasks().get(i));
+                newSubTasks.add(t.getSubTasks().get(i));
             }
             holder.moreDots.setVisibility(View.VISIBLE);
             subTaskPreviewAdapter = new SubTaskPreviewAdapter(newSubTasks);
         } else {
             holder.moreDots.setVisibility(View.GONE);
-            subTaskPreviewAdapter = new SubTaskPreviewAdapter(tasks.get(position).getSubTasks());
+            subTaskPreviewAdapter = new SubTaskPreviewAdapter(t.getSubTasks());
         }
         holder.subtasksRecycler.setAdapter(subTaskPreviewAdapter);
-        holder.progressBar.setProgress(tasks.get(position).getProgress());
+        holder.progressBar.setProgress(t.getProgress());
     }
 
     @Override
     public int getItemCount() {
         return tasks.size();
+    }
+
+    public interface OnTaskClickListener {
+        void onClick(Task task);
     }
 
     class DayTaskViewHolder extends RecyclerView.ViewHolder {
@@ -82,6 +88,18 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             subtasksRecycler = (RecyclerView) itemView.findViewById(R.id.subTasksRecyclerView);
             moreDots = (ImageView) itemView.findViewById(R.id.more_dots_tv);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+            View.OnClickListener taskClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(tasks.get(getAdapterPosition()));
+                }
+            };
+            itemView.setOnClickListener(taskClickListener);
+            tagTextView.setOnClickListener(taskClickListener);
+            nameTextView.setOnClickListener(taskClickListener);
+            subtasksRecycler.setOnClickListener(taskClickListener);
+            moreDots.setOnClickListener(taskClickListener);
+            progressBar.setOnClickListener(taskClickListener);
         }
     }
 }

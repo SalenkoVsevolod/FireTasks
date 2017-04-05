@@ -145,9 +145,9 @@ public class Task implements Serializable {
         float done = 0;
         float sum = 0;
         for (SubTask s : getSubTasks()) {
-            sum += s.getPriority();
+            sum += (s.getPriority() + 1);
             if (s.isDone()) {
-                done += s.getPriority();
+                done += (s.getPriority() + 1);
             }
         }
         return (int) ((done / sum) * 100);

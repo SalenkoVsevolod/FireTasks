@@ -1,10 +1,11 @@
-package com.example.portable.firebasetests.network;
+package com.example.portable.firebasetests.network.listeners;
 
 import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.Tag;
+import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -17,11 +18,11 @@ import java.util.Set;
  * Created by Salenko Vsevolod on 28.03.2017.
  */
 
-public class TagsObserverTask extends AsyncTask<Void, ArrayList<Tag>, Void> {
+public class AllTagsFirebaseListener extends AsyncTask<Void, ArrayList<Tag>, Void> {
     private OnTagsSyncListener listener;
     private ValueEventListener valueEventListener;
 
-    public TagsObserverTask(OnTagsSyncListener listener) {
+    public AllTagsFirebaseListener(OnTagsSyncListener listener) {
         this.listener = listener;
     }
 
@@ -42,7 +43,7 @@ public class TagsObserverTask extends AsyncTask<Void, ArrayList<Tag>, Void> {
                 Toast.makeText(FireTasksApp.getInstance(), "Connection cancelled", Toast.LENGTH_LONG).show();
             }
         };
-        FirebaseManager.getInstance().getTagsReference().addValueEventListener(valueEventListener);
+        FirebaseUtils.getInstance().getTagsReference().addValueEventListener(valueEventListener);
         return null;
     }
 
@@ -66,9 +67,7 @@ public class TagsObserverTask extends AsyncTask<Void, ArrayList<Tag>, Void> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
-
-        FirebaseManager.getInstance().getTagsReference().removeEventListener(valueEventListener);
-
+        FirebaseUtils.getInstance().getTagsReference().removeEventListener(valueEventListener);
     }
 
     public interface OnTagsSyncListener {

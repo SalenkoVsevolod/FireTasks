@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,7 +19,7 @@ import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Tag;
-import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.jrummyapps.android.colorpicker.ColorPickerDialog;
 import com.jrummyapps.android.colorpicker.ColorPickerDialogListener;
 
@@ -32,7 +31,6 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
     private EditText nameEdit;
     private View colorPreview;
     private Button colorPick;
-    private CardView tagPreviewCardView;
     private TextView tagPreviewTextView;
     private View previewContainer;
     private ArrayList<Tag> allTags;
@@ -52,7 +50,6 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         colorPick = (Button) findViewById(R.id.pick_color_button);
         colorPreview = findViewById(R.id.color_preview);
         colorPreview.setOnClickListener(this);
-        tagPreviewCardView = (CardView) findViewById(R.id.tag_cardview);
         tagPreviewTextView = (TextView) findViewById(R.id.tagTextView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.tag_editor_toolbat);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -72,8 +69,7 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
             tag = new Tag();
         } else {
             nameEdit.setText(tag.getName());
-            colorPreview.setBackgroundColor((int) tag.getColor());
-            tagPreviewCardView.setCardBackgroundColor((int) tag.getColor());
+            tagPreviewTextView.setTextColor((int) tag.getColor());
             tagPreviewTextView.setText(tag.getName());
             previewContainer.setVisibility(View.VISIBLE);
             hideButton();
@@ -102,7 +98,7 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
     @Override
     public void onColorSelected(int dialogId, @ColorInt int color) {
         tag.setColor(color);
-        tagPreviewCardView.setCardBackgroundColor(color);
+        tagPreviewTextView.setTextColor(color);
         colorPreview.setBackgroundColor(color);
         hideButton();
     }
@@ -142,7 +138,7 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         }
 
         if (!allTags.contains(tag)) {
-            FirebaseManager.getInstance().addTag(tag);
+            FirebaseUtils.getInstance().addTag(tag);
             finish();
         } else {
             Toast.makeText(this, "tag allready exists", Toast.LENGTH_SHORT).show();

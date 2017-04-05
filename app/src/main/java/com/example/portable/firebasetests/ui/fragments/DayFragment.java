@@ -8,13 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.DayObserverTask;
-import com.example.portable.firebasetests.network.FirebaseManager;
+import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.listeners.DayFirebaseListener;
+import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 import com.example.portable.firebasetests.ui.adapters.TasksDayRecyclerAdapter;
 
 import java.util.ArrayList;
@@ -23,9 +23,8 @@ public class DayFragment extends Fragment {
     private static final String DAY_OF_YEAR = "dayOfYear";
     private RecyclerView tasksRecycler;
     private ProgressBar progressBar;
-    private ImageView moreImageView;
     private int dayOfYear;
-
+    private ArrayList<Task> tasks;
 
     public DayFragment() {
         // Required empty public constructor
@@ -54,21 +53,36 @@ public class DayFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_day, container, false);
         tasksRecycler = (RecyclerView) rootView.findViewById(R.id.day_tasks_rv);
         progressBar = (ProgressBar) rootView.findViewById(R.id.day_progress_bar);
-        moreImageView = (ImageView) rootView.findViewById(R.id.more_dots_tv);
+        tasks = new ArrayList<>();
+        tasksRecycler.setAdapter(new TasksDayRecyclerAdapter(tasks, new TasksDayRecyclerAdapter.OnTaskClickListener() {
+            @Override
+            public void onClick(Task task) {
+                TaskDisplayActivity.start(getActivity(), task);
+            }
+        }));
         return rootView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        FirebaseManager.getInstance().setDayListener(dayOfYear, new DayObserverTask.DataChangingListener() {
+        FirebaseListenersManager.getInstance().setDayListener(dayOfYear, new DayFirebaseListener.DataChangingListener() {
             @Override
-            public void onDataChanged(ArrayList<Task> tasks) {
+            public void onDataChanged(ArrayList<Task> tasksArray) {
                 tasksRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
                 progressBar.setVisibility(View.GONE);
-                tasksRecycler.setAdapter(new TasksDayRecyclerAdapter(tasks));
+                tasks.clear();
+                tasks.addAll(tasksArray);
+                tasksRecycler.getAdapter().notifyDataSetChanged();
                 tasksRecycler.setVisibility(View.VISIBLE);
             }
         });
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        FirebaseListenersManager.getInstance().removeDayListener(dayOfYear);
+    }
+
 }
