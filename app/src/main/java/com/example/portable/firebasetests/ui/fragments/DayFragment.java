@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Task;
@@ -29,6 +28,7 @@ public class DayFragment extends Fragment {
     private int dayOfYear;
     private ArrayList<Task> tasks;
     private String sortingTagId;
+    private TasksDayRecyclerAdapter adapter;
 
     public DayFragment() {
         // Required empty public constructor
@@ -67,20 +67,15 @@ public class DayFragment extends Fragment {
         tasksRecycler = (RecyclerView) rootView.findViewById(R.id.day_tasks_rv);
         progressBar = (ProgressBar) rootView.findViewById(R.id.day_progress_bar);
         tasks = new ArrayList<>();
-        TasksDayRecyclerAdapter.OnTaskClickListener onTaskClickListener = new TasksDayRecyclerAdapter.OnTaskClickListener() {
+        TasksDayRecyclerAdapter.OnTaskInteractionListener onTaskInteractionListener = new TasksDayRecyclerAdapter.OnTaskInteractionListener() {
             @Override
             public void onClick(Task task) {
                 TaskDisplayActivity.start(getActivity(), task);
             }
+
         };
-        View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toast.makeText(getActivity(), "show deleting", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        };
-        tasksRecycler.setAdapter(new TasksDayRecyclerAdapter(tasks, onTaskClickListener, onLongClickListener));
+        adapter = new TasksDayRecyclerAdapter(tasks, onTaskInteractionListener);
+        tasksRecycler.setAdapter(adapter);
         return rootView;
     }
 

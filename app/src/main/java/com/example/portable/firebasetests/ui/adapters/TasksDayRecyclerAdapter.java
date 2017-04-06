@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,13 +29,13 @@ import java.util.ArrayList;
 public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecyclerAdapter.DayTaskViewHolder> {
     private static final int MAX_SUBTASKS_DISPLAYING = 3;
     private ArrayList<Task> tasks;
-    private OnTaskClickListener onTaskClicklistener;
-    private View.OnLongClickListener longClickListener;
+    private OnTaskInteractionListener onTaskInteractionListener;
+    private boolean deleting = false;
+    private int longClicked;
 
-    public TasksDayRecyclerAdapter(ArrayList<Task> tasks, OnTaskClickListener onTaskClicklistener, View.OnLongClickListener longClickListener) {
+    public TasksDayRecyclerAdapter(ArrayList<Task> tasks, OnTaskInteractionListener onTaskInteractionListener) {
         this.tasks = tasks;
-        this.onTaskClicklistener = onTaskClicklistener;
-        this.longClickListener = longClickListener;
+        this.onTaskInteractionListener = onTaskInteractionListener;
     }
 
     @Override
@@ -43,15 +44,53 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
     }
 
     @Override
-    public void onBindViewHolder(final DayTaskViewHolder holder, int position) {
+    public void onBindViewHolder(final DayTaskViewHolder holder, final int position) {
+
         final Task t = tasks.get(position);
+
+        View.OnClickListener onSubtaskClick;
+        View.OnLongClickListener onSubtaskLongClick;
+
+        if (deleting) {
+            holder.deletingCheckbox.setVisibility(View.VISIBLE);
+            holder.deletingCheckbox.setChecked(longClicked == position);
+            onSubtaskClick = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleting = false;
+                    notifyDataSetChanged();
+                }
+            };
+            onSubtaskLongClick = new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    deleting = false;
+                    notifyDataSetChanged();
+                    return true;
+                }
+            };
+        } else {
+            holder.deletingCheckbox.setVisibility(View.GONE);
+            holder.deletingCheckbox.setChecked(false);
+            onSubtaskClick = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onTaskInteractionListener.onClick(t);
+                }
+            };
+            onSubtaskLongClick = new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    holder.deletingCheckbox.setChecked(true);
+                    setDeleting(true);
+                    longClicked = position;
+                    notifyDataSetChanged();
+                    return true;
+                }
+            };
+        }
         holder.nameTextView.setText(t.getName());
-        View.OnClickListener onSubtaskClick = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onTaskClicklistener.onClick(t);
-            }
-        };
+
         FirebaseListenersManager.getInstance().setTagListener(t.getTagId(), new TagFirebaseListener.OnTagGetListener() {
             @Override
             public void onGet(Tag tag) {
@@ -69,13 +108,15 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
                 newSubTasks.add(t.getSubTasks().get(i));
             }
             holder.moreDots.setVisibility(View.VISIBLE);
-            subTaskPreviewAdapter = new SubTaskPreviewAdapter(newSubTasks, onSubtaskClick, longClickListener);
+            subTaskPreviewAdapter = new SubTaskPreviewAdapter(newSubTasks, onSubtaskClick, onSubtaskLongClick);
         } else {
             holder.moreDots.setVisibility(View.GONE);
-            subTaskPreviewAdapter = new SubTaskPreviewAdapter(t.getSubTasks(), onSubtaskClick, longClickListener);
+            subTaskPreviewAdapter = new SubTaskPreviewAdapter(t.getSubTasks(), onSubtaskClick, onSubtaskLongClick);
         }
         holder.subtasksRecycler.setAdapter(subTaskPreviewAdapter);
         holder.progressBar.setProgress(t.getProgress());
+        holder.rootView.setOnClickListener(onSubtaskClick);
+        holder.rootView.setOnLongClickListener(onSubtaskLongClick);
     }
 
     @Override
@@ -83,30 +124,31 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         return tasks.size();
     }
 
-    public interface OnTaskClickListener {
+    public void setDeleting(boolean deleting) {
+        this.deleting = deleting;
+    }
+
+    public interface OnTaskInteractionListener {
         void onClick(Task task);
     }
 
-    class DayTaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class DayTaskViewHolder extends RecyclerView.ViewHolder {
         TextView tagTextView, nameTextView;
         RecyclerView subtasksRecycler;
         ImageView moreDots;
         ProgressBar progressBar;
+        CheckBox deletingCheckbox;
+        View rootView;
 
         DayTaskViewHolder(View itemView) {
             super(itemView);
+            rootView = itemView;
             tagTextView = (TextView) itemView.findViewById(R.id.tag_tv);
+            deletingCheckbox = (CheckBox) itemView.findViewById(R.id.deleting_checkbox);
             nameTextView = (TextView) itemView.findViewById(R.id.task_name_tv);
             subtasksRecycler = (RecyclerView) itemView.findViewById(R.id.subTasksRecyclerView);
             moreDots = (ImageView) itemView.findViewById(R.id.more_dots_tv);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(longClickListener);
-        }
-
-        @Override
-        public void onClick(View v) {
-            onTaskClicklistener.onClick(tasks.get(getAdapterPosition()));
         }
     }
 }
