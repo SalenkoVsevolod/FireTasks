@@ -106,6 +106,7 @@ public class TaskDisplayActivity extends AppCompatActivity {
                 finish();
                 break;
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

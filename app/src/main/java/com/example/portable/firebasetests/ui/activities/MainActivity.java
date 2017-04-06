@@ -3,7 +3,6 @@ package com.example.portable.firebasetests.ui.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,11 +42,11 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
-    private FloatingActionButton floatingActionButton;
     private ArrayList<Tag> tags;
     private Spinner tagSpinner;
     private TagAdapter tagAdapter;
     private DayFragment currentFragment;
+    private TabLayout.OnTabSelectedListener onTabSelectedListener;
 
     @SuppressWarnings("all")
     @Override
@@ -55,10 +54,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
         tabLayout = (TabLayout) findViewById(R.id.days_tabs);
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
-        floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
-        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.yellow)));
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton addTaskfloatingActionButton = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
+        addTaskfloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
+        addTaskfloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startTaskModifier();
@@ -74,27 +72,7 @@ public class MainActivity extends AppCompatActivity {
         tagAdapter = new TagAdapter(this, tags);
         tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
         tagSpinner.setAdapter(tagAdapter);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
-            @Override
-            public void onSync(ArrayList<Tag> tagsArray) {
-                tags.clear();
-                tags.addAll(tagsArray);
-                tagAdapter.notifyDataSetChanged();
-            }
-        });
-        new Handler().postDelayed(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        tabLayout.getTabAt(getSelectionDay()).select();
-                    }
-                }, 100);
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 setTabViewSelected(tab, true);
@@ -112,7 +90,28 @@ public class MainActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
 
             }
+        };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
+            @Override
+            public void onSync(ArrayList<Tag> tagsArray) {
+                tags.clear();
+                tags.addAll(tagsArray);
+                tagAdapter.notifyDataSetChanged();
+            }
         });
+        new Handler().postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        tabLayout.getTabAt(getSelectionDay()).select();
+                    }
+                }, 100);
+        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
         tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -128,6 +127,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        FirebaseListenersManager.getInstance().removeAllTagsListener();
+        tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+    }
+
     private int getSelectionDay() {
         int lastOpenedDay = Preferences.getInstance().readLastOpenedDay();
         int lastOpened = Preferences.getInstance().readWhenLastOpened();
@@ -140,14 +146,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        FirebaseListenersManager.getInstance().removeAllTagsListener();
-    }
-
     private void putNewFragment(int dayOfYear) {
-        currentFragment = DayFragment.newInstance(dayOfYear + 1);
+        int position = tagSpinner.getSelectedItemPosition();
+        if (position != -1) {
+            currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagAdapter.getItem(position)).getId());
+        } else
+            currentFragment = DayFragment.newInstance(dayOfYear + 1);
         getFragmentManager().beginTransaction()
                 .replace(R.id.day_of_week_container, currentFragment)
                 .commit();

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Task;
@@ -22,7 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class DayFragment extends Fragment {
-    private static final String DAY_OF_YEAR = "dayOfYear";
+    private static final String DAY_OF_YEAR = "dayOfYear", SORTING = "sort";
     private RecyclerView tasksRecycler;
     private ProgressBar progressBar;
     private int dayOfYear;
@@ -33,11 +34,19 @@ public class DayFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     public static DayFragment newInstance(int dayOfYear) {
         DayFragment fragment = new DayFragment();
         Bundle args = new Bundle();
         args.putInt(DAY_OF_YEAR, dayOfYear);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static DayFragment newInstance(int dayOfYear, String sortingTagId) {
+        DayFragment fragment = new DayFragment();
+        Bundle args = new Bundle();
+        args.putInt(DAY_OF_YEAR, dayOfYear);
+        args.putString(SORTING, sortingTagId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,6 +56,7 @@ public class DayFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             dayOfYear = getArguments().getInt(DAY_OF_YEAR);
+            sortingTagId = getArguments().getString(SORTING);
         }
     }
 
@@ -57,12 +67,20 @@ public class DayFragment extends Fragment {
         tasksRecycler = (RecyclerView) rootView.findViewById(R.id.day_tasks_rv);
         progressBar = (ProgressBar) rootView.findViewById(R.id.day_progress_bar);
         tasks = new ArrayList<>();
-        tasksRecycler.setAdapter(new TasksDayRecyclerAdapter(tasks, new TasksDayRecyclerAdapter.OnTaskClickListener() {
+        TasksDayRecyclerAdapter.OnTaskClickListener onTaskClickListener = new TasksDayRecyclerAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
                 TaskDisplayActivity.start(getActivity(), task);
             }
-        }));
+        };
+        View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(getActivity(), "show deleting", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        };
+        tasksRecycler.setAdapter(new TasksDayRecyclerAdapter(tasks, onTaskClickListener, onLongClickListener));
         return rootView;
     }
 

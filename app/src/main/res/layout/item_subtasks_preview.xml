@@ -2,13 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="4dp">
+    android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/subtask_checkbox"
+    <ImageView
+        android:id="@+id/subtask_done_imv"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="start"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/subtask_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:enabled="false" />
-
+        android:layout_gravity="center"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1" />
 </LinearLayout>
