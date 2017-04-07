@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
     private void showLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Logout");
-        builder.setMessage("Logout?");
+        builder.setMessage("Logout from app?");
         builder.setCancelable(true);
         builder.setNegativeButton(android.R.string.cancel, null);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -272,5 +272,13 @@ public class MainActivity extends AppCompatActivity {
 
     private int getTabColor(boolean selected) {
         return selected ? Color.BLACK : ContextCompat.getColor(MainActivity.this, R.color.gray_inactive);
+    }
+
+    @Override
+    public void onBackPressed() {
+        boolean handled = currentFragment.hideDeleting();
+        if (!handled) {
+            super.onBackPressed();
+        }
     }
 }

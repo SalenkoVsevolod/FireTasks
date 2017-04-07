@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,13 +30,17 @@ import java.util.ArrayList;
 public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecyclerAdapter.DayTaskViewHolder> {
     private static final int MAX_SUBTASKS_DISPLAYING = 3;
     private ArrayList<Task> tasks;
-    private OnTaskInteractionListener onTaskInteractionListener;
+    private OnTaskClickListener onTaskClickListener;
     private boolean deleting = false;
     private int longClicked;
+    private OnDeletingListener onDeletingListener;
+    private ArrayList<String> tasksForDeleting;
 
-    public TasksDayRecyclerAdapter(ArrayList<Task> tasks, OnTaskInteractionListener onTaskInteractionListener) {
+    public TasksDayRecyclerAdapter(ArrayList<Task> tasks, OnTaskClickListener onTaskClickListener, OnDeletingListener onDeletingListener) {
         this.tasks = tasks;
-        this.onTaskInteractionListener = onTaskInteractionListener;
+        this.onTaskClickListener = onTaskClickListener;
+        tasksForDeleting = new ArrayList<>();
+        this.onDeletingListener = onDeletingListener;
     }
 
     @Override
@@ -43,29 +48,40 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         return new DayTaskViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(final DayTaskViewHolder holder, final int position) {
+    public ArrayList<String> getTasksForDeleting() {
+        return tasksForDeleting;
+    }
 
-        final Task t = tasks.get(position);
+    public boolean handleBackPress() {
+        boolean handled = deleting;
+        if (deleting) {
+            setDeletingEnabled(false);
+        }
+        return handled;
+    }
+
+    @Override
+    public void onBindViewHolder(final DayTaskViewHolder holder, int position) {
+
+        final Task t = tasks.get(holder.getAdapterPosition());
 
         View.OnClickListener onSubtaskClick;
         View.OnLongClickListener onSubtaskLongClick;
 
         if (deleting) {
             holder.deletingCheckbox.setVisibility(View.VISIBLE);
-            holder.deletingCheckbox.setChecked(longClicked == position);
+            holder.deletingCheckbox.setChecked(longClicked == holder.getAdapterPosition());
             onSubtaskClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    deleting = false;
-                    notifyDataSetChanged();
+                    holder.deletingCheckbox.setChecked(!holder.deletingCheckbox.isChecked());
                 }
             };
             onSubtaskLongClick = new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    deleting = false;
-                    notifyDataSetChanged();
+                    longClicked = holder.getAdapterPosition();
+                    setDeletingEnabled(false);
                     return true;
                 }
             };
@@ -75,22 +91,20 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             onSubtaskClick = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onTaskInteractionListener.onClick(t);
+                    onTaskClickListener.onClick(t);
                 }
             };
             onSubtaskLongClick = new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    holder.deletingCheckbox.setChecked(true);
-                    setDeleting(true);
-                    longClicked = position;
-                    notifyDataSetChanged();
+                    longClicked = holder.getAdapterPosition();
+                    setDeletingEnabled(true);
                     return true;
                 }
             };
         }
         holder.nameTextView.setText(t.getName());
-
+//TODO big bad crutch!
         FirebaseListenersManager.getInstance().setTagListener(t.getTagId(), new TagFirebaseListener.OnTagGetListener() {
             @Override
             public void onGet(Tag tag) {
@@ -124,12 +138,20 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         return tasks.size();
     }
 
-    public void setDeleting(boolean deleting) {
-        this.deleting = deleting;
+    private void setDeletingEnabled(boolean enabled) {
+        deleting = enabled;
+        onDeletingListener.onDeletingDisplay(enabled);
+        notifyDataSetChanged();
     }
 
-    public interface OnTaskInteractionListener {
+    public interface OnTaskClickListener {
         void onClick(Task task);
+    }
+
+    public interface OnDeletingListener {
+        void onDeletingDisplay(boolean displaying);
+
+        void onDeletingTasksNumberChanged(int number);
     }
 
     class DayTaskViewHolder extends RecyclerView.ViewHolder {
@@ -149,6 +171,18 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             subtasksRecycler = (RecyclerView) itemView.findViewById(R.id.subTasksRecyclerView);
             moreDots = (ImageView) itemView.findViewById(R.id.more_dots_tv);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+            deletingCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Task t = tasks.get(getAdapterPosition());
+                    if (isChecked) {
+                        tasksForDeleting.add(t.getId());
+                    } else {
+                        tasksForDeleting.remove(t.getId());
+                    }
+                    onDeletingListener.onDeletingTasksNumberChanged(tasksForDeleting.size());
+                }
+            });
         }
     }
 }
