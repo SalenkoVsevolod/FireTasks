@@ -76,7 +76,15 @@
             android:layout_marginTop="64dp"
             android:visibility="gone">
 
-            <include layout="@layout/item_tag" />
+            <TextView
+                android:id="@+id/tagTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="Tag"
+                android:textSize="18sp" />
         </FrameLayout>
 
         <Button

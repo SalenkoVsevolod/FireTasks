@@ -1,10 +1,10 @@
 package com.example.portable.firebasetests.ui.adapters;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
@@ -18,12 +18,11 @@ import java.util.ArrayList;
 
 public class TagAdapter extends BaseAdapter {
     private ArrayList<Tag> tags;
-    private LayoutInflater inflater;
-
+    private Context context;
 
     public TagAdapter(Context context, ArrayList<Tag> tags) {
         this.tags = tags;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.context = context;
     }
 
     @Override
@@ -45,7 +44,15 @@ public class TagAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = inflater.inflate(R.layout.item_tag, parent, false);
+            FrameLayout frameLayout = new FrameLayout(context);
+            TextView tag = new TextView(context);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(8, 0, 8, 8);
+            tag.setTextSize(18);
+            tag.setId(R.id.tagTextView);
+            tag.setLayoutParams(params);
+            frameLayout.addView(tag);
+            view = frameLayout;
         }
         final Tag tag = (Tag) getItem(position);
         TextView item = (TextView) view.findViewById(R.id.tagTextView);

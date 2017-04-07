@@ -37,6 +37,7 @@ public class DayFragment extends Fragment {
         // Required empty public constructor
     }
 
+    //TODO looks like crutch
     public static DayFragment newInstance(int dayOfYear) {
         DayFragment fragment = new DayFragment();
         Bundle args = new Bundle();

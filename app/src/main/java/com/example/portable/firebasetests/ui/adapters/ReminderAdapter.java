@@ -1,9 +1,10 @@
 package com.example.portable.firebasetests.ui.adapters;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
@@ -26,7 +27,15 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
 
     @Override
     public ReminderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ReminderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reminder, parent, false));
+        FrameLayout res = new FrameLayout(parent.getContext());
+        TextView textView = new TextView(parent.getContext());
+        textView.setId(R.id.reminder_tv);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        textView.setTextColor(Color.BLACK);
+        params.setMargins(0, 0, 0, 32);
+        textView.setLayoutParams(params);
+        res.addView(textView);
+        return new ReminderViewHolder(res);
     }
 
     @Override
@@ -46,9 +55,9 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
     class ReminderViewHolder extends RecyclerView.ViewHolder {
         private TextView time;
 
-        public ReminderViewHolder(View item) {
+        ReminderViewHolder(View item) {
             super(item);
-            time = (TextView) item.findViewById(R.id.reminder_time_tv);
+            time = (TextView) item.findViewById(R.id.reminder_tv);
             if (listener != null) {
                 item.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -27,10 +28,9 @@ import com.example.portable.firebasetests.ui.adapters.SubtaskCheckableAdapter;
 import java.util.Calendar;
 
 public class TaskDisplayActivity extends AppCompatActivity {
-    public static final String TASK_ARG = "task", TAGS_ARG = "tags";
-    private TextView name, description, tagTV;
+    public static final String TASK_ARG = "task";
+    private TextView tagTV;
     private Task task;
-    private RecyclerView subtasksRecyclerView, remindsRecyclerView;
 
     public static void start(Context context, Task task) {
         Intent starter = new Intent(context, TaskDisplayActivity.class);
@@ -42,19 +42,22 @@ public class TaskDisplayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_display);
-        name = (TextView) findViewById(R.id.name_tv);
-        description = (TextView) findViewById(R.id.description_display);
-        remindsRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
-        subtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
+        TextView name = (TextView) findViewById(R.id.name_tv);
+        TextView description = (TextView) findViewById(R.id.description_display);
+        RecyclerView remindsRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
+        RecyclerView subtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         tagTV = (TextView) findViewById(R.id.tagTextView);
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
         name.setText(task.getName());
         description.setText(task.getDescription());
-
-        findViewById(R.id.reminder_tv).setVisibility(task.getReminds().size() > 0 ? View.VISIBLE : View.GONE);
-        remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
-        remindsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        View remindersContainer = findViewById(R.id.reminders_container);
+        if (task.getReminds() != null && task.getReminds().size() > 0) {
+            remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
+            remindsRecyclerView.setLayoutManager(new GridLayoutManager(this, 5));
+            remindersContainer.setVisibility(View.VISIBLE);
+        } else {
+            remindersContainer.setVisibility(View.GONE);
+        }
         SubtaskCheckableAdapter adapter = new SubtaskCheckableAdapter(task.getSubTasks(), new SubtaskCheckableAdapter.OnSubtaskCheckListener() {
             @Override
             public void onCheck(SubTask subTask, boolean checked) {
@@ -103,6 +106,9 @@ public class TaskDisplayActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.edit_item:
                 TaskModifyActivity.start(this, task);
+                finish();
+                break;
+            case android.R.id.home:
                 finish();
                 break;
         }
