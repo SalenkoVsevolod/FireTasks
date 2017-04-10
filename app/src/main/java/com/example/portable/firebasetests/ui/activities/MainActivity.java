@@ -27,7 +27,7 @@ import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
-import com.example.portable.firebasetests.ui.adapters.TagAdapter;
+import com.example.portable.firebasetests.ui.adapters.TagSortingAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.android.gms.auth.api.Auth;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ArrayList<Tag> tags;
     private Spinner tagSpinner;
-    private TagAdapter tagAdapter;
+    private TagSortingAdapter tagSortingAdapter;
     private DayFragment currentFragment;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
 
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tasks);
+        setContentView(R.layout.activity_main);
         tabLayout = (TabLayout) findViewById(R.id.days_tabs);
         FloatingActionButton addTaskfloatingActionButton = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
         addTaskfloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         calendar.setTimeInMillis(System.currentTimeMillis());
         inflateDays(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
         tags = new ArrayList<>();
-        tagAdapter = new TagAdapter(this, tags);
+        tagSortingAdapter = new TagSortingAdapter(this, tags);
         tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
-        tagSpinner.setAdapter(tagAdapter);
+        tagSpinner.setAdapter(tagSortingAdapter);
         onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSync(ArrayList<Tag> tagsArray) {
                 tags.clear();
                 tags.addAll(tagsArray);
-                tagAdapter.notifyDataSetChanged();
+                tagSortingAdapter.notifyDataSetChanged();
             }
         });
         new Handler().postDelayed(
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (currentFragment != null) {
-                    currentFragment.setSortingTagIdAndSort(((Tag) tagAdapter.getItem(position)).getId());
+                    currentFragment.setSortingTagIdAndSort(((Tag) tagSortingAdapter.getItem(position)).getId());
                 }
             }
 
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     private void putNewFragment(int dayOfYear) {
         int position = tagSpinner.getSelectedItemPosition();
         if (position != -1) {
-            currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagAdapter.getItem(position)).getId());
+            currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagSortingAdapter.getItem(position)).getId());
         } else
             currentFragment = DayFragment.newInstance(dayOfYear + 1);
         getFragmentManager().beginTransaction()

@@ -1,10 +1,13 @@
 package com.example.portable.firebasetests.ui.adapters;
 
-import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
@@ -13,52 +16,74 @@ import com.example.portable.firebasetests.model.Tag;
 import java.util.ArrayList;
 
 /**
- * Created by Portable on 26.01.2017.
+ * Created by Black on 10.04.2017.
  */
 
-public class TagAdapter extends BaseAdapter {
+public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagVH> {
     private ArrayList<Tag> tags;
-    private Context context;
+    private OnTagInteractionListener listener;
 
-    public TagAdapter(Context context, ArrayList<Tag> tags) {
+    public TagAdapter(ArrayList<Tag> tags, OnTagInteractionListener listener) {
         this.tags = tags;
-        this.context = context;
+        this.listener = listener;
     }
 
     @Override
-    public int getCount() {
+    public TagVH onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new TagVH(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tag, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(TagVH holder, int position) {
+        Tag tag = tags.get(holder.getAdapterPosition());
+        holder.text.setText(tag.getName());
+        holder.text.setTextColor((int) tag.getColor());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            holder.editIcon.setImageTintList(ColorStateList.valueOf((int) tag.getColor()));
+        }
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setStroke(5, (int) tag.getColor());
+        drawable.setCornerRadius(270f);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            holder.root.setBackground(drawable);
+        } else {
+            holder.root.setBackgroundDrawable(drawable);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
         return tags.size();
     }
 
-    @Override
-    public Object getItem(int position) {
-        return tags.get(position);
+    public interface OnTagInteractionListener {
+        void clickOnTag(Tag tag);
+
+        void clickOnEdit(Tag tag);
     }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    class TagVH extends RecyclerView.ViewHolder {
+        View root;
+        TextView text;
+        ImageView editIcon;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-        if (view == null) {
-            FrameLayout frameLayout = new FrameLayout(context);
-            TextView tag = new TextView(context);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(8, 0, 8, 8);
-            tag.setTextSize(18);
-            tag.setId(R.id.tagTextView);
-            tag.setLayoutParams(params);
-            frameLayout.addView(tag);
-            view = frameLayout;
+        private TagVH(View rootView) {
+            super(rootView);
+            root = rootView;
+            text = (TextView) rootView.findViewById(R.id.tag_text);
+            editIcon = (ImageView) rootView.findViewById(R.id.tag_edit_iv);
+            root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.clickOnTag(tags.get(getAdapterPosition()));
+                }
+            });
+            editIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.clickOnEdit(tags.get(getAdapterPosition()));
+                }
+            });
         }
-        final Tag tag = (Tag) getItem(position);
-        TextView item = (TextView) view.findViewById(R.id.tagTextView);
-        item.setTextColor((int) tag.getColor());
-        item.setText(tag.getName());
-        return view;
     }
-
 }

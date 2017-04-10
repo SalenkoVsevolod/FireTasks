@@ -1,185 +1,206 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/task_modify_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/task_modify_toolbar"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/colorPrimaryDark" />
+        android:layout_height="wrap_content">
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/task_modify_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/colorPrimaryDark"
+            android:theme="@style/AppTheme.ActionBar" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:id="@+id/nameNTV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/nameN"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <View
-            android:layout_width="0px"
-            android:layout_height="0px"
-            android:focusable="true"
-            android:focusableInTouchMode="true" />
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/nameET"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/name"
-            app:layout_constraintBaseline_toBaselineOf="@+id/nameNTV"
-            app:layout_constraintLeft_toLeftOf="@+id/taskDescriptionEdit" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/descriptionTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/descriptionName"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nameNTV" />
+                    <TextView
+                        android:id="@+id/nameNTV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:text="@string/nameN" />
 
-        <EditText
-            android:id="@+id/taskDescriptionEdit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="top"
-            android:hint="@string/descriptionHint"
-            android:inputType="textMultiLine"
-            android:maxLines="5"
-            android:minLines="2"
-            app:layout_constraintBaseline_toBaselineOf="@+id/descriptionTextView"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toRightOf="@+id/descriptionTextView"
-            app:layout_constraintRight_toRightOf="parent" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true" />
 
-        <LinearLayout
-            android:id="@+id/tag_container"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/taskDescriptionEdit">
+                    <EditText
+                        android:id="@+id/nameET"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@id/nameNTV"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/nameNTV"
+                        android:layout_toRightOf="@id/nameNTV"
+                        android:hint="@string/name"
+                        android:textColor="@android:color/black"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/descriptionTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/nameET"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/descriptionName" />
+
+                    <EditText
+                        android:id="@+id/taskDescriptionEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@id/descriptionTextView"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/descriptionTextView"
+                        android:layout_toRightOf="@id/descriptionTextView"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:hint="@string/descriptionHint"
+                        android:inputType="textMultiLine"
+                        android:maxLines="4"
+                        android:textColor="@android:color/black" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tagTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:text="@string/tagName" />
+
+                    <FrameLayout
+                        android:id="@+id/tag_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_toRightOf="@id/tagTextView">
+
+                        <include layout="@layout/item_tag" />
+                    </FrameLayout>
+
+                    <View
+                        android:id="@+id/divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/tag_container"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/gray_text" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/tags_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_below="@id/divider"
+                        android:layout_marginTop="8dp" />
+
+
+                    <ImageView
+                        android:id="@+id/add_tag_imv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:src="@drawable/ic_control_point_black_24dp" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/reminders_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/reminder_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+
+                    android:text="Reminders:" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/reminder_recycler"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp" />
+
+                <ImageView
+                    android:id="@+id/add_reminder_imv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_control_point_black_24dp" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tagTextView"
+                android:id="@+id/subTasksTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:text="@string/tagName" />
-
-            <Spinner
-                android:id="@+id/tagSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginTop="16dp"
-                android:spinnerMode="dropdown"
-                app:layout_constraintLeft_toRightOf="@+id/tagTextView" />
-
-            <ImageView
-                android:id="@+id/edit_tag_imv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:src="@drawable/ic_edit_black_24dp"
-                android:tint="@android:color/holo_orange_light"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/add_tag_imv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:src="@drawable/ic_control_point_black_24dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/reminders_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/tag_container">
-
-            <TextView
-                android:id="@+id/reminder_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-
-                android:text="Reminders:" />
+                android:layout_marginTop="32dp"
+                android:text="@string/subtasks_name" />
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/reminder_recycler"
+                android:id="@+id/subTasksRecyclerView"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="100dp"
+                android:layout_centerHorizontal="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintLeft_toRightOf="@+id/reminder_tv"
-                app:layout_constraintTop_toTopOf="@+id/reminder_tv" />
+                android:clipToPadding="true" />
 
-            <ImageView
-                android:id="@+id/add_reminder_imv"
+            <Button
+                android:id="@+id/addSubTaskButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:src="@drawable/ic_control_point_black_24dp"
-                app:layout_constraintLeft_toRightOf="@+id/reminder_recycler"
-                app:layout_constraintTop_toTopOf="@+id/reminder_recycler" />
+                android:layout_below="@id/subTasksRecyclerView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:text="@string/add_subtask" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/subTasksTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/subtasks_name"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/reminders_container" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/subTasksRecyclerView"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:clipToPadding="true"
-            app:layout_constraintLeft_toRightOf="@+id/subTasksTextView"
-            app:layout_constraintTop_toTopOf="@+id/subTasksTextView" />
-
-        <Button
-            android:id="@+id/addSubTaskButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/subTasksRecyclerView"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:text="@string/add_subtask"
-            app:layout_constraintLeft_toRightOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subTasksRecyclerView" />
-
-        <Button
-            android:id="@+id/addTaskButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="SAVE"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/addSubTaskButton" />
-    </android.support.constraint.ConstraintLayout>
-</LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>
