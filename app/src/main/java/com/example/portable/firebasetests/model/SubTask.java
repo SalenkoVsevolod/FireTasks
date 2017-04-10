@@ -1,5 +1,6 @@
 package com.example.portable.firebasetests.model;
 
+import com.example.portable.firebasetests.R;
 import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class SubTask implements Serializable {
     public static final List<String> PRIORITIES = Arrays.asList("Low", "Normal", "High", "Urgent");
+    public static final List<Integer> PRIORITY_COLORS_IDS = Arrays.asList(R.color.low, R.color.medium, R.color.high, R.color.urgent);
     private String description;
     private boolean done;
     private long priority;

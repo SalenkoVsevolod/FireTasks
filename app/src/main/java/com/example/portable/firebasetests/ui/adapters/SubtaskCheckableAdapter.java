@@ -1,5 +1,6 @@
 package com.example.portable.firebasetests.ui.adapters;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.SubTask;
 
 import java.util.ArrayList;
@@ -35,7 +37,9 @@ public class SubtaskCheckableAdapter extends RecyclerView.Adapter<SubtaskCheckab
     public void onBindViewHolder(CheckableVH holder, int position) {
         holder.checkBox.setText(subTasks.get(position).getDescription());
         holder.checkBox.setChecked(subTasks.get(position).isDone());
-        holder.priority.setText(SubTask.PRIORITIES.get((int) subTasks.get(position).getPriority()));
+        int priorityId = (int) subTasks.get(position).getPriority();
+        holder.priority.setText(SubTask.PRIORITIES.get(priorityId));
+        holder.priority.setBackgroundColor(ContextCompat.getColor(FireTasksApp.getInstance(), SubTask.PRIORITY_COLORS_IDS.get(priorityId)));
     }
 
     @Override

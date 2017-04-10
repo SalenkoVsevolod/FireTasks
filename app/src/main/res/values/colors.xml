@@ -15,4 +15,10 @@
     <color name="titleText">#ffffff</color>
     <color name="gray_inactive">#CFCFCF</color>
     <color name="main_background">#f9f9f9</color>
+    <color name="gray_text">#B4B4B4</color>
+
+    <color name="low">#649F45</color>
+    <color name="medium">#FDC800</color>
+    <color name="high">#FF8800</color>
+    <color name="urgent">#FF4133</color>
 </resources>

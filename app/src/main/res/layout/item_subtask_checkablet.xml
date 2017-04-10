@@ -2,17 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
-
-    <CheckBox
-        android:id="@+id/subtask_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    android:layout_marginBottom="16dp"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/priority_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="32dp"
-        android:layout_marginStart="32dp" />
+        android:background="@color/medium"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp"
+        android:text="Normal"
+        android:textColor="@android:color/white"
+        android:textSize="12sp" />
+
+    <CheckBox
+        android:id="@+id/subtask_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:buttonTint="@color/gray_text"
+        android:text="Subtask"
+        android:textColor="@color/gray_text"
+        android:textSize="18sp" />
+
 </LinearLayout>
