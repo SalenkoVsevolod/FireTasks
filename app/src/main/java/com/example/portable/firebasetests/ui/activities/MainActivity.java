@@ -96,12 +96,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        final View showFirstContainer = findViewById(R.id.show_first_container);
         FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
             @Override
             public void onSync(ArrayList<Tag> tagsArray) {
-                tags.clear();
-                tags.addAll(tagsArray);
-                tagSortingAdapter.notifyDataSetChanged();
+                if (tagsArray.size() > 0) {
+                    showFirstContainer.setVisibility(View.VISIBLE);
+                    tags.clear();
+                    tags.addAll(tagsArray);
+                    tagSortingAdapter.notifyDataSetChanged();
+                } else {
+                    showFirstContainer.setVisibility(View.GONE);
+                }
             }
         });
         new Handler().postDelayed(

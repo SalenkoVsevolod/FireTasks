@@ -1,98 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@android:color/white"
+    android:padding="16dp">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/tag_editor_toolbat"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/colorPrimaryDark" />
+    <TextView
+        android:id="@+id/tag_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/tagName" />
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+    <EditText
+        android:id="@+id/tag_name_edit"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tag_name"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@id/tag_name"
+        android:layout_toRightOf="@id/tag_name"
+        android:hint="tag name..."
+        android:maxLength="12" />
+
+    <TextView
+        android:id="@+id/color_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tag_name_edit"
+        android:layout_marginTop="8dp"
+        android:text="Color:" />
+
+    <View
+        android:id="@+id/color_preview"
+        android:layout_width="30dp"
+        android:layout_height="18dp"
+        android:layout_alignTop="@id/color_name"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@id/color_name"
+        android:layout_toRightOf="@id/color_name"
+        android:background="@android:color/holo_red_light" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/tag_name_edit"
+        android:layout_alignRight="@id/tag_name_edit"
+        android:layout_below="@id/color_preview"
+        android:layout_marginTop="32dp">
 
         <TextView
-            android:id="@+id/tag_editor_n"
+            android:id="@+id/dialog_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Tag editor"
-            android:textSize="24dp" />
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="CANCEL"
+            android:textColor="@color/colorAccent" />
 
         <TextView
-            android:id="@+id/color_name"
+            android:id="@+id/dialog_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="Color:" />
-
-        <TextView
-            android:id="@+id/tag_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/color_name"
-            android:layout_marginBottom="32dp"
-            android:text="@string/tagName" />
-
-        <EditText
-            android:id="@+id/tag_name_editx"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/tag_name"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/tag_name"
-            android:hint="tag name..."
-            android:maxLength="12" />
+            android:text="OK"
+            android:textColor="@color/colorAccent" />
+    </LinearLayout>
 
 
-        <Button
-            android:id="@+id/pick_color_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/color_name"
-            android:layout_toRightOf="@id/color_name"
-            android:text="Pick color" />
+</RelativeLayout>
 
-        <View
-            android:id="@+id/color_preview"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignTop="@id/color_name"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/color_name"
-            android:background="@android:color/holo_red_light"
-            android:visibility="gone" />
-
-        <FrameLayout
-            android:id="@+id/preview_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/color_name"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="64dp"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tagTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:text="Tag"
-                android:textSize="18sp" />
-        </FrameLayout>
-
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:text="save" />
-    </RelativeLayout>
-</LinearLayout>

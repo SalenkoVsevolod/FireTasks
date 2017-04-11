@@ -8,7 +8,7 @@
     <string name="add_subtask">add subtask</string>
     <string name="descriptionName">Description:</string>
     <string name="tagName">Tag:</string>
-    <string name="subtasks_name">SubTasks:</string>
+    <string name="subtasks_name">Subtasks</string>
     <string name="timeName">Time:</string>
     <string name="_0_0">0:0</string>
     <string name="TOKEN_ID_SHARED_KED">tokenId</string>

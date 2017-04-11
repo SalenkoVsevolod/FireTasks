@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -21,7 +20,7 @@ import java.util.Calendar;
 
 public class ReminderEditorActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String REMINDER = "remind";
-    public static final int CREATE = 1, UPDATE = 2, DELETE = 4;
+    public static final int CREATE = 1, UPDATE = 2;
     private static final String TIMESTAMP = "timestamp";
     private static final int SOUND_CODE = 5;
     private Remind remind;
@@ -30,7 +29,6 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
     private TextView soundTV;
     private Uri sound;
     private long timestamp;
-    private Button deleteButton;
 
     public static Intent getStarterIntent(Context context, Remind remind, long taskTimeStamp) {
         Intent starter = new Intent(context, ReminderEditorActivity.class);
@@ -47,16 +45,13 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
         reminderTime.setIs24HourView(true);
         soundTV = (TextView) findViewById(R.id.sound_tv);
         vibro = (CheckBox) findViewById(R.id.reminder_vibro);
-        deleteButton = (Button) findViewById(R.id.delete_reminder);
 
         soundTV.setOnClickListener(this);
-        deleteButton.setOnClickListener(this);
-        findViewById(R.id.save_button).setOnClickListener(this);
-
+        findViewById(R.id.dialog_ok).setOnClickListener(this);
+        findViewById(R.id.dialog_cancel).setOnClickListener(this);
         remind = (Remind) getIntent().getSerializableExtra(REMINDER);
         timestamp = getIntent().getLongExtra(TIMESTAMP, -1);
         if (remind != null) {
-            deleteButton.setVisibility(View.VISIBLE);
             soundTV.setText(remind.getSound() == null ? "No sound" : RingtoneManager.getRingtone(this, Uri.parse(remind.getSound())).getTitle(this));
             vibro.setChecked(remind.isVibro());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -134,12 +129,20 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
             case R.id.sound_tv:
                 chooseSound();
                 break;
-            case R.id.save_button:
+            case R.id.dialog_ok:
                 saveClick();
                 break;
-            case R.id.delete_reminder:
-                returnRemind(DELETE, remind);
+            case R.id.dialog_cancel:
+                finish();
                 break;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (reminderTime.getVisibility() == View.GONE) {
+            reminderTime.setVisibility(View.VISIBLE);
         }
     }
 

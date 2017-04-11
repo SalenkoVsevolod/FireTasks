@@ -5,16 +5,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
@@ -30,9 +24,6 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
     private Tag tag;
     private EditText nameEdit;
     private View colorPreview;
-    private Button colorPick;
-    private TextView tagPreviewTextView;
-    private View previewContainer;
     private ArrayList<Tag> allTags;
 
     public static void start(Context context, ArrayList<Tag> allTags, Tag tag) {
@@ -46,20 +37,11 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_editor);
-        nameEdit = (EditText) findViewById(R.id.tag_name_editx);
-        colorPick = (Button) findViewById(R.id.pick_color_button);
+        nameEdit = (EditText) findViewById(R.id.tag_name_edit);
+        findViewById(R.id.dialog_cancel).setOnClickListener(this);
+        findViewById(R.id.dialog_ok).setOnClickListener(this);
         colorPreview = findViewById(R.id.color_preview);
         colorPreview.setOnClickListener(this);
-        tagPreviewTextView = (TextView) findViewById(R.id.tagTextView);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tag_editor_toolbat);
-        toolbar.setTitleTextColor(Color.WHITE);
-        setSupportActionBar(toolbar);
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
-        previewContainer = findViewById(R.id.preview_container);
-        findViewById(R.id.save_button).setOnClickListener(this);
         tag = (Tag) getIntent().getSerializableExtra(TAG);
         allTags = (ArrayList<Tag>) getIntent().getSerializableExtra(ALL_TAGS);
         if (allTags == null) {
@@ -67,40 +49,20 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         }
         if (tag == null) {
             tag = new Tag();
+            tag.setColor(Color.GREEN);
+            colorPreview.setBackgroundColor(Color.GREEN);
         } else {
             nameEdit.setText(tag.getName());
-            tagPreviewTextView.setTextColor((int) tag.getColor());
-            tagPreviewTextView.setText(tag.getName());
-            previewContainer.setVisibility(View.VISIBLE);
-            hideButton();
+            nameEdit.setTextColor((int) tag.getColor());
+            colorPreview.setBackgroundColor((int) tag.getColor());
         }
-        colorPick.setOnClickListener(this);
-        nameEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                previewContainer.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
-                tagPreviewTextView.setText(s);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
     }
 
     @Override
     public void onColorSelected(int dialogId, @ColorInt int color) {
         tag.setColor(color);
-        tagPreviewTextView.setTextColor(color);
         colorPreview.setBackgroundColor(color);
-        hideButton();
+        nameEdit.setTextColor(color);
     }
 
     @Override
@@ -108,26 +70,24 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
 
     }
 
-    private void hideButton() {
-        colorPick.setVisibility(View.GONE);
-        colorPreview.setVisibility(View.VISIBLE);
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.save_button:
+            case R.id.color_preview:
+                showColorPicker();
+                break;
+            case R.id.dialog_ok:
                 saveTag();
                 break;
-            case R.id.color_preview:
-            case R.id.pick_color_button:
-                showColorPicker();
+            case R.id.dialog_cancel:
+                finish();
                 break;
         }
     }
 
     private void showColorPicker() {
         ColorPickerDialog.Builder builder = ColorPickerDialog.newBuilder();
+        builder.setColor((int) tag.getColor());
         builder.show(this);
     }
 

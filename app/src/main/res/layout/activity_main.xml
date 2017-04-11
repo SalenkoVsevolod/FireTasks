@@ -31,7 +31,7 @@
 
         <android.support.design.widget.TabLayout
             android:id="@+id/days_tabs"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_weight="10"
             app:tabIndicatorColor="@android:color/transparent"
@@ -46,30 +46,34 @@
             android:tint="@color/gray_inactive" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/show_first_n"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/days_tabs_container"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Show first:" />
-
-    <Spinner
-        android:id="@+id/tagSpinner"
+    <LinearLayout
+        android:id="@+id/show_first_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/days_tabs_container"
         android:layout_marginBottom="8dp"
-        android:layout_toEndOf="@id/show_first_n"
-        android:layout_toRightOf="@id/show_first_n" />
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/show_first_n"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show first:" />
+
+        <Spinner
+            android:id="@+id/tagSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/day_of_week_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tagSpinner" />
+        android:layout_below="@id/show_first_container" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/homeFloatingActionButton"

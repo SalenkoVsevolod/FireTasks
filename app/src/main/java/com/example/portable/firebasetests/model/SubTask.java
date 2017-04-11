@@ -56,7 +56,8 @@ public class SubTask implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        SubTask s = (SubTask) obj;
+        return s.getId().equals(id);
     }
 
     public long getPriority() {

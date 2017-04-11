@@ -4,17 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,11 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,14 +36,12 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
-import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
+import com.example.portable.firebasetests.ui.adapters.ReminderDeletableAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubtaskClickableAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagAdapter;
 import com.example.portable.firebasetests.utils.TimeUtils;
 
 import java.util.ArrayList;
-
-import static com.example.portable.firebasetests.model.SubTask.PRIORITIES;
 
 public class TaskModifyActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -58,11 +52,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     private Task task;
     private ArrayList<Tag> tags;
     private Tag lastSelectedTag;
-    private View tagRoot;
     private TextView tagTextView;
-    private ImageView tagEditImageView;
- /*   private ImageView editTag;
-    private ArrayList<Tag> tags;*/
 
 
     public static void start(Context context, Task task) {
@@ -75,11 +65,10 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_modify);
-        tagRoot = findViewById(R.id.tag_root);
         tagTextView = (TextView) findViewById(R.id.tag_text);
-        tagEditImageView = (ImageView) findViewById(R.id.tag_edit_iv);
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
         nameEdit = (EditText) findViewById(R.id.nameET);
+        findViewById(R.id.add_tag_imv).setOnClickListener(this);
         descriptionEdit = (EditText) findViewById(R.id.taskDescriptionEdit);
         tagsRecycler = (RecyclerView) findViewById(R.id.tags_recycler);
         tags = new ArrayList<>();
@@ -97,10 +86,9 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         tagsRecycler.setAdapter(new TagAdapter(tags, onTagInteractionListener));
         tagsRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         subTasksRecycleView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
-        Button addSubTaskButton = (Button) findViewById(R.id.addSubTaskButton);
+        findViewById(R.id.add_subtask).setOnClickListener(this);
         remindersRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
-    /*    editTag = (ImageView) findViewById(R.id.edit_tag_imv);
-        editTag.setOnClickListener(this);*/
+        tagTextView.setOnClickListener(this);
         findViewById(R.id.add_tag_imv).setOnClickListener(this);
         findViewById(R.id.add_reminder_imv).setOnClickListener(this);
         configViewsForClosingKeyBord(findViewById(R.id.task_modify_root));
@@ -110,23 +98,19 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         }
 
         initSubtasksRecyclerView();
-
-        addSubTaskButton.setOnClickListener(new View.OnClickListener()
-
-        {
+        remindersRecyclerView.setAdapter(new ReminderDeletableAdapter(task.getReminds(), new ReminderDeletableAdapter.OnReminderInteractionListener() {
             @Override
-            public void onClick(View v) {
-                editSubtask(null);
+            public void deleteClick(Remind remind) {
+                deleteReminder(remind);
             }
-        });
-        remindersRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), new ReminderAdapter.OnRemindClickListener() {
+
             @Override
-            public void onClick(Remind remind) {
+            public void reminderClick(Remind remind) {
                 startActivityForResult(ReminderEditorActivity
                         .getStarterIntent(TaskModifyActivity.this, remind, task.getTimeStamp()), 36);
             }
         }));
-        remindersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        remindersRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         Toolbar toolbar = (Toolbar) findViewById(R.id.task_modify_toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
@@ -144,37 +128,33 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onStart() {
         super.onStart();
+        final View divider = findViewById(R.id.divider);
         FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
             @Override
             public void onSync(ArrayList<Tag> tagsArray) {
-                tags.clear();
-                tags.addAll(tagsArray);
-                tagsRecycler.getAdapter().notifyDataSetChanged();
-                selectTag(tags.get(0));
-                /*if (tagsArray.size() == 0) {
-                    tagSpinner.setVisibility(View.GONE);
-                    editTag.setVisibility(View.GONE);
+                if (tagsArray.size() == 0) {
+                    divider.setVisibility(View.GONE);
+                    tagsRecycler.setVisibility(View.GONE);
+                    tagTextView.setVisibility(View.GONE);
                     task.setTagId(null);
                 } else {
-                    tagSpinner.setVisibility(View.VISIBLE);
-                    editTag.setVisibility(View.VISIBLE);
+                    tagTextView.setVisibility(View.VISIBLE);
+                    if (tagsArray.size() > 1) {
+                        Log.i("visibility", "tags num:" + tagsArray.size());
+                        Log.i("visibility", "tags:" + tagsArray);
+                        tagsRecycler.setVisibility(View.VISIBLE);
+                        divider.setVisibility(View.VISIBLE);
+                    }
                     tags.clear();
                     tags.addAll(tagsArray);
-                    tagSortingAdapter.notifyDataSetChanged();
+                    tagsRecycler.getAdapter().notifyDataSetChanged();
+                    lastSelectedTag = null;
                     if (task.getTagId() != null) {
-                        int pos = -1;
-                        for (int i = 0; i < tags.size(); i++) {
-                            if (tags.get(i).getId().equals(task.getTagId())) {
-                                pos = i;
-                                break;
-                            }
-                        }
-                        tagSpinner.setSelection(pos);
+                        selectTag(Tag.getTagById(task.getTagId(), tagsArray));
                     } else {
-                        tagSpinner.setSelection(0);
+                        selectTag(tags.get(0));
                     }
-                }*/
-
+                }
             }
         });
     }
@@ -193,19 +173,10 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void drawNewTag(Tag tag) {
-        tagTextView.setText(tag.getName());
+        SpannableString content = new SpannableString(tag.getName());
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        tagTextView.setText(content);
         tagTextView.setTextColor((int) tag.getColor());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tagEditImageView.setImageTintList(ColorStateList.valueOf((int) tag.getColor()));
-        }
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setStroke(5, (int) tag.getColor());
-        drawable.setCornerRadius(270f);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            tagRoot.setBackground(drawable);
-        } else {
-            tagRoot.setBackgroundDrawable(drawable);
-        }
     }
 
     @Override
@@ -269,15 +240,25 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initSubtasksRecyclerView() {
-        subTasksRecycleView.setAdapter(new SubtaskClickableAdapter(task.getSubTasks(), new SubtaskClickableAdapter.OnSubtaskClickListener() {
+        subTasksRecycleView.setAdapter(new SubtaskClickableAdapter(task.getSubTasks(), new SubtaskClickableAdapter.OnSubtaskInteractionListener() {
             @Override
-            public void onClick(SubTask subTask) {
-                editSubtask(subTask);
+            public void onSubtaskClick(SubTask subTask) {
+                startActivityForResult(SubtaskEditorActivity.getStarterIntent(TaskModifyActivity.this, subTask), 87);
+            }
+
+            @Override
+            public void onDeleteClick(SubTask subTask) {
+                deleteSubtask(subTask);
             }
         }));
         subTasksRecycleView.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    private void deleteSubtask(SubTask subTask) {
+        int pos = task.getSubTasks().indexOf(subTask);
+        task.getSubTasks().remove(subTask);
+        subTasksRecycleView.getAdapter().notifyItemRemoved(pos);
+    }
 
     @Override
     public void onClick(View v) {
@@ -285,63 +266,18 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
             case R.id.add_reminder_imv:
                 startActivityForResult(ReminderEditorActivity.getStarterIntent(this, null, task.getTimeStamp()), 36);
                 break;
-        /*    case R.id.add_tag_imv:
-                TagEditorActivity.start(this, tags, null);
-                break;
-            case R.id.edit_tag_imv:
-
-                break;*/
-        }
-    }
-
-
-    private void editSubtask(final SubTask subTask) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View view = getLayoutInflater().inflate(R.layout.dialog_subtask_editor, null);
-        final EditText editText = (EditText) view.findViewById(R.id.subtask_name);
-        final Spinner spinner = (Spinner) view.findViewById(R.id.priority_spinner);
-        spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PRIORITIES));
-        Button button = (Button) view.findViewById(R.id.delete_subtask);
-        if (subTask != null) {
-            button.setVisibility(View.VISIBLE);
-            editText.setText(subTask.getDescription());
-            spinner.setSelection((int) subTask.getPriority());
-        }
-        builder.setView(view);
-        builder.setCancelable(true);
-        builder.setNegativeButton(android.R.string.cancel, null);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (editText.getText().toString().length() > 0) {
-                    if (subTask == null) {
-                        SubTask s = new SubTask();
-                        s.setDescription(editText.getText().toString());
-                        s.setId("" + System.currentTimeMillis());
-                        s.setPriority(spinner.getSelectedItemId());
-                        task.getSubTasks().add(s);
-                        subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().indexOf(s));
-                    } else {
-                        int index = task.getSubTasks().indexOf(subTask);
-                        subTask.setDescription(editText.getText().toString());
-                        subTask.setPriority(spinner.getSelectedItemId());
-                        task.getSubTasks().set(index, subTask);
-                        subTasksRecycleView.getAdapter().notifyItemChanged(index);
-                    }
+            case R.id.tag_text:
+                if (lastSelectedTag != null) {
+                    TagEditorActivity.start(TaskModifyActivity.this, tags, lastSelectedTag);
                 }
-            }
-        });
-        final AlertDialog dialog = builder.show();
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int pos = task.getSubTasks().indexOf(subTask);
-                task.getSubTasks().remove(subTask);
-                subTasksRecycleView.getAdapter().notifyItemRemoved(pos);
-                dialog.dismiss();
-            }
-        });
-
+                break;
+            case R.id.add_subtask:
+                startActivityForResult(SubtaskEditorActivity.getStarterIntent(TaskModifyActivity.this, null), 87);
+                break;
+            case R.id.add_tag_imv:
+                TagEditorActivity.start(TaskModifyActivity.this, tags, null);
+                break;
+        }
     }
 
     @Override
@@ -371,6 +307,23 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
             case 36:
                 handleRemindResult(resultCode, data == null ? null : (Remind) data.getSerializableExtra(ReminderEditorActivity.REMINDER));
                 break;
+            case 87:
+                handleSubtaskResult(resultCode, data == null ? null : (SubTask) data.getSerializableExtra(SubtaskEditorActivity.SUBTASK));
+                break;
+        }
+    }
+
+    private void handleSubtaskResult(int result, SubTask subTask) {
+        switch (result) {
+            case SubtaskEditorActivity.CREATE:
+                task.getSubTasks().add(subTask);
+                subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().size());
+                break;
+            case SubtaskEditorActivity.UPDATE:
+                int index = task.getSubTasks().indexOf(subTask);
+                task.getSubTasks().set(index, subTask);
+                subTasksRecycleView.getAdapter().notifyItemChanged(index);
+                break;
         }
     }
 
@@ -393,13 +346,14 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                     showErrorToast("time in future");
                 }
                 break;
-            case ReminderEditorActivity.DELETE:
-                int i = task.getReminds().indexOf(remind);
-                task.getReminds().remove(i);
-                remindersRecyclerView.getAdapter().notifyItemRemoved(i);
-                Notifier.removeAlarm((int) remind.getTimeStamp());
-                break;
         }
+    }
+
+    private void deleteReminder(Remind remind) {
+        int i = task.getReminds().indexOf(remind);
+        task.getReminds().remove(i);
+        remindersRecyclerView.getAdapter().notifyItemRemoved(i);
+        Notifier.removeAlarm((int) remind.getTimeStamp());
     }
 
     @Override
@@ -418,16 +372,15 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     private void assembleTaskAndSave() {
         task.setName(nameEdit.getText().toString());
         task.setDescription(descriptionEdit.getText().toString());
-       /* if (tagSpinner.getVisibility() == View.VISIBLE) {
-            task.setTagId(((Tag) tagSpinner.getSelectedItem()).getId());
+        if (lastSelectedTag != null) {
+            task.setTagId(lastSelectedTag.getId());
         } else {
             task.setTagId(null);
         }
-
         if (canComplete()) {
             saveTask();
             finish();
-        }*/
+        }
     }
 
     @Override
