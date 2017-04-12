@@ -1,0 +1,44 @@
+package com.example.portable.firebasetests.ui.adapters;
+
+import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.model.SubTask;
+
+/**
+ * Created by Salenko Vsevolod on 12.04.2017.
+ */
+
+public class PrioritySpinnerAdapter extends BaseAdapter {
+
+    @Override
+    public int getCount() {
+        return SubTask.PRIORITIES.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return SubTask.PRIORITIES.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_priority, parent, false);
+        }
+        TextView tv = (TextView) convertView.findViewById(R.id.priority_tv);
+        tv.setText(SubTask.PRIORITIES.get(position));
+        tv.setBackgroundColor(ContextCompat.getColor(parent.getContext(), SubTask.PRIORITY_COLORS_IDS.get(position)));
+        return convertView;
+    }
+}

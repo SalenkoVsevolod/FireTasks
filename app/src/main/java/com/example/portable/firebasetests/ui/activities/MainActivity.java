@@ -27,7 +27,7 @@ import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
-import com.example.portable.firebasetests.ui.adapters.TagSortingAdapter;
+import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.android.gms.auth.api.Auth;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ArrayList<Tag> tags;
     private Spinner tagSpinner;
-    private TagSortingAdapter tagSortingAdapter;
+    private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
     private DayFragment currentFragment;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
 
@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         calendar.setTimeInMillis(System.currentTimeMillis());
         inflateDays(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
         tags = new ArrayList<>();
-        tagSortingAdapter = new TagSortingAdapter(this, tags);
+        tagSortingSpinnerAdapter = new TagSortingSpinnerAdapter(this, tags);
         tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
-        tagSpinner.setAdapter(tagSortingAdapter);
+        tagSpinner.setAdapter(tagSortingSpinnerAdapter);
         onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                     showFirstContainer.setVisibility(View.VISIBLE);
                     tags.clear();
                     tags.addAll(tagsArray);
-                    tagSortingAdapter.notifyDataSetChanged();
+                    tagSortingSpinnerAdapter.notifyDataSetChanged();
                 } else {
                     showFirstContainer.setVisibility(View.GONE);
                 }
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (currentFragment != null) {
-                    currentFragment.setSortingTagIdAndSort(((Tag) tagSortingAdapter.getItem(position)).getId());
+                    currentFragment.setSortingTagIdAndSort(((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
                 }
             }
 
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     private void putNewFragment(int dayOfYear) {
         int position = tagSpinner.getSelectedItemPosition();
         if (position != -1) {
-            currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagSortingAdapter.getItem(position)).getId());
+            currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
         } else
             currentFragment = DayFragment.newInstance(dayOfYear + 1);
         getFragmentManager().beginTransaction()

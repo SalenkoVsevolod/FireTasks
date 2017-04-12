@@ -16,11 +16,11 @@ import java.util.ArrayList;
  * Created by Salenko Vsevolod on 22.03.2017.
  */
 
-public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ReminderViewHolder> {
+public class ReminderDisplayRecyclerAdapter extends RecyclerView.Adapter<ReminderDisplayRecyclerAdapter.ReminderViewHolder> {
     private ArrayList<Remind> reminds;
     private OnRemindClickListener listener;
 
-    public ReminderAdapter(ArrayList<Remind> reminds, OnRemindClickListener listener) {
+    public ReminderDisplayRecyclerAdapter(ArrayList<Remind> reminds, OnRemindClickListener listener) {
         this.reminds = reminds;
         this.listener = listener;
     }

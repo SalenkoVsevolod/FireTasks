@@ -19,11 +19,11 @@ import java.util.ArrayList;
  * Created by Salenko Vsevolod on 05.04.2017.
  */
 
-public class SubtaskCheckableAdapter extends RecyclerView.Adapter<SubtaskCheckableAdapter.CheckableVH> {
+public class SubtaskCheckableRecyclerAdapter extends RecyclerView.Adapter<SubtaskCheckableRecyclerAdapter.CheckableVH> {
     private ArrayList<SubTask> subTasks;
     private OnSubtaskCheckListener listener;
 
-    public SubtaskCheckableAdapter(ArrayList<SubTask> subTasks, OnSubtaskCheckListener listener) {
+    public SubtaskCheckableRecyclerAdapter(ArrayList<SubTask> subTasks, OnSubtaskCheckListener listener) {
         this.subTasks = subTasks;
         this.listener = listener;
     }

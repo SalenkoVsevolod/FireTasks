@@ -17,11 +17,11 @@ import java.util.ArrayList;
  * Created by Salenko Vsevolod on 05.04.2017.
  */
 
-public class SubtaskClickableAdapter extends RecyclerView.Adapter<SubtaskClickableAdapter.SubtaskClickableVH> {
+public class SubtaskClickableRecyclerAdapter extends RecyclerView.Adapter<SubtaskClickableRecyclerAdapter.SubtaskClickableVH> {
     private ArrayList<SubTask> subTasks;
     private OnSubtaskInteractionListener listener;
 
-    public SubtaskClickableAdapter(ArrayList<SubTask> subTasks, OnSubtaskInteractionListener listener) {
+    public SubtaskClickableRecyclerAdapter(ArrayList<SubTask> subTasks, OnSubtaskInteractionListener listener) {
         this.subTasks = subTasks;
         this.listener = listener;
     }
@@ -53,7 +53,7 @@ public class SubtaskClickableAdapter extends RecyclerView.Adapter<SubtaskClickab
     class SubtaskClickableVH extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView subtask, priority;
 
-        public SubtaskClickableVH(View itemView) {
+        SubtaskClickableVH(View itemView) {
             super(itemView);
             subtask = (TextView) itemView.findViewById(R.id.subtask_name);
             priority = (TextView) itemView.findViewById(R.id.priority_tv);

@@ -16,40 +16,46 @@
 
     <EditText
         android:id="@+id/subtask_name"
-        android:layout_width="wrap_content"
+        android:layout_width="128dp"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/subtask_name_n"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@id/subtask_name_n"
         android:layout_toRightOf="@id/subtask_name_n"
-        android:hint="@string/name" />
+        android:hint="@string/name"
+        android:maxLines="1" />
 
-    <Spinner
-        android:id="@+id/priority_spinner"
+    <LinearLayout
+        android:id="@+id/priority_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/subtask_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp">
 
-    <Button
-        android:id="@+id/delete_subtask"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/priority_spinner"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
-        android:background="@android:color/holo_red_light"
-        android:text="delete"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/priority_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Priority:" />
+
+        <Spinner
+            android:id="@+id/priority_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@id/subtask_name"
         android:layout_alignRight="@id/subtask_name"
-        android:layout_below="@id/priority_spinner"
+        android:layout_below="@id/priority_container"
         android:layout_marginTop="32dp">
 
         <TextView

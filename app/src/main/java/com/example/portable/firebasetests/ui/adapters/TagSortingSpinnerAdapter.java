@@ -16,11 +16,11 @@ import java.util.ArrayList;
  * Created by Portable on 26.01.2017.
  */
 
-public class TagSortingAdapter extends BaseAdapter {
+public class TagSortingSpinnerAdapter extends BaseAdapter {
     private ArrayList<Tag> tags;
     private Context context;
 
-    public TagSortingAdapter(Context context, ArrayList<Tag> tags) {
+    public TagSortingSpinnerAdapter(Context context, ArrayList<Tag> tags) {
         this.tags = tags;
         this.context = context;
     }

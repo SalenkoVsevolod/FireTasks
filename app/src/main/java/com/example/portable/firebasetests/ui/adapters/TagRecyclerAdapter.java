@@ -19,11 +19,11 @@ import java.util.ArrayList;
  * Created by Black on 10.04.2017.
  */
 
-public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagVH> {
+public class TagRecyclerAdapter extends RecyclerView.Adapter<TagRecyclerAdapter.TagVH> {
     private ArrayList<Tag> tags;
     private OnTagInteractionListener listener;
 
-    public TagAdapter(ArrayList<Tag> tags, OnTagInteractionListener listener) {
+    public TagRecyclerAdapter(ArrayList<Tag> tags, OnTagInteractionListener listener) {
         this.tags = tags;
         this.listener = listener;
     }

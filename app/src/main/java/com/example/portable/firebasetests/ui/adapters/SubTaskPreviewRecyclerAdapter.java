@@ -18,12 +18,12 @@ import java.util.List;
  * Created by Portable on 27.01.2017.
  */
 
-public class SubTaskPreviewAdapter extends RecyclerView.Adapter<SubTaskPreviewAdapter.ViewHolder> {
+public class SubTaskPreviewRecyclerAdapter extends RecyclerView.Adapter<SubTaskPreviewRecyclerAdapter.ViewHolder> {
     private List<SubTask> subTasks;
     private View.OnClickListener recyclerClickListener;
     private View.OnLongClickListener recyclerLongClickListener;
 
-    public SubTaskPreviewAdapter(List<SubTask> subTasks, View.OnClickListener recyclerClickListener, View.OnLongClickListener recyclerLongClickListener) {
+    public SubTaskPreviewRecyclerAdapter(List<SubTask> subTasks, View.OnClickListener recyclerClickListener, View.OnLongClickListener recyclerLongClickListener) {
         this.subTasks = subTasks;
         this.recyclerClickListener = recyclerClickListener;
         this.recyclerLongClickListener = recyclerLongClickListener;

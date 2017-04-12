@@ -22,8 +22,8 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
-import com.example.portable.firebasetests.ui.adapters.ReminderAdapter;
-import com.example.portable.firebasetests.ui.adapters.SubtaskCheckableAdapter;
+import com.example.portable.firebasetests.ui.adapters.ReminderDisplayRecyclerAdapter;
+import com.example.portable.firebasetests.ui.adapters.SubtaskCheckableRecyclerAdapter;
 
 import java.util.Calendar;
 
@@ -52,13 +52,13 @@ public class TaskDisplayActivity extends AppCompatActivity {
         description.setText(task.getDescription());
         View remindersContainer = findViewById(R.id.reminders_container);
         if (task.getReminds() != null && task.getReminds().size() > 0) {
-            remindsRecyclerView.setAdapter(new ReminderAdapter(task.getReminds(), null));
+            remindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(task.getReminds(), null));
             remindsRecyclerView.setLayoutManager(new GridLayoutManager(this, 5));
             remindersContainer.setVisibility(View.VISIBLE);
         } else {
             remindersContainer.setVisibility(View.GONE);
         }
-        SubtaskCheckableAdapter adapter = new SubtaskCheckableAdapter(task.getSubTasks(), new SubtaskCheckableAdapter.OnSubtaskCheckListener() {
+        SubtaskCheckableRecyclerAdapter adapter = new SubtaskCheckableRecyclerAdapter(task.getSubTasks(), new SubtaskCheckableRecyclerAdapter.OnSubtaskCheckListener() {
             @Override
             public void onCheck(SubTask subTask, boolean checked) {
                 subTask.setDone(checked);

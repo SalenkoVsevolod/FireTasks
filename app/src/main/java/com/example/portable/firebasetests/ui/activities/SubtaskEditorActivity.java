@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.SubTask;
-
-import static com.example.portable.firebasetests.model.SubTask.PRIORITIES;
+import com.example.portable.firebasetests.ui.adapters.PrioritySpinnerAdapter;
 
 public class SubtaskEditorActivity extends AppCompatActivity implements View.OnClickListener {
     public static final int UPDATE = 1, CREATE = 2;
@@ -35,7 +33,7 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
         editText = (EditText) findViewById(R.id.subtask_name);
         subtask = (SubTask) getIntent().getSerializableExtra(SUBTASK);
         spinner = (Spinner) findViewById(R.id.priority_spinner);
-        spinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, PRIORITIES));
+        spinner.setAdapter(new PrioritySpinnerAdapter());
         if (subtask != null) {
             editText.setText(subtask.getDescription());
             spinner.setSelection((int) subtask.getPriority());

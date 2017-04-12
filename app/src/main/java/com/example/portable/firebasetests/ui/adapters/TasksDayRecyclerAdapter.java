@@ -115,19 +115,19 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             }
         });
         holder.subtasksRecycler.setLayoutManager(new LinearLayoutManager(FireTasksApp.getInstance()));
-        SubTaskPreviewAdapter subTaskPreviewAdapter;
+        SubTaskPreviewRecyclerAdapter subTaskPreviewRecyclerAdapter;
         if (t.getSubTasks().size() > MAX_SUBTASKS_DISPLAYING) {
             ArrayList<SubTask> newSubTasks = new ArrayList<>();
             for (int i = 0; i < MAX_SUBTASKS_DISPLAYING; i++) {
                 newSubTasks.add(t.getSubTasks().get(i));
             }
             holder.moreDots.setVisibility(View.VISIBLE);
-            subTaskPreviewAdapter = new SubTaskPreviewAdapter(newSubTasks, onSubtaskClick, onSubtaskLongClick);
+            subTaskPreviewRecyclerAdapter = new SubTaskPreviewRecyclerAdapter(newSubTasks, onSubtaskClick, onSubtaskLongClick);
         } else {
             holder.moreDots.setVisibility(View.GONE);
-            subTaskPreviewAdapter = new SubTaskPreviewAdapter(t.getSubTasks(), onSubtaskClick, onSubtaskLongClick);
+            subTaskPreviewRecyclerAdapter = new SubTaskPreviewRecyclerAdapter(t.getSubTasks(), onSubtaskClick, onSubtaskLongClick);
         }
-        holder.subtasksRecycler.setAdapter(subTaskPreviewAdapter);
+        holder.subtasksRecycler.setAdapter(subTaskPreviewRecyclerAdapter);
         holder.progressBar.setProgress(t.getProgress());
         holder.rootView.setOnClickListener(onSubtaskClick);
         holder.rootView.setOnLongClickListener(onSubtaskLongClick);

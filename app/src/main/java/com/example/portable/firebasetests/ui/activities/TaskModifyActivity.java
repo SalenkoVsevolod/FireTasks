@@ -36,9 +36,9 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
-import com.example.portable.firebasetests.ui.adapters.ReminderDeletableAdapter;
-import com.example.portable.firebasetests.ui.adapters.SubtaskClickableAdapter;
-import com.example.portable.firebasetests.ui.adapters.TagAdapter;
+import com.example.portable.firebasetests.ui.adapters.ReminderModifyRecyclerAdapter;
+import com.example.portable.firebasetests.ui.adapters.SubtaskClickableRecyclerAdapter;
+import com.example.portable.firebasetests.ui.adapters.TagRecyclerAdapter;
 import com.example.portable.firebasetests.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         descriptionEdit = (EditText) findViewById(R.id.taskDescriptionEdit);
         tagsRecycler = (RecyclerView) findViewById(R.id.tags_recycler);
         tags = new ArrayList<>();
-        TagAdapter.OnTagInteractionListener onTagInteractionListener = new TagAdapter.OnTagInteractionListener() {
+        TagRecyclerAdapter.OnTagInteractionListener onTagInteractionListener = new TagRecyclerAdapter.OnTagInteractionListener() {
             @Override
             public void clickOnTag(Tag tag) {
                 selectTag(tag);
@@ -83,7 +83,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                 TagEditorActivity.start(TaskModifyActivity.this, tags, tag);
             }
         };
-        tagsRecycler.setAdapter(new TagAdapter(tags, onTagInteractionListener));
+        tagsRecycler.setAdapter(new TagRecyclerAdapter(tags, onTagInteractionListener));
         tagsRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         subTasksRecycleView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         findViewById(R.id.add_subtask).setOnClickListener(this);
@@ -98,7 +98,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         }
 
         initSubtasksRecyclerView();
-        remindersRecyclerView.setAdapter(new ReminderDeletableAdapter(task.getReminds(), new ReminderDeletableAdapter.OnReminderInteractionListener() {
+        remindersRecyclerView.setAdapter(new ReminderModifyRecyclerAdapter(task.getReminds(), new ReminderModifyRecyclerAdapter.OnReminderInteractionListener() {
             @Override
             public void deleteClick(Remind remind) {
                 deleteReminder(remind);
@@ -240,7 +240,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initSubtasksRecyclerView() {
-        subTasksRecycleView.setAdapter(new SubtaskClickableAdapter(task.getSubTasks(), new SubtaskClickableAdapter.OnSubtaskInteractionListener() {
+        subTasksRecycleView.setAdapter(new SubtaskClickableRecyclerAdapter(task.getSubTasks(), new SubtaskClickableRecyclerAdapter.OnSubtaskInteractionListener() {
             @Override
             public void onSubtaskClick(SubTask subTask) {
                 startActivityForResult(SubtaskEditorActivity.getStarterIntent(TaskModifyActivity.this, subTask), 87);
