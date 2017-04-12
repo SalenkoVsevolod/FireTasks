@@ -8,8 +8,7 @@
         android:id="@+id/subtask_done_imv"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:layout_gravity="start"
-        android:layout_weight="1" />
+        android:layout_gravity="start" />
 
     <TextView
         android:id="@+id/subtask_tv"
@@ -18,5 +17,6 @@
         android:layout_gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:textColor="@color/gray_text" />
 </LinearLayout>

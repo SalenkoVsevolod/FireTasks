@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -52,8 +53,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     private Task task;
     private ArrayList<Tag> tags;
     private Tag lastSelectedTag;
-    private TextView tagTextView;
-
+    private TextView tagTextView, noSubtasksTextView, noRemindersTextView;
 
     public static void start(Context context, Task task) {
         Intent starter = new Intent(context, TaskModifyActivity.class);
@@ -66,6 +66,8 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_modify);
         tagTextView = (TextView) findViewById(R.id.tag_text);
+        noSubtasksTextView = (TextView) findViewById(R.id.no_subtask);
+        noRemindersTextView = (TextView) findViewById(R.id.no_reminders);
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
         nameEdit = (EditText) findViewById(R.id.nameET);
         findViewById(R.id.add_tag_imv).setOnClickListener(this);
@@ -122,7 +124,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         if (TimeUtils.isInPast(task.getCalendar().getTimeInMillis())) {
             findViewById(R.id.reminders_container).setVisibility(View.GONE);
         }
-
+        noRemindersTextView.setVisibility(task.getReminds().size() > 0 ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -135,13 +137,13 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                 if (tagsArray.size() == 0) {
                     divider.setVisibility(View.GONE);
                     tagsRecycler.setVisibility(View.GONE);
-                    tagTextView.setVisibility(View.GONE);
+                    tagTextView.setText("no tags created yet");
+                    tagTextView.setTextColor(ContextCompat.getColor(TaskModifyActivity.this, R.color.gray_text));
                     task.setTagId(null);
+                    lastSelectedTag = null;
                 } else {
                     tagTextView.setVisibility(View.VISIBLE);
                     if (tagsArray.size() > 1) {
-                        Log.i("visibility", "tags num:" + tagsArray.size());
-                        Log.i("visibility", "tags:" + tagsArray);
                         tagsRecycler.setVisibility(View.VISIBLE);
                         divider.setVisibility(View.VISIBLE);
                     }
@@ -223,10 +225,6 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
             showErrorToast("name");
             return false;
         }
-        if (task.getDescription().length() == 0) {
-            showErrorToast("description");
-            return false;
-        }
         if (task.getTagId() == null) {
             showErrorToast("tag");
             return false;
@@ -252,12 +250,26 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
             }
         }));
         subTasksRecycleView.setLayoutManager(new LinearLayoutManager(this));
+        noSubtasksTextView.setVisibility(task.getSubTasks().size() > 0 ? View.GONE : View.VISIBLE);
     }
 
-    private void deleteSubtask(SubTask subTask) {
+    private void deleteSubtask(final SubTask subTask) {
         int pos = task.getSubTasks().indexOf(subTask);
         task.getSubTasks().remove(subTask);
         subTasksRecycleView.getAdapter().notifyItemRemoved(pos);
+        noSubtasksTextView.setVisibility(task.getSubTasks().size() > 0 ? View.GONE : View.VISIBLE);
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.task_modify_root), "Subtask deleted", Snackbar.LENGTH_LONG)
+                .setAction("Cancel", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        task.getSubTasks().add(subTask);
+                        noSubtasksTextView.setVisibility(View.GONE);
+                        subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().size());
+                    }
+                });
+
+        snackbar.show();
     }
 
     @Override
@@ -290,9 +302,6 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         if (task.getId() == null) {
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
-        for (Remind r : task.getReminds()) {
-            Log.i("remind", r.getId() + ":" + r);
-        }
         for (int i = 0; i < task.getReminds().size(); i++) {
             Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
         }
@@ -317,6 +326,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         switch (result) {
             case SubtaskEditorActivity.CREATE:
                 task.getSubTasks().add(subTask);
+                noSubtasksTextView.setVisibility(View.GONE);
                 subTasksRecycleView.getAdapter().notifyItemInserted(task.getSubTasks().size());
                 break;
             case SubtaskEditorActivity.UPDATE:
@@ -332,6 +342,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
             case ReminderEditorActivity.CREATE:
                 if (remind.getTimeStamp() > System.currentTimeMillis()) {
                     task.getReminds().add(remind);
+                    noRemindersTextView.setVisibility(View.GONE);
                     remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
                 } else {
                     showErrorToast("time in future");
@@ -349,11 +360,28 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    private void deleteReminder(Remind remind) {
+
+    private void deleteReminder(final Remind remind) {
         int i = task.getReminds().indexOf(remind);
         task.getReminds().remove(i);
         remindersRecyclerView.getAdapter().notifyItemRemoved(i);
-        Notifier.removeAlarm((int) remind.getTimeStamp());
+        noRemindersTextView.setVisibility(task.getReminds().size() > 0 ? View.GONE : View.VISIBLE);
+        Snackbar snackbar = Snackbar
+                .make(findViewById(R.id.task_modify_root), "Remind deleted", Snackbar.LENGTH_LONG)
+                .setAction("Cancel", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (remind.getTimeStamp() > System.currentTimeMillis()) {
+                            task.getReminds().add(remind);
+                            noRemindersTextView.setVisibility(View.GONE);
+                            remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
+                        } else {
+                            showErrorToast("time in future");
+                        }
+                    }
+                });
+
+        snackbar.show();
     }
 
     @Override

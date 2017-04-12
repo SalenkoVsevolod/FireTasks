@@ -16,15 +16,15 @@
 
     <EditText
         android:id="@+id/subtask_name"
-        android:layout_width="128dp"
+        android:layout_width="152dp"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/subtask_name_n"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@id/subtask_name_n"
         android:layout_toRightOf="@id/subtask_name_n"
-        android:hint="@string/name"
-        android:maxLines="1" />
+        android:hint="subtask name..."
+        android:maxLines="3" />
 
     <LinearLayout
         android:id="@+id/priority_container"
@@ -46,7 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:background="@android:color/transparent" />
     </LinearLayout>
 
 

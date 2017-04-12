@@ -32,6 +32,7 @@ public class DayFragment extends Fragment {
     private String sortingTagId;
     private TextView deletingTextView;
     private TasksDayRecyclerAdapter adapter;
+    private TextView noTasksTextView;
 
     public DayFragment() {
         // Required empty public constructor
@@ -69,6 +70,7 @@ public class DayFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_day, container, false);
         tasksRecycler = (RecyclerView) rootView.findViewById(R.id.day_tasks_rv);
+        noTasksTextView = (TextView) rootView.findViewById(R.id.no_tasks_tv);
         deletingTextView = (TextView) rootView.findViewById(R.id.deleting_tv);
         deletingTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,13 +118,18 @@ public class DayFragment extends Fragment {
             public void onDataChanged(ArrayList<Task> tasksArray) {
                 tasksRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
                 progressBar.setVisibility(View.GONE);
+                if (tasksArray.size() > 0) {
+                    noTasksTextView.setVisibility(View.GONE);
+                    tasksRecycler.setVisibility(View.VISIBLE);
+                } else {
+                    noTasksTextView.setVisibility(View.VISIBLE);
+                }
                 tasks.clear();
                 tasks.addAll(tasksArray);
                 if (sortingTagId != null) {
                     sortTasks();
                 }
                 tasksRecycler.getAdapter().notifyDataSetChanged();
-                tasksRecycler.setVisibility(View.VISIBLE);
             }
         });
     }

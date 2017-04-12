@@ -26,8 +26,7 @@
         android:layout_below="@id/sound_n_tv"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:background="@android:color/darker_gray"
-        android:text="sound..." />
+        android:text="No sound" />
 
     <CheckBox
         android:id="@+id/reminder_vibro"

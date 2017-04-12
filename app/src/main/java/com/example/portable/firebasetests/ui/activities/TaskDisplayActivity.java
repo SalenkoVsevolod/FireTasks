@@ -49,7 +49,13 @@ public class TaskDisplayActivity extends AppCompatActivity {
         tagTV = (TextView) findViewById(R.id.tagTextView);
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
         name.setText(task.getName());
-        description.setText(task.getDescription());
+        if (task.getDescription().length() > 0) {
+            description.setText(task.getDescription());
+            description.setVisibility(View.VISIBLE);
+        } else {
+            description.setVisibility(View.GONE);
+        }
+
         View remindersContainer = findViewById(R.id.reminders_container);
         if (task.getReminds() != null && task.getReminds().size() > 0) {
             remindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(task.getReminds(), null));

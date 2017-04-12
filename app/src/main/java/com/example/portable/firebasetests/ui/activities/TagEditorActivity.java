@@ -1,5 +1,6 @@
 package com.example.portable.firebasetests.ui.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,6 +9,7 @@ import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -77,7 +79,9 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
                 showColorPicker();
                 break;
             case R.id.dialog_ok:
-                saveTag();
+                if (nameEdit.getText().toString().length() > 0) {
+                    saveTag();
+                }
                 break;
             case R.id.dialog_cancel:
                 finish();
@@ -112,5 +116,18 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //TODO crutch
+    @Override
+    protected void onStop() {
+        super.onStop();
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if (getCurrentFocus() != null) {
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+        }
     }
 }

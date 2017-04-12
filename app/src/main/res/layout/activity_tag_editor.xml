@@ -23,7 +23,10 @@
         android:layout_toEndOf="@id/tag_name"
         android:layout_toRightOf="@id/tag_name"
         android:hint="tag name..."
-        android:maxLength="12" />
+        android:inputType="text"
+        android:lines="1"
+        android:maxLength="12"
+        android:maxLines="1" />
 
     <TextView
         android:id="@+id/color_name"
