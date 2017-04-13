@@ -2,9 +2,9 @@ package com.example.portable.firebasetests.network;
 
 import android.util.SparseArray;
 
-import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
 import com.example.portable.firebasetests.network.listeners.DayFirebaseListener;
-import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
+import com.example.portable.firebasetests.network.listeners.TagsFirebaseListener;
+import com.example.portable.firebasetests.network.listeners.TaskFirebaseListener;
 
 /**
  * Created by Salenko Vsevolod on 05.04.2017.
@@ -13,8 +13,8 @@ import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
 public class FirebaseListenersManager extends FirebaseMediator {
     private static FirebaseListenersManager instance;
     private SparseArray<DayFirebaseListener> dayListeners;
-    private AllTagsFirebaseListener allTagsFirebaseListener;
-    private TagFirebaseListener tagFirebaseListener;
+    private TagsFirebaseListener tagsFirebaseListener;
+    private TaskFirebaseListener taskFirebaseListener;
 
     private FirebaseListenersManager() {
         dayListeners = new SparseArray<>();
@@ -28,15 +28,14 @@ public class FirebaseListenersManager extends FirebaseMediator {
     }
 
 
-    public void setAllTagsListener(AllTagsFirebaseListener.OnTagsSyncListener listener) {
-        allTagsFirebaseListener = new AllTagsFirebaseListener(listener);
-        allTagsFirebaseListener.execute();
+    public void setTagsListener(TagsFirebaseListener.OnTagsSyncListener listener) {
+        tagsFirebaseListener = new TagsFirebaseListener(listener);
+        tagsFirebaseListener.execute();
     }
 
-    public void removeAllTagsListener() {
-        if (allTagsFirebaseListener != null) {
-            allTagsFirebaseListener.cancel(true);
-        }
+    public void removeTagsListener() {
+        tagsFirebaseListener.cancel(true);
+        tagsFirebaseListener = null;
     }
 
     public void setDayListener(int day, DayFirebaseListener.DataChangingListener listener) {
@@ -50,14 +49,15 @@ public class FirebaseListenersManager extends FirebaseMediator {
         dayListeners.remove(day);
     }
 
-    public void setTagListener(String tagId, TagFirebaseListener.OnTagGetListener listener) {
-        tagFirebaseListener = new TagFirebaseListener(tagId, listener);
-        tagFirebaseListener.execute();
+    public void setTaskFirebaseListener(int day, String id, TaskFirebaseListener.OnTaskChangingListener listener) {
+        taskFirebaseListener = new TaskFirebaseListener(day, id, listener);
+        taskFirebaseListener.execute();
     }
 
-    public void removeTagListener() {
-        if (tagFirebaseListener != null) {
-            tagFirebaseListener.cancel(true);
+    public void removeTaskFirebaseListener() {
+        if (taskFirebaseListener != null) {
+            taskFirebaseListener.cancel(true);
+            taskFirebaseListener = null;
         }
     }
 }

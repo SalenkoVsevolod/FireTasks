@@ -13,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +27,7 @@ import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
-import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
+import com.example.portable.firebasetests.network.listeners.TagsFirebaseListener;
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         final View showFirstContainer = findViewById(R.id.show_first_container);
-        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
+        FirebaseListenersManager.getInstance().setTagsListener(new TagsFirebaseListener.OnTagsSyncListener() {
             @Override
             public void onSync(ArrayList<Tag> tagsArray) {
                 if (tagsArray.size() > 0) {
@@ -114,7 +115,10 @@ public class MainActivity extends AppCompatActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        tabLayout.getTabAt(getSelectionDay()).select();
+                        TabLayout.Tab tab = tabLayout.getTabAt(getSelectionDay());
+                        if (tab != null) {
+                            tab.select();
+                        }
                     }
                 }, 100);
         tabLayout.addOnTabSelectedListener(onTabSelectedListener);
@@ -136,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        FirebaseListenersManager.getInstance().removeAllTagsListener();
+        FirebaseListenersManager.getInstance().removeTagsListener();
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
     }
 
@@ -238,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void inflateDays(int maxDays) {
+        long start = System.currentTimeMillis();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         for (int i = 1; i <= maxDays; i++) {
@@ -246,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
             tab.setCustomView(inflateDay(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_WEEK)));
             tabLayout.addTab(tab);
         }
+        Log.i("freezing", "millis:" + (System.currentTimeMillis() - start));
     }
 
     private View inflateDay(int dayOfMonth, int dayOfWeek) {
@@ -265,15 +271,17 @@ public class MainActivity extends AppCompatActivity {
         task.getCalendar().set(Calendar.DAY_OF_WEEK, calendar.get(Calendar.DAY_OF_WEEK));
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR));
         task.getCalendar().set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-        TaskModifyActivity.start(MainActivity.this, task);
+        TaskModifyActivity.start(MainActivity.this, task.getDayOfYear(), task.getId());
     }
 
     private void setTabViewSelected(TabLayout.Tab tab, boolean selected) {
         View v = tab.getCustomView();
-        TextView week = (TextView) v.findViewById(R.id.day_of_week);
-        TextView month = (TextView) v.findViewById(R.id.day_of_month);
-        week.setTextColor(getTabColor(selected));
-        month.setTextColor(getTabColor(selected));
+        if (v != null) {
+            TextView week = (TextView) v.findViewById(R.id.day_of_week);
+            TextView month = (TextView) v.findViewById(R.id.day_of_month);
+            week.setTextColor(getTabColor(selected));
+            month.setTextColor(getTabColor(selected));
+        }
     }
 
     private int getTabColor(boolean selected) {

@@ -18,9 +18,9 @@ public class Task implements Serializable {
     private String name, description;
     private ArrayList<SubTask> subTasks;
     private String id;
-    private String tagId;
     private Calendar calendar;
     private ArrayList<Remind> reminds;
+    private Tag tag;
 
     public Task() {
         description = "";
@@ -32,10 +32,25 @@ public class Task implements Serializable {
 
     public Task(HashMap<String, Object> map) {
         this();
+        setData(map);
+    }
+
+    public void setData(Task task) {
+        name = task.getName();
+        description = task.getDescription();
+        calendar.setTimeInMillis(task.getTimeStamp());
+        tag = task.getTag();
+        subTasks.clear();
+        subTasks.addAll(task.getSubTasks());
+        reminds.clear();
+        reminds.addAll(task.getReminds());
+    }
+
+    public void setData(HashMap<String, Object> map) {
         name = (String) map.get("name");
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
-        tagId = (String) map.get("tagId");
+        tag = new Tag((HashMap<String, Object>) map.get("tag"));
         subTasks = getSubTasks((HashMap<String, Object>) map.get("subTasks"));
         reminds = getReminders((HashMap<String, Object>) map.get("reminds"));
     }
@@ -91,16 +106,6 @@ public class Task implements Serializable {
         this.id = id;
     }
 
-    @Exclude
-    public boolean isCompleted() {
-        for (SubTask subTask : subTasks) {
-            if (!subTask.isDone()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public long getTimeStamp() {
         return calendar.getTimeInMillis();
     }
@@ -132,14 +137,6 @@ public class Task implements Serializable {
         this.reminds = reminds;
     }
 
-    public String getTagId() {
-        return tagId;
-    }
-
-    public void setTagId(String tagId) {
-        this.tagId = tagId;
-    }
-
     @Exclude
     public int getProgress() {
         float done = 0;
@@ -151,5 +148,17 @@ public class Task implements Serializable {
             }
         }
         return (int) ((done / sum) * 100);
+    }
+
+    public Tag getTag() {
+        return tag;
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
+
+    public int getDayOfYear() {
+        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 }

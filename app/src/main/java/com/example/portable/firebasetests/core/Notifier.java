@@ -10,8 +10,6 @@ import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 
-import java.util.Calendar;
-
 /**
  * Created by Salenko Vsevolod on 27.01.2017.
  */
@@ -32,12 +30,11 @@ public class Notifier {
                     alarmManager.set(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).round(), pendingIntent);
                 }
             } else {
-                FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(i));
+                FirebaseUtils.getInstance().removeReminder(task, task.getReminds().get(i));
             }
         }
 
     }
-
 
     public static void removeAlarm(int code) {
         AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
