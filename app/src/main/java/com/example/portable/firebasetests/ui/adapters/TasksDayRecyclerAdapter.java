@@ -16,7 +16,10 @@ import android.widget.TextView;
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.SubTask;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
 
 import java.util.ArrayList;
 
@@ -31,7 +34,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
     private boolean deleting = false;
     private int longClicked;
     private OnDeletingListener onDeletingListener;
-    private ArrayList<Task> tasksForDeleting;
+    private ArrayList<String> tasksForDeleting;
 
     public TasksDayRecyclerAdapter(ArrayList<Task> tasks, OnTaskClickListener onTaskClickListener, OnDeletingListener onDeletingListener) {
         this.tasks = tasks;
@@ -45,7 +48,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         return new DayTaskViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task, parent, false));
     }
 
-    public ArrayList<Task> getTasksForDeleting() {
+    public ArrayList<String> getTasksForDeleting() {
         return tasksForDeleting;
     }
 
@@ -101,11 +104,16 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             };
         }
         holder.nameTextView.setText(t.getName());
-
-        holder.tagTextView.setText(t.getTag().getName());
-        holder.tagTextView.setTextColor((int) t.getTag().getColor());
-        Drawable drawable = holder.progressBar.getProgressDrawable();
-        drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) t.getTag().getColor()));
+//TODO big bad crutch!
+        FirebaseListenersManager.getInstance().setTagListener(t.getTagId(), new TagFirebaseListener.OnTagGetListener() {
+            @Override
+            public void onGet(Tag tag) {
+                holder.tagTextView.setText(tag.getName());
+                holder.tagTextView.setTextColor((int) tag.getColor());
+                Drawable drawable = holder.progressBar.getProgressDrawable();
+                drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) tag.getColor()));
+            }
+        });
         holder.subtasksRecycler.setLayoutManager(new LinearLayoutManager(FireTasksApp.getInstance()));
         SubTaskPreviewRecyclerAdapter subTaskPreviewRecyclerAdapter;
         if (t.getSubTasks().size() > MAX_SUBTASKS_DISPLAYING) {
@@ -168,9 +176,9 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     Task t = tasks.get(getAdapterPosition());
                     if (isChecked) {
-                        tasksForDeleting.add(t);
+                        tasksForDeleting.add(t.getId());
                     } else {
-                        tasksForDeleting.remove(t);
+                        tasksForDeleting.remove(t.getId());
                     }
                     onDeletingListener.onDeletingTasksNumberChanged(tasksForDeleting.size());
                 }

@@ -4,6 +4,7 @@ import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Salenko Vsevolod on 16.02.2017.
@@ -20,6 +21,18 @@ public class Tag implements Serializable {
     public Tag(HashMap<String, Object> map) {
         name = (String) map.get("name");
         color = (long) map.get("color");
+    }
+
+    @Exclude
+    public static Tag getTagById(String id, List<Tag> tags) {
+        if (tags != null) {
+            for (Tag t : tags) {
+                if (t.getId().equals(id)) {
+                    return t;
+                }
+            }
+        }
+        return null;
     }
 
     public String getName() {

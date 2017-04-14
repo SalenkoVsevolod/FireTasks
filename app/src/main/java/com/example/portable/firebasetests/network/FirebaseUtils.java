@@ -6,6 +6,8 @@ import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.google.firebase.database.DatabaseReference;
 
+import java.util.Calendar;
+
 /**
  * Created by Black on 18.03.2017.
  */
@@ -21,46 +23,37 @@ public class FirebaseUtils extends FirebaseMediator {
     }
 
 
-    public void deleteTask(Task task) {
-        getTaskReference(task.getDayOfYear(), task.getId()).removeValue();
-        for (Remind r : task.getReminds()) {
-            getTagsReference().child(r.getId()).removeValue();
-        }
+
+    public void deleteTask(int day, String taskId) {
+        getTaskReference(day, taskId).setValue(null);
     }
 
-    //TODO crutch, do not create reference each time
+
     public void saveTask(Task task) {
-        getTaskReference(task.getDayOfYear(), task.getId()).setValue(task);
+        int day = task.getCalendar().get(Calendar.DAY_OF_YEAR);
+        getTaskReference(day, task.getId()).setValue(task);
         for (Remind r : task.getReminds()) {
-            getTaskReference(task.getDayOfYear(), task.getId()).child("reminds").child(r.getId()).setValue(r);
-            getRemindersReference().child(r.getId()).setValue(r);
+            getTaskReference(day, task.getId()).child("reminds").child(r.getId()).setValue(r);
         }
         for (SubTask subTask : task.getSubTasks()) {
-            DatabaseReference ref = getTaskReference(task.getDayOfYear(), task.getId()).child("subTasks")
+            DatabaseReference ref = getTaskReference(day, task.getId()).child("subTasks")
                     .child(subTask.getId());
             ref.setValue(subTask);
         }
+
     }
 
 
-    public void setSubTaskDone(int day, String id, SubTask subTask) {
-        getTaskReference(day, id).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
+    public void setSubTaskDone(int day, String taskId, SubTask subTask) {
+        getTaskReference(day, taskId).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
     }
 
-    public void removeReminder(Task task, Remind remind) {
-        getRemindersReference().child(remind.getId()).removeValue();
-        getTaskReference(task.getDayOfYear(), task.getId()).child("reminds").child(remind.getId()).removeValue();
+    public void removeReminder(int day, String taskId, Remind remind) {
+        getTaskReference(day, taskId).child("reminds").child(remind.getId()).setValue(null);
     }
+
 
     public void addTag(Tag tag) {
         getTagsReference().child(tag.getId()).setValue(tag);
-    }
-
-    public void selectTag(Task task, Tag tag) {
-        getTagsReference().child(tag.getId())
-                .child("tasks").child(task.getDayOfYear() + "")
-                .child(task.getId())
-                .setValue(true);
-        getTaskReference(task.getDayOfYear(), task.getId()).child("tag").child(tag.getId()).setValue(tag);
     }
 }

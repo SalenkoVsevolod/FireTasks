@@ -1,5 +1,6 @@
 package com.example.portable.firebasetests.ui.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,29 +9,30 @@ import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Tag;
+import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.jrummyapps.android.colorpicker.ColorPickerDialog;
 import com.jrummyapps.android.colorpicker.ColorPickerDialogListener;
 
 import java.util.ArrayList;
 
 public class TagEditorActivity extends AppCompatActivity implements ColorPickerDialogListener, View.OnClickListener {
-    public static final String TAG = "tag", ALL_TAGS = "all_tags";
-    public static final int UPDATE = 1, CREATE = 2;
+    private static final String TAG = "tag", ALL_TAGS = "all_tags";
     private Tag tag;
     private EditText nameEdit;
     private View colorPreview;
     private ArrayList<Tag> allTags;
 
-    public static Intent getStarterIntent(Context context, ArrayList<Tag> allTags, Tag tag) {
+    public static void start(Context context, ArrayList<Tag> allTags, Tag tag) {
         Intent starter = new Intent(context, TagEditorActivity.class);
         starter.putExtra(TAG, tag);
         starter.putExtra(ALL_TAGS, allTags);
-        return starter;
+        context.startActivity(starter);
     }
 
     @Override
@@ -94,19 +96,13 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
     }
 
     private void saveTag() {
-        int result;
         tag.setName(nameEdit.getText().toString());
         if (tag.getId() == null) {
             tag.setId("tag" + System.currentTimeMillis());
-            result = CREATE;
-        } else {
-            result = UPDATE;
         }
 
         if (!allTags.contains(tag)) {
-            Intent intent = new Intent();
-            intent.putExtra(TAG, tag);
-            setResult(result, intent);
+            FirebaseUtils.getInstance().addTag(tag);
             finish();
         } else {
             Toast.makeText(this, "tag allready exists", Toast.LENGTH_SHORT).show();
@@ -120,5 +116,18 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //TODO crutch
+    @Override
+    protected void onStop() {
+        super.onStop();
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if (getCurrentFocus() != null) {
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+        }
     }
 }

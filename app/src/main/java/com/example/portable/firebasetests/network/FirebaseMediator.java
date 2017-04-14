@@ -20,8 +20,4 @@ public class FirebaseMediator {
     public DatabaseReference getDayReference(int day) {
         return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("days").child("" + day);
     }
-
-    public DatabaseReference getRemindersReference() {
-        return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("reminders");
-    }
 }

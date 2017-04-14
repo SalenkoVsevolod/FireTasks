@@ -13,6 +13,8 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 
+import java.util.Calendar;
+
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     public static final String TASK_TAG = "task", INDEX = "index";
 
@@ -26,7 +28,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         Task task = (Task) intent.getSerializableExtra(TASK_TAG);
         int index = intent.getIntExtra(INDEX, -1);
         showNotification(mNotificationManager, task, index, context);
-        FirebaseUtils.getInstance().removeReminder(task, task.getReminds().get(index));
+        FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(index));
     }
 
     private void showNotification(final NotificationManager manager, Task task, int index, Context context) {
@@ -41,7 +43,9 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         if (task.getReminds().get(index).isVibro()) {
             builder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, TaskDisplayActivity.getStarterIntent(context, task.getDayOfYear(), task.getId()), 0);
+        Intent intent = new Intent(context, TaskDisplayActivity.class);
+        intent.putExtra(TaskDisplayActivity.TASK_ARG, task);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
         builder.setContentTitle(task.getName());
         builder.setContentText(task.getDescription());

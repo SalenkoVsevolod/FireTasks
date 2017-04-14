@@ -75,8 +75,8 @@ public class DayFragment extends Fragment {
         deletingTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (Task task : adapter.getTasksForDeleting()) {
-                    FirebaseUtils.getInstance().deleteTask(task);
+                for (String taskId : adapter.getTasksForDeleting()) {
+                    FirebaseUtils.getInstance().deleteTask(dayOfYear, taskId);
                 }
                 hideDeleting();
             }
@@ -86,7 +86,7 @@ public class DayFragment extends Fragment {
         TasksDayRecyclerAdapter.OnTaskClickListener onTaskClickListener = new TasksDayRecyclerAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
-                TaskDisplayActivity.start(getActivity(), task.getDayOfYear(), task.getId());
+                TaskDisplayActivity.start(getActivity(), task);
             }
         };
         TasksDayRecyclerAdapter.OnDeletingListener onDeletingListener = new TasksDayRecyclerAdapter.OnDeletingListener() {
@@ -146,9 +146,9 @@ public class DayFragment extends Fragment {
             Collections.sort(tasks, new Comparator<Task>() {
                 @Override
                 public int compare(Task o1, Task o2) {
-                    if (o1.getTag().getId().equals(sortingTagId)) {
+                    if (o1.getTagId().equals(sortingTagId)) {
                         return -1;
-                    } else if (o2.getTag().getId().equals(sortingTagId)) {
+                    } else if (o2.getTagId().equals(sortingTagId)) {
                         return 1;
                     }
                     return 0;

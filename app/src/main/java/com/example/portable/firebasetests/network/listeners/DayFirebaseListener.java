@@ -48,7 +48,7 @@ public class DayFirebaseListener extends AsyncTask<Void, ArrayList<Task>, Void> 
                 ArrayList<Task> taskArrayList = getTasks(tasks);
                 for (Task t : taskArrayList) {
                     if (t.getCalendar().get(Calendar.YEAR) < currentYear) {
-                        FirebaseUtils.getInstance().deleteTask(t);
+                        FirebaseUtils.getInstance().deleteTask(day, t.getId());
                     }
                 }
                 publishProgress(taskArrayList);

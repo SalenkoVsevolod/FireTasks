@@ -18,11 +18,11 @@ import java.util.Set;
  * Created by Salenko Vsevolod on 28.03.2017.
  */
 
-public class TagsFirebaseListener extends AsyncTask<Void, ArrayList<Tag>, Void> {
+public class AllTagsFirebaseListener extends AsyncTask<Void, ArrayList<Tag>, Void> {
     private OnTagsSyncListener listener;
     private ValueEventListener valueEventListener;
 
-    public TagsFirebaseListener(OnTagsSyncListener listener) {
+    public AllTagsFirebaseListener(OnTagsSyncListener listener) {
         this.listener = listener;
     }
 
