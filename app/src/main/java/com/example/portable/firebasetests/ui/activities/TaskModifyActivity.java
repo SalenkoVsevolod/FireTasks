@@ -61,6 +61,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         context.startActivity(starter);
     }
 
+    //TODO refactor
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,10 +88,10 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         };
         tagsRecycler.setAdapter(new TagRecyclerAdapter(tags, onTagInteractionListener));
         tagsRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        tagTextView.setOnClickListener(this);
         subTasksRecycleView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         findViewById(R.id.add_subtask).setOnClickListener(this);
         remindersRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
-        tagTextView.setOnClickListener(this);
         findViewById(R.id.add_tag_imv).setOnClickListener(this);
         findViewById(R.id.add_reminder_imv).setOnClickListener(this);
         configViewsForClosingKeyBord(findViewById(R.id.task_modify_root));
@@ -142,7 +143,6 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                     task.setTagId(null);
                     lastSelectedTag = null;
                 } else {
-                    tagTextView.setVisibility(View.VISIBLE);
                     if (tagsArray.size() > 1) {
                         tagsRecycler.setVisibility(View.VISIBLE);
                         divider.setVisibility(View.VISIBLE);
@@ -279,9 +279,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
                 startActivityForResult(ReminderEditorActivity.getStarterIntent(this, null, task.getTimeStamp()), 36);
                 break;
             case R.id.tag_text:
-                if (lastSelectedTag != null) {
-                    TagEditorActivity.start(TaskModifyActivity.this, tags, lastSelectedTag);
-                }
+                TagEditorActivity.start(TaskModifyActivity.this, tags, lastSelectedTag);
                 break;
             case R.id.add_subtask:
                 startActivityForResult(SubtaskEditorActivity.getStarterIntent(TaskModifyActivity.this, null), 87);
@@ -388,13 +386,20 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                finishAndStartRightActivity();
                 return true;
             case R.id.saveTask:
                 assembleTaskAndSave();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void finishAndStartRightActivity() {
+        if (task.getId() != null) {
+            TaskDisplayActivity.start(this, task);
+        }
+        finish();
     }
 
     private void assembleTaskAndSave() {
@@ -407,7 +412,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         }
         if (canComplete()) {
             saveTask();
-            finish();
+            finishAndStartRightActivity();
         }
     }
 
@@ -419,7 +424,7 @@ public class TaskModifyActivity extends AppCompatActivity implements View.OnClic
         builder.setPositiveButton("quit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                finish();
+                finishAndStartRightActivity();
             }
         });
         builder.setNegativeButton("cancel", null);
