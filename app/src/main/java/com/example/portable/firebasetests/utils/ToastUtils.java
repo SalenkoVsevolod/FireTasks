@@ -1,6 +1,8 @@
 package com.example.portable.firebasetests.utils;
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
@@ -13,10 +15,11 @@ import com.example.portable.firebasetests.core.FireTasksApp;
 public class ToastUtils {
 
     public static void showToast(String text, boolean lengthLong) {
-        Toast toast = Toast.makeText(FireTasksApp.getInstance(), text, lengthLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
-        View view = toast.getView();
-        view.setPadding(16, 8, 16, 8);
-        view.setBackgroundResource(R.drawable.toast_background);
+        Toast toast = new Toast(FireTasksApp.getInstance());
+        View view = LayoutInflater.from(FireTasksApp.getInstance()).inflate(R.layout.toast_view, null);
+        TextView textView = (TextView) view.findViewById(R.id.message);
+        textView.setText(text);
+        toast.setDuration(lengthLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
         toast.setView(view);
         toast.show();
     }

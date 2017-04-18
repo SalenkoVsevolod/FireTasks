@@ -161,8 +161,8 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         final View divider = findViewById(R.id.divider);
         FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
             @Override
@@ -195,6 +195,12 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        FirebaseListenersManager.getInstance().removeAllTagsListener();
+    }
+
     private void selectTag(Tag tag) {
         int pos = tags.indexOf(tag);
         tags.remove(pos);
@@ -213,12 +219,6 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         tagTextView.setText(content);
         tagTextView.setTextColor((int) tag.getColor());
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        FirebaseListenersManager.getInstance().removeAllTagsListener();
     }
 
     private boolean canComplete() {
