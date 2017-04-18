@@ -381,7 +381,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
-                return true;
+                break;
             case R.id.saveTask:
                 assembleTaskAndSave();
                 break;
@@ -418,11 +418,10 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         builder.setPositiveButton("quit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                finishAndStartRightActivity();
+                finish();
             }
         });
         builder.setNegativeButton("cancel", null);
         builder.show();
     }
-
 }

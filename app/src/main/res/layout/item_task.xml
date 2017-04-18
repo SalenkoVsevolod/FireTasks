@@ -48,11 +48,13 @@
             android:id="@+id/more_dots_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/subTasksRecyclerView"
-            android:layout_alignStart="@id/subTasksRecyclerView"
+            android:layout_alignLeft="@id/subtasks_container"
+            android:layout_alignStart="@id/subtasks_container"
             android:layout_below="@id/subtasks_container"
+            android:layout_marginLeft="-4dp"
+            android:layout_marginStart="-4dp"
             android:src="@drawable/ic_more_horiz_black_24dp"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <ProgressBar
             android:id="@+id/progressBar"
