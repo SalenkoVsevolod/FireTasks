@@ -1,11 +1,10 @@
 package com.example.portable.firebasetests.network.listeners;
 
 import android.os.AsyncTask;
-import android.widget.Toast;
 
-import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.utils.ToastUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -40,7 +39,7 @@ public class AllTagsFirebaseListener extends AsyncTask<Void, ArrayList<Tag>, Voi
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(FireTasksApp.getInstance(), "Connection cancelled", Toast.LENGTH_LONG).show();
+                ToastUtils.showToast("Connection cancelled", true);
             }
         };
         FirebaseUtils.getInstance().getTagsReference().addValueEventListener(valueEventListener);

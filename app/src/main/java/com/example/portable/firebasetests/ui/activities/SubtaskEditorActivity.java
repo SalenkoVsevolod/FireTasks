@@ -1,18 +1,17 @@
 package com.example.portable.firebasetests.ui.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.ui.adapters.PrioritySpinnerAdapter;
+import com.example.portable.firebasetests.utils.KeyBoardUtils;
 
 public class SubtaskEditorActivity extends AppCompatActivity implements View.OnClickListener {
     public static final int UPDATE = 1, CREATE = 2;
@@ -77,16 +76,9 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    //TODO crutch
     @Override
     protected void onStop() {
         super.onStop();
-        InputMethodManager inputMethodManager =
-                (InputMethodManager) getSystemService(
-                        Activity.INPUT_METHOD_SERVICE);
-        if (getCurrentFocus() != null) {
-            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-
-        }
+        KeyBoardUtils.hideKeyBoard(this);
     }
 }

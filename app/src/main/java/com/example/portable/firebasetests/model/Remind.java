@@ -18,7 +18,6 @@ public class Remind implements Serializable {
     private Calendar calendar;
 
     public Remind() {
-        sound = "";
         calendar = Calendar.getInstance();
     }
 

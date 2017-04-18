@@ -5,7 +5,9 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:background="@android:color/white"
-    android:padding="32dp"
+    android:paddingLeft="32dp"
+    android:paddingStart="32dp"
+    android:paddingTop="32dp"
     tools:context="com.example.portable.firebasetests.ui.activities.SubtaskEditorActivity">
 
     <TextView
@@ -20,7 +22,9 @@
         android:layout_width="152dp"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/subtask_name_n"
+        android:layout_marginEnd="32dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginRight="32dp"
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@id/subtask_name_n"
         android:layout_toRightOf="@id/subtask_name_n"
@@ -59,14 +63,15 @@
         android:layout_alignEnd="@id/subtask_name"
         android:layout_alignRight="@id/subtask_name"
         android:layout_below="@id/priority_container"
+        android:layout_marginEnd="-16dp"
+        android:layout_marginRight="-16dp"
         android:layout_marginTop="32dp">
 
         <TextView
             android:id="@+id/dialog_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:padding="16dp"
             android:text="CANCEL"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
@@ -76,6 +81,7 @@
             android:id="@+id/dialog_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="16dp"
             android:text="OK"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"

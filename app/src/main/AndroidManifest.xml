@@ -31,7 +31,7 @@
             android:name=".ui.activities.TagEditorActivity"
             android:theme="@style/MainTheme.Dialog" />
         <activity android:name=".ui.activities.TaskDisplayActivity" />
-        <activity android:name=".ui.activities.TaskModifyActivity" />
+        <activity android:name=".ui.activities.TaskEditActivity" />
         <activity
             android:name=".ui.activities.ReminderEditorActivity"
             android:screenOrientation="portrait"

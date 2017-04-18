@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.network.listeners.FirebaseLoginListener;
+import com.example.portable.firebasetests.utils.ToastUtils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -94,8 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (resultCode == FirebaseLoginListener.DONE) {
                     startTasksActivity();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
+                    ToastUtils.showToast("Authentication failed", true);
                 }
             }
         });

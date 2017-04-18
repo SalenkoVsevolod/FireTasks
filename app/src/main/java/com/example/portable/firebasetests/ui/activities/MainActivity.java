@@ -30,6 +30,7 @@ import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListe
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
+import com.example.portable.firebasetests.utils.ToastUtils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
     private DayFragment currentFragment;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
+    private int backPresses;
 
     @SuppressWarnings("all")
     @Override
@@ -94,8 +96,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         final View showFirstContainer = findViewById(R.id.show_first_container);
         FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
             @Override
@@ -131,11 +133,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        backPresses = 0;
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         FirebaseListenersManager.getInstance().removeAllTagsListener();
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
     }
@@ -265,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
         task.getCalendar().set(Calendar.DAY_OF_WEEK, calendar.get(Calendar.DAY_OF_WEEK));
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR));
         task.getCalendar().set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-        TaskModifyActivity.start(MainActivity.this, task);
+        TaskEditActivity.start(MainActivity.this, task);
     }
 
     private void setTabViewSelected(TabLayout.Tab tab, boolean selected) {
@@ -284,7 +287,16 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         boolean handled = currentFragment.hideDeleting();
         if (!handled) {
-            super.onBackPressed();
+            exit();
+        }
+    }
+
+    private void exit() {
+        backPresses++;
+        if (backPresses > 1) {
+            finish();
+        } else {
+            ToastUtils.showToast("Press back again to exit", true);
         }
     }
 }

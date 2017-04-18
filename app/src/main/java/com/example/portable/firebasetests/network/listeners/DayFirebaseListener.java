@@ -1,13 +1,12 @@
 package com.example.portable.firebasetests.network.listeners;
 
 import android.os.AsyncTask;
-import android.widget.Toast;
 
-import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.utils.ToastUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -56,7 +55,7 @@ public class DayFirebaseListener extends AsyncTask<Void, ArrayList<Task>, Void> 
 
             @Override
             public void onCancelled(DatabaseError error) {
-                Toast.makeText(FireTasksApp.getInstance(), "connection cancelled", Toast.LENGTH_LONG).show();
+                ToastUtils.showToast("connection cancelled", true);
             }
         };
         FirebaseUtils.getInstance().getDayReference(day).addValueEventListener(listener);

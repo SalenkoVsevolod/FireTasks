@@ -67,7 +67,9 @@
                         android:layout_toEndOf="@id/nameNTV"
                         android:layout_toRightOf="@id/nameNTV"
                         android:hint="name..."
+                        android:inputType="textMultiLine"
                         android:maxLines="2"
+                        android:minLines="1"
                         android:textColor="@android:color/black"
                         android:textSize="24sp" />
 
@@ -75,8 +77,10 @@
                         android:id="@+id/descriptionTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_below="@id/nameET"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
                         android:text="@string/descriptionName"
                         android:textColor="@color/gray_text" />
 
@@ -85,20 +89,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@id/descriptionTextView"
+                        android:layout_below="@id/nameET"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
                         android:layout_toEndOf="@id/descriptionTextView"
                         android:layout_toRightOf="@id/descriptionTextView"
-                        android:ems="10"
                         android:gravity="top"
                         android:hint="@string/descriptionHint"
                         android:inputType="textMultiLine"
-                        android:maxLines="4"
+                        android:maxLines="5"
+                        android:minLines="1"
                         android:textColor="@android:color/black" />
                 </RelativeLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/tag_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
@@ -212,6 +218,7 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/subtasks_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp">

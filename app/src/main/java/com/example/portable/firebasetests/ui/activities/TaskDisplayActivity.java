@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -32,12 +33,13 @@ public class TaskDisplayActivity extends AppCompatActivity {
     private TextView tagTV;
     private Task task;
 
-    public static void start(Context context, Task task) {
+    public static void start(Context context, @NonNull Task task) {
         Intent starter = new Intent(context, TaskDisplayActivity.class);
         starter.putExtra(TASK_ARG, task);
         context.startActivity(starter);
     }
 
+    //TODO refactor
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +113,7 @@ public class TaskDisplayActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.edit_item:
-                TaskModifyActivity.start(this, task);
+                TaskEditActivity.start(this, task);
                 finish();
                 break;
             case android.R.id.home:

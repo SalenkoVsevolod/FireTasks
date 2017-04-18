@@ -4,12 +4,16 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingTop="16dp">
 
     <TimePicker
         android:id="@+id/reminder_time_picker"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp" />
 
     <TextView
         android:id="@+id/sound_n_tv"
@@ -46,8 +50,7 @@
             android:id="@+id/dialog_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:padding="16dp"
             android:text="CANCEL"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
@@ -57,6 +60,7 @@
             android:id="@+id/dialog_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="16dp"
             android:text="OK"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"

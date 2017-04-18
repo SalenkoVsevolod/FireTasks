@@ -7,6 +7,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -17,26 +18,22 @@ import android.widget.TimePicker;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Remind;
+import com.example.portable.firebasetests.utils.ToastUtils;
 
 import java.util.Calendar;
 
-//TODO contains many crutches
 public class ReminderEditorActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String REMINDER = "remind";
     public static final int CREATE = 1, UPDATE = 2;
-    private static final String TIMESTAMP = "timestamp";
     private static final int SOUND_CODE = 5;
     private Remind remind;
     private CheckBox vibro;
     private TimePicker reminderTime;
     private TextView soundTV;
-    private Uri sound;
-    private long timestamp;
 
-    public static Intent getStarterIntent(Context context, Remind remind, long taskTimeStamp) {
+    public static Intent getStarterIntent(Context context, @NonNull Remind remind) {
         Intent starter = new Intent(context, ReminderEditorActivity.class);
         starter.putExtra(REMINDER, remind);
-        starter.putExtra(TIMESTAMP, taskTimeStamp);
         return starter;
     }
 
@@ -52,27 +49,23 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
         findViewById(R.id.dialog_ok).setOnClickListener(this);
         findViewById(R.id.dialog_cancel).setOnClickListener(this);
         remind = (Remind) getIntent().getSerializableExtra(REMINDER);
-        timestamp = getIntent().getLongExtra(TIMESTAMP, -1);
-        if (remind != null) {
-            if (remind.getSound() != null) {
-                soundTV.setText(getSoundContent(getRingtoneTitle(Uri.parse(remind.getSound()))));
-            }
-            vibro.setChecked(remind.isVibro());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                reminderTime.setHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
-                reminderTime.setMinute(remind.getCalendar().get(Calendar.MINUTE));
-            } else {
-                reminderTime.setCurrentHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
-                reminderTime.setCurrentMinute(remind.getCalendar().get(Calendar.MINUTE));
-            }
+
+        if (remind.getSound() != null) {
+            soundTV.setText(getSoundContent(getRingtoneTitle(Uri.parse(remind.getSound()))));
         } else {
             soundTV.setText(getSoundContent("No sound"));
+        }
+        vibro.setChecked(remind.isVibro());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            reminderTime.setHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
+            reminderTime.setMinute(remind.getCalendar().get(Calendar.MINUTE));
+        } else {
+            reminderTime.setCurrentHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
+            reminderTime.setCurrentMinute(remind.getCalendar().get(Calendar.MINUTE));
         }
     }
 
     private void saveClick() {
-        final Remind rem = remind == null ? new Remind() : remind;
-        rem.setTimeStamp(timestamp);
         int hour, minute;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             hour = reminderTime.getHour();
@@ -81,29 +74,26 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
             hour = reminderTime.getCurrentHour();
             minute = reminderTime.getCurrentMinute();
         }
-        rem.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
-        rem.getCalendar().set(Calendar.MINUTE, minute);
-        if (sound != null) {
-            rem.setSound(sound.toString());
+        remind.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
+        remind.getCalendar().set(Calendar.MINUTE, minute);
+        if (remind.getCalendar().getTimeInMillis() > System.currentTimeMillis()) {
+            remind.setVibro(vibro.isChecked());
+            if (remind.getId() == null) {
+                remind.setId("reminder_" + System.currentTimeMillis());
+                returnRemind(CREATE);
+            } else {
+                returnRemind(UPDATE);
+            }
         } else {
-            rem.setSound(null);
-            soundTV.setText(getSoundContent("No sound"));
+            ToastUtils.showToast("Please choose time in future", false);
         }
-        rem.setVibro(vibro.isChecked());
-        if (remind == null) {
-            rem.setId("reminder_" + System.currentTimeMillis());
-            returnRemind(CREATE, rem);
-        } else {
-            returnRemind(UPDATE, rem);
-        }
-
     }
 
     private void chooseSound() {
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, sound);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, remind.getSound() == null ? null : Uri.parse(remind.getSound()));
         this.startActivityForResult(intent, SOUND_CODE);
     }
 
@@ -115,10 +105,8 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
                 if (resultCode == Activity.RESULT_OK) {
                     Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
                     if (uri != null) {
-                        sound = uri;
+                        remind.setSound(uri.toString());
                         soundTV.setText(getSoundContent(getRingtoneTitle(uri)));
-                        // Preferences.getInstance().writeLastRingtone(uri.toString());
-                        // soundTextView.setText(RingtoneManager.getRingtone(getActivity(), uri).getTitle(getActivity()));
                     } else {
                         soundTV.setText(getSoundContent("No sound"));
                     }
@@ -160,9 +148,9 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
         return content;
     }
 
-    private void returnRemind(int code, Remind r) {
+    private void returnRemind(int code) {
         Intent intent = new Intent();
-        intent.putExtra(REMINDER, r);
+        intent.putExtra(REMINDER, remind);
         setResult(code, intent);
         finish();
     }
