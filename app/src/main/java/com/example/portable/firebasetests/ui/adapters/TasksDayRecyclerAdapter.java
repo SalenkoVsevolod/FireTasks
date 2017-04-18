@@ -2,7 +2,7 @@ package com.example.portable.firebasetests.ui.adapters;
 
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.FireTasksApp;
-import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseListenersManager;
@@ -103,8 +103,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
                 }
             };
         }
-        holder.nameTextView.setText(t.getName());
-//TODO big bad crutch!
+        //TODO big bad crutch!
         FirebaseListenersManager.getInstance().setTagListener(t.getTagId(), new TagFirebaseListener.OnTagGetListener() {
             @Override
             public void onGet(Tag tag) {
@@ -114,23 +113,26 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
                 drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) tag.getColor()));
             }
         });
-        holder.subtasksRecycler.setLayoutManager(new LinearLayoutManager(FireTasksApp.getInstance()));
-        SubTaskPreviewRecyclerAdapter subTaskPreviewRecyclerAdapter;
-        if (t.getSubTasks().size() > MAX_SUBTASKS_DISPLAYING) {
-            ArrayList<SubTask> newSubTasks = new ArrayList<>();
-            for (int i = 0; i < MAX_SUBTASKS_DISPLAYING; i++) {
-                newSubTasks.add(t.getSubTasks().get(i));
-            }
-            holder.moreDots.setVisibility(View.VISIBLE);
-            subTaskPreviewRecyclerAdapter = new SubTaskPreviewRecyclerAdapter(newSubTasks, onSubtaskClick, onSubtaskLongClick);
-        } else {
-            holder.moreDots.setVisibility(View.GONE);
-            subTaskPreviewRecyclerAdapter = new SubTaskPreviewRecyclerAdapter(t.getSubTasks(), onSubtaskClick, onSubtaskLongClick);
-        }
-        holder.subtasksRecycler.setAdapter(subTaskPreviewRecyclerAdapter);
+        inflateSubtasks(holder);
+        holder.nameTextView.setText(t.getName());
         holder.progressBar.setProgress(t.getProgress());
         holder.rootView.setOnClickListener(onSubtaskClick);
         holder.rootView.setOnLongClickListener(onSubtaskLongClick);
+    }
+
+    private void inflateSubtasks(DayTaskViewHolder holder) {
+        Task t = tasks.get(holder.getAdapterPosition());
+        int length = t.getSubTasks().size() < MAX_SUBTASKS_DISPLAYING ? t.getSubTasks().size() : MAX_SUBTASKS_DISPLAYING;
+        holder.subtasksLayout.removeAllViews();
+        for (int i = 0; i < length; i++) {
+            View subtaskView = LayoutInflater.from(FireTasksApp.getInstance()).inflate(R.layout.item_subtasks_preview, null);
+            ImageView check = (ImageView) subtaskView.findViewById(R.id.subtask_done_imv);
+            TextView text = (TextView) subtaskView.findViewById(R.id.subtask_tv);
+            text.setText(t.getSubTasks().get(i).getDescription());
+            check.setImageDrawable(ContextCompat.getDrawable(FireTasksApp.getInstance(), t.getSubTasks().get(i).isDone() ? R.drawable.taskdone : R.drawable.taskundone));
+            holder.subtasksLayout.addView(subtaskView);
+        }
+        holder.moreDots.setVisibility(t.getSubTasks().size() > MAX_SUBTASKS_DISPLAYING ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -156,10 +158,10 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
 
     class DayTaskViewHolder extends RecyclerView.ViewHolder {
         TextView tagTextView, nameTextView;
-        RecyclerView subtasksRecycler;
         ImageView moreDots;
         ProgressBar progressBar;
         CheckBox deletingCheckbox;
+        LinearLayout subtasksLayout;
         View rootView;
 
         DayTaskViewHolder(View itemView) {
@@ -168,7 +170,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             tagTextView = (TextView) itemView.findViewById(R.id.tag_tv);
             deletingCheckbox = (CheckBox) itemView.findViewById(R.id.deleting_checkbox);
             nameTextView = (TextView) itemView.findViewById(R.id.task_name_tv);
-            subtasksRecycler = (RecyclerView) itemView.findViewById(R.id.subTasksRecyclerView);
+            subtasksLayout = (LinearLayout) itemView.findViewById(R.id.subtasks_container);
             moreDots = (ImageView) itemView.findViewById(R.id.more_dots_tv);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
             deletingCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

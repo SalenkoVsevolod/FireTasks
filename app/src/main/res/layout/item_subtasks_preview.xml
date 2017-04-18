@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/subtask_done_imv"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:layout_gravity="start" />
+        android:layout_gravity="start|center_vertical" />
 
     <TextView
         android:id="@+id/subtask_tv"
