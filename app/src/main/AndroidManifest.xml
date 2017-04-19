@@ -23,7 +23,7 @@
         <activity android:name=".ui.activities.MainActivity" />
 
         <receiver
-            android:name=".NotificationsBroadcastReceiver"
+            android:name=".broadcast_receivers.NotificationsBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
 
@@ -39,6 +39,7 @@
         <activity
             android:name=".ui.activities.SubtaskEditorActivity"
             android:theme="@style/MainTheme.Dialog" />
+
     </application>
 
 </manifest>

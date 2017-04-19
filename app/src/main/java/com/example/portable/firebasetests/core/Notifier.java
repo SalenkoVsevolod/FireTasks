@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
+import com.example.portable.firebasetests.broadcast_receivers.NotificationsBroadcastReceiver;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 

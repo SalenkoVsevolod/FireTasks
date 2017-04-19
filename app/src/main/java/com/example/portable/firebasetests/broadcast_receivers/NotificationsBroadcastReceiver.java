@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests;
+package com.example.portable.firebasetests.broadcast_receivers;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
@@ -35,6 +36,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setContentText(task.getName());
+        builder.setAutoCancel(true);
         Log.i("snd", task.getReminds().toString() + ":" + task.getReminds().get(index).getSound());
         String sound = task.getReminds().get(index).getSound();
         if (sound != null) {
