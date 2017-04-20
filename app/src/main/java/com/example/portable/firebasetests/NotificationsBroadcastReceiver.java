@@ -1,19 +1,11 @@
 package com.example.portable.firebasetests;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseUtils;
-import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
-
-import java.util.Calendar;
 
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     public static final String TASK_TAG = "task", INDEX = "index";
@@ -28,11 +20,11 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         Task task = (Task) intent.getSerializableExtra(TASK_TAG);
         int index = intent.getIntExtra(INDEX, -1);
         showNotification(mNotificationManager, task, index, context);
-        FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(index));
+        //TODO    FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(index));
     }
 
     private void showNotification(final NotificationManager manager, Task task, int index, Context context) {
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+     /* TODO   final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setContentText(task.getName());
         Log.i("snd", task.getReminds().toString() + ":" + task.getReminds().get(index).getSound());
@@ -49,6 +41,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         builder.setContentIntent(pendingIntent);
         builder.setContentTitle(task.getName());
         builder.setContentText(task.getDescription());
-        manager.notify(1, builder.build());
+        manager.notify(1, builder.build());*/
     }
 }

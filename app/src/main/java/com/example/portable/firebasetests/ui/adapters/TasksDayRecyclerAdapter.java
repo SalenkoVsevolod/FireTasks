@@ -1,7 +1,5 @@
 package com.example.portable.firebasetests.ui.adapters;
 
-import android.graphics.LightingColorFilter;
-import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,10 +14,7 @@ import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.FireTasksApp;
-import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseListenersManager;
-import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
 
 import java.util.ArrayList;
 
@@ -62,7 +57,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
 
     @Override
     public void onBindViewHolder(final DayTaskViewHolder holder, int position) {
-
+/* TODO
         final Task t = tasks.get(holder.getAdapterPosition());
 
         View.OnClickListener onSubtaskClick;
@@ -118,6 +113,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         holder.progressBar.setProgress(t.getProgress());
         holder.rootView.setOnClickListener(onSubtaskClick);
         holder.rootView.setOnLongClickListener(onSubtaskLongClick);
+    */
     }
 
     private void inflateSubtasks(DayTaskViewHolder holder) {
@@ -128,7 +124,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             View subtaskView = LayoutInflater.from(FireTasksApp.getInstance()).inflate(R.layout.item_subtasks_preview, null);
             ImageView check = (ImageView) subtaskView.findViewById(R.id.subtask_done_imv);
             TextView text = (TextView) subtaskView.findViewById(R.id.subtask_tv);
-            text.setText(t.getSubTasks().get(i).getDescription());
+            text.setText(t.getSubTasks().get(i).getName());
             check.setImageDrawable(ContextCompat.getDrawable(FireTasksApp.getInstance(), t.getSubTasks().get(i).isDone() ? R.drawable.taskdone : R.drawable.taskundone));
             holder.subtasksLayout.addView(subtaskView);
         }

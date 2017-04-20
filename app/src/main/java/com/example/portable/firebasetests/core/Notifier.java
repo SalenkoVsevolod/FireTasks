@@ -4,13 +4,9 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseUtils;
-
-import java.util.Calendar;
 
 /**
  * Created by Salenko Vsevolod on 27.01.2017.
@@ -21,7 +17,7 @@ public class Notifier {
     public static void setAlarms(Task task) {
         Intent notificationIntent = new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class);
         notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_TAG, task);
-        for (int i = 0; i < task.getReminds().size(); i++) {
+  /*TODO      for (int i = 0; i < task.getReminds().size(); i++) {
             if (task.getReminds().get(i).getTimeStamp() > System.currentTimeMillis()) {
                 notificationIntent.putExtra(NotificationsBroadcastReceiver.INDEX, i);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) task.getReminds().get(i).getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -35,7 +31,7 @@ public class Notifier {
                 FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(i));
             }
         }
-
+*/
     }
 
 

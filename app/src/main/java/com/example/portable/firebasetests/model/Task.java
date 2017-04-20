@@ -1,6 +1,7 @@
 package com.example.portable.firebasetests.model;
 
 
+import com.example.portable.firebasetests.network.FirebaseEntity;
 import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
@@ -14,13 +15,12 @@ import java.util.Set;
  */
 
 @SuppressWarnings("unchecked")
-public class Task implements Serializable {
+public class Task extends FirebaseEntity implements Serializable {
     private String name, description;
     private ArrayList<SubTask> subTasks;
-    private String id;
     private String tagId;
     private Calendar calendar;
-    private ArrayList<Remind> reminds;
+    private ArrayList<String> reminds;
 
     public Task() {
         description = "";
@@ -37,7 +37,7 @@ public class Task implements Serializable {
         calendar.setTimeInMillis((long) map.get("timeStamp"));
         tagId = (String) map.get("tagId");
         subTasks = getSubTasks((HashMap<String, Object>) map.get("subTasks"));
-        reminds = getReminders((HashMap<String, Object>) map.get("reminds"));
+        reminds = (ArrayList<String>) map.get("reminds");
     }
 
     private ArrayList<SubTask> getSubTasks(HashMap<String, Object> map) {
@@ -54,20 +54,6 @@ public class Task implements Serializable {
         return subTasks;
     }
 
-    private ArrayList<Remind> getReminders(HashMap<String, Object> map) {
-        if (map == null) {
-            map = new HashMap<>();
-        }
-        ArrayList<Remind> res = new ArrayList<>();
-        Set<String> keys = map.keySet();
-        for (String key : keys) {
-            Remind remind = new Remind((HashMap<String, Object>) map.get(key));
-            remind.setId(key);
-            res.add(remind);
-        }
-        return res;
-    }
-
     @Exclude
     public ArrayList<SubTask> getSubTasks() {
         return subTasks;
@@ -80,25 +66,6 @@ public class Task implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Exclude
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Exclude
-    public boolean isCompleted() {
-        for (SubTask subTask : subTasks) {
-            if (!subTask.isDone()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public long getTimeStamp() {
@@ -124,11 +91,11 @@ public class Task implements Serializable {
     }
 
     @Exclude
-    public ArrayList<Remind> getReminds() {
+    public ArrayList<String> getReminds() {
         return reminds;
     }
 
-    public void setReminds(ArrayList<Remind> reminds) {
+    public void setReminds(ArrayList<String> reminds) {
         this.reminds = reminds;
     }
 
@@ -151,5 +118,44 @@ public class Task implements Serializable {
             }
         }
         return (int) ((done / sum) * 100);
+    }
+
+    @Override
+    public void init(FirebaseEntity entity) {
+        Task task = (Task) entity;
+        name = task.getName();
+        description = task.getDescription();
+        tagId = task.getTagId();
+        reminds.clear();
+        reminds.addAll(task.getReminds());
+        calendar.setTimeInMillis(task.getCalendar().getTimeInMillis());
+        subTasks.clear();
+        subTasks.addAll(task.getSubTasks());
+    }
+
+    @Override
+    public boolean isIdentical(FirebaseEntity entity) {
+        Task task = (Task) entity;
+        if (reminds.size() != task.getReminds().size()) {
+            return false;
+        }
+
+        if (subTasks.size() != task.getSubTasks().size()) {
+            return false;
+        }
+        for (int i = 0; i < subTasks.size(); i++) {
+            if (!subTasks.get(i).idential(task.getSubTasks().get(i))) {
+                return false;
+            }
+        }
+        for (int i = 0; i < reminds.size(); i++) {
+            if (!reminds.get(i).equals(task.getReminds().get(i))) {
+                return false;
+            }
+        }
+        return name.equals(task.getName())
+                && description.equals(task.getDescription())
+                && tagId.equals(task.getTagId())
+                && calendar.getTimeInMillis() == task.getCalendar().getTimeInMillis();
     }
 }

@@ -33,7 +33,7 @@ public class SubtaskClickableRecyclerAdapter extends RecyclerView.Adapter<Subtas
 
     @Override
     public void onBindViewHolder(SubtaskClickableVH holder, int position) {
-        holder.subtask.setText(subTasks.get(position).getDescription());
+        holder.subtask.setText(subTasks.get(position).getName());
         int priority = (int) subTasks.get(position).getPriority();
         holder.priority.setText(SubTask.PRIORITIES.get(priority));
         holder.priority.setBackgroundColor(ContextCompat.getColor(FireTasksApp.getInstance(), SubTask.PRIORITY_COLORS_IDS.get(priority)));

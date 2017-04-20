@@ -15,14 +15,14 @@ import java.util.List;
 public class SubTask implements Serializable {
     public static final List<String> PRIORITIES = Arrays.asList("Low", "Normal", "High", "Urgent");
     public static final List<Integer> PRIORITY_COLORS_IDS = Arrays.asList(R.color.low, R.color.medium, R.color.high, R.color.urgent);
-    private String description;
+    private String name;
     private boolean done;
     private long priority;
     private String id;
 
     public SubTask(HashMap<String, Object> map) {
         done = (boolean) map.get("done");
-        description = (String) map.get("description");
+        name = (String) map.get("name");
         priority = (long) map.get("priority");
     }
 
@@ -37,12 +37,12 @@ public class SubTask implements Serializable {
         this.done = done;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Exclude
@@ -66,5 +66,9 @@ public class SubTask implements Serializable {
 
     public void setPriority(long priority) {
         this.priority = priority;
+    }
+
+    public boolean idential(SubTask subTask) {
+        return name.equals(subTask.getName()) && done == subTask.isDone() && priority == subTask.getPriority();
     }
 }

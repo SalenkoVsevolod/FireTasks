@@ -9,15 +9,21 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 
 public class FirebaseMediator {
-    public DatabaseReference getTaskReference(int day, String taskId) {
-        return getDayReference(day).child(taskId);
+    private DatabaseReference userReference;
+
+    protected FirebaseMediator() {
+        userReference = FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId());
     }
 
     public DatabaseReference getTagsReference() {
-        return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("tags");
+        return userReference.child("tags");
     }
 
     public DatabaseReference getDayReference(int day) {
-        return FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId()).child("days").child("" + day);
+        return userReference.child("days").child("" + day);
+    }
+
+    public DatabaseReference getRemindersReference() {
+        return userReference.child("reminders");
     }
 }

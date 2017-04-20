@@ -13,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,11 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseListenersManager;
-import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
+import com.example.portable.firebasetests.network.FirebaseEntity;
+import com.example.portable.firebasetests.network.listeners.RemindersSyncTask;
+import com.example.portable.firebasetests.network.listeners.TagsSyncTask;
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
@@ -38,12 +41,12 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
-    private ArrayList<Tag> tags;
     private Spinner tagSpinner;
     private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
     private DayFragment currentFragment;
@@ -70,8 +73,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         inflateDays(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
-        tags = new ArrayList<>();
-        tagSortingSpinnerAdapter = new TagSortingSpinnerAdapter(this, tags);
+        tagSortingSpinnerAdapter = new TagSortingSpinnerAdapter(this, FirebaseObserver.getInstance().getTags());
         tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
         tagSpinner.setAdapter(tagSortingSpinnerAdapter);
         onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -93,25 +95,46 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+        subscribe();
+        sync();
+    }
+
+    private void sync() {
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        executorService.submit(new TagsSyncTask());
+        executorService.submit(new RemindersSyncTask());
+    }
+
+    private void subscribe() {
+        FirebaseObserver.getInstance().getTags().getCreatedListeners().add(new FirebaseObserver.OnEntityCreatedListener() {
+            @Override
+            public void onCreated(final FirebaseEntity entity) {
+                Log.i("fireSync", "new tag created " + entity.getId());
+                tagSortingSpinnerAdapter.notifyDataSetChanged();
+                findViewById(R.id.show_first_container).setVisibility(View.VISIBLE);
+                entity.addListener(new FirebaseEntity.FirebaseEntityListener() {
+                    @Override
+                    public void onChanged() {
+                        Log.i("fireSync", "tag changed: " + entity.getId());
+                        tagSortingSpinnerAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onDeleted() {
+                        Log.i("fireSync", "tag deleted: " + entity.getId());
+                        tagSortingSpinnerAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        final View showFirstContainer = findViewById(R.id.show_first_container);
-        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
-            @Override
-            public void onSync(ArrayList<Tag> tagsArray) {
-                if (tagsArray.size() > 0) {
-                    showFirstContainer.setVisibility(View.VISIBLE);
-                    tags.clear();
-                    tags.addAll(tagsArray);
-                    tagSortingSpinnerAdapter.notifyDataSetChanged();
-                } else {
-                    showFirstContainer.setVisibility(View.GONE);
-                }
-            }
-        });
+        findViewById(R.id.show_first_container).setVisibility(
+                FirebaseObserver.getInstance().getTags().size() > 0 ? View.VISIBLE : View.GONE);
         new Handler().postDelayed(
                 new Runnable() {
                     @Override
@@ -130,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                tabLayout.getTabAt(getSelectionDay()).select();
             }
         });
         backPresses = 0;
@@ -139,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        FirebaseListenersManager.getInstance().removeAllTagsListener();
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
     }
 
@@ -160,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         if (position != -1) {
             currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
         } else
-            currentFragment = DayFragment.newInstance(dayOfYear + 1);
+            currentFragment = DayFragment.newInstance(dayOfYear + 1, null);
         getFragmentManager().beginTransaction()
                 .replace(R.id.day_of_week_container, currentFragment)
                 .commit();

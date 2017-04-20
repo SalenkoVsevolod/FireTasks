@@ -1,20 +1,11 @@
 package com.example.portable.firebasetests.network;
 
-import android.util.SparseArray;
-
-import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
-import com.example.portable.firebasetests.network.listeners.DayFirebaseListener;
-import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
-
 /**
  * Created by Salenko Vsevolod on 05.04.2017.
  */
 
 public class FirebaseListenersManager extends FirebaseMediator {
-    private static FirebaseListenersManager instance;
-    private SparseArray<DayFirebaseListener> dayListeners;
-    private AllTagsFirebaseListener allTagsFirebaseListener;
-    private TagFirebaseListener tagFirebaseListener;
+ /*   private static FirebaseListenersManager instance;
 
     private FirebaseListenersManager() {
         dayListeners = new SparseArray<>();
@@ -59,5 +50,5 @@ public class FirebaseListenersManager extends FirebaseMediator {
         if (tagFirebaseListener != null) {
             tagFirebaseListener.cancel(true);
         }
-    }
+    }*/
 }

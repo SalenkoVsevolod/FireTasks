@@ -18,12 +18,8 @@ import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.SubTask;
-import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.FirebaseUtils;
-import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
-import com.example.portable.firebasetests.ui.adapters.ReminderDisplayRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubtaskCheckableRecyclerAdapter;
 
 import java.util.Calendar;
@@ -60,7 +56,7 @@ public class TaskDisplayActivity extends AppCompatActivity {
 
         View remindersContainer = findViewById(R.id.reminders_container);
         if (task.getReminds() != null && task.getReminds().size() > 0) {
-            remindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(task.getReminds(), null));
+            //TODO         remindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(task.getReminds(), null));
             remindsRecyclerView.setLayoutManager(new GridLayoutManager(this, 5));
             remindersContainer.setVisibility(View.VISIBLE);
         } else {
@@ -88,19 +84,19 @@ public class TaskDisplayActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseListenersManager.getInstance().setTagListener(task.getTagId(), new TagFirebaseListener.OnTagGetListener() {
+   /*TODO     FirebaseListenersManager.getInstance().setTagListener(task.getTagId(), new TagFirebaseListener.OnTagGetListener() {
             @Override
             public void onGet(Tag tag) {
                 tagTV.setText(tag.getName());
                 tagTV.setTextColor((int) tag.getColor());
             }
-        });
+        });*/
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        FirebaseListenersManager.getInstance().removeTagListener();
+        //TODO      FirebaseListenersManager.getInstance().removeTagListener();
     }
 
     @Override

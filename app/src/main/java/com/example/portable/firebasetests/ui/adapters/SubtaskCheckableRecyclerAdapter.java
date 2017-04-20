@@ -35,7 +35,7 @@ public class SubtaskCheckableRecyclerAdapter extends RecyclerView.Adapter<Subtas
 
     @Override
     public void onBindViewHolder(CheckableVH holder, int position) {
-        holder.checkBox.setText(subTasks.get(position).getDescription());
+        holder.checkBox.setText(subTasks.get(position).getName());
         holder.checkBox.setChecked(subTasks.get(position).isDone());
         int priorityId = (int) subTasks.get(position).getPriority();
         holder.priority.setText(SubTask.PRIORITIES.get(priorityId));

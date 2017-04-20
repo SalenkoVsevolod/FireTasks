@@ -7,11 +7,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -30,14 +28,10 @@ import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseListenersManager;
 import com.example.portable.firebasetests.network.FirebaseUtils;
-import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
-import com.example.portable.firebasetests.ui.adapters.ReminderModifyRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubtaskClickableRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagRecyclerAdapter;
 import com.example.portable.firebasetests.utils.KeyBoardUtils;
-import com.example.portable.firebasetests.utils.TimeUtils;
 import com.example.portable.firebasetests.utils.ToastUtils;
 
 import java.util.ArrayList;
@@ -116,6 +110,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void initReminders() {
+/*TODO
         remindersRecyclerView.setAdapter(new ReminderModifyRecyclerAdapter(task.getReminds(), new ReminderModifyRecyclerAdapter.OnReminderInteractionListener() {
             @Override
             public void deleteClick(Remind remind) {
@@ -136,7 +131,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         } else {
             findViewById(R.id.reminders_container).setOnClickListener(this);
             findViewById(R.id.no_reminders).setVisibility(View.VISIBLE);
-        }
+        }*/
     }
 
     private void initSubtasks() {
@@ -163,7 +158,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onResume() {
         super.onResume();
-        final View divider = findViewById(R.id.divider);
+        /* TODO final View divider = findViewById(R.id.divider);
         FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
             @Override
             public void onSync(ArrayList<Tag> tagsArray) {
@@ -192,13 +187,13 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
                     }
                 }
             }
-        });
+        });*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        FirebaseListenersManager.getInstance().removeAllTagsListener();
+        // TODO FirebaseListenersManager.getInstance().removeAllTagsListener();
     }
 
     private void selectTag(Tag tag) {
@@ -272,7 +267,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
         for (int i = 0; i < task.getReminds().size(); i++) {
-            Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
+            //TODO     Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
         }
         Notifier.setAlarms(task);
         FirebaseUtils.getInstance().saveTask(task);
@@ -310,14 +305,14 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     private void handleRemindResult(int result, Remind remind) {
         switch (result) {
             case ReminderEditorActivity.CREATE:
-                task.getReminds().add(remind);
+                //TODO  task.getReminds().add(remind);
                 findViewById(R.id.no_reminders).setVisibility(View.GONE);
                 findViewById(R.id.reminders_container).setOnClickListener(null);
                 remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
                 break;
             case ReminderEditorActivity.UPDATE:
                 final int index = task.getReminds().indexOf(remind);
-                task.getReminds().set(index, remind);
+                //TODO     task.getReminds().set(index, remind);
                 remindersRecyclerView.getAdapter().notifyItemChanged(index);
                 break;
         }
@@ -365,7 +360,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void onClick(View view) {
                         if (remind.getTimeStamp() > System.currentTimeMillis()) {
-                            task.getReminds().add(remind);
+                            //TODO         task.getReminds().add(remind);
                             findViewById(R.id.no_reminders).setVisibility(View.GONE);
                             remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
                         } else {
