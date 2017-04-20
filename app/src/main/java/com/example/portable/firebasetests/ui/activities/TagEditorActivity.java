@@ -78,8 +78,10 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
                 showColorPicker();
                 break;
             case R.id.dialog_ok:
-                if (nameEdit.getText().toString().length() > 0) {
+                if (nameEdit.getText().toString().trim().length() > 0) {
                     saveTag();
+                } else {
+                    ToastUtils.showToastNotChoosed("tag name");
                 }
                 break;
             case R.id.dialog_cancel:
@@ -95,7 +97,7 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
     }
 
     private void saveTag() {
-        tag.setName(nameEdit.getText().toString());
+        tag.setName(nameEdit.getText().toString().trim());
         if (tag.getId() == null) {
             tag.setId("tag" + System.currentTimeMillis());
         }

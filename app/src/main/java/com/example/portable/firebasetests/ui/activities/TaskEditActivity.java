@@ -397,8 +397,8 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void assembleTaskAndSave() {
-        task.setName(nameEdit.getText().toString());
-        task.setDescription(descriptionEdit.getText().toString());
+        task.setName(nameEdit.getText().toString().trim());
+        task.setDescription(descriptionEdit.getText().toString().trim());
         if (lastSelectedTag != null) {
             task.setTagId(lastSelectedTag.getId());
         } else {
