@@ -1,5 +1,7 @@
 package com.example.portable.firebasetests.ui.adapters;
 
+import android.graphics.LightingColorFilter;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +16,9 @@ import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.FireTasksApp;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseObserver;
 
 import java.util.ArrayList;
 
@@ -57,9 +61,8 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
 
     @Override
     public void onBindViewHolder(final DayTaskViewHolder holder, int position) {
-/* TODO
         final Task t = tasks.get(holder.getAdapterPosition());
-
+        final Tag tag = FirebaseObserver.getInstance().getTags().getById(t.getTagId());
         View.OnClickListener onSubtaskClick;
         View.OnLongClickListener onSubtaskLongClick;
 
@@ -98,22 +101,17 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
                 }
             };
         }
-        //TODO big bad crutch!
-        FirebaseListenersManager.getInstance().setTagListener(t.getTagId(), new TagFirebaseListener.OnTagGetListener() {
-            @Override
-            public void onGet(Tag tag) {
-                holder.tagTextView.setText(tag.getName());
-                holder.tagTextView.setTextColor((int) tag.getColor());
-                Drawable drawable = holder.progressBar.getProgressDrawable();
-                drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) tag.getColor()));
-            }
-        });
+        if (tag != null) {
+            holder.tagTextView.setText(tag.getName());
+            holder.tagTextView.setTextColor((int) tag.getColor());
+            Drawable drawable = holder.progressBar.getProgressDrawable();
+            drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) tag.getColor()));
+        }
         inflateSubtasks(holder);
         holder.nameTextView.setText(t.getName());
         holder.progressBar.setProgress(t.getProgress());
         holder.rootView.setOnClickListener(onSubtaskClick);
         holder.rootView.setOnLongClickListener(onSubtaskLongClick);
-    */
     }
 
     private void inflateSubtasks(DayTaskViewHolder holder) {

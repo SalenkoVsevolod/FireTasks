@@ -3,7 +3,6 @@ package com.example.portable.firebasetests.model;
 import com.example.portable.firebasetests.R;
 import com.google.firebase.database.Exclude;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
  * Created by Portable on 24.01.2017.
  */
 
-public class SubTask implements Serializable {
+public class SubTask extends FirebaseEntity {
     public static final List<String> PRIORITIES = Arrays.asList("Low", "Normal", "High", "Urgent");
     public static final List<Integer> PRIORITY_COLORS_IDS = Arrays.asList(R.color.low, R.color.medium, R.color.high, R.color.urgent);
     private String name;
@@ -55,6 +54,20 @@ public class SubTask implements Serializable {
     }
 
     @Override
+    public void init(FirebaseEntity entity) {
+        SubTask subTask = (SubTask) entity;
+        name = subTask.getName();
+        done = subTask.isDone();
+        priority = subTask.getPriority();
+    }
+
+    @Override
+    public boolean isIdentical(FirebaseEntity entity) {
+        SubTask subTask = (SubTask) entity;
+        return name.equals(subTask.getName()) && done == subTask.isDone() && priority == subTask.getPriority();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         SubTask s = (SubTask) obj;
         return s.getId().equals(id);
@@ -68,7 +81,4 @@ public class SubTask implements Serializable {
         this.priority = priority;
     }
 
-    public boolean idential(SubTask subTask) {
-        return name.equals(subTask.getName()) && done == subTask.isDone() && priority == subTask.getPriority();
-    }
 }

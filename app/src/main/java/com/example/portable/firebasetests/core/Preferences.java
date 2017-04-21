@@ -3,7 +3,6 @@ package com.example.portable.firebasetests.core;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * Created by Salenko Vsevolod on 15.02.2017.
@@ -16,7 +15,6 @@ public class Preferences {
     private SharedPreferences preferences;
 
     private Preferences() {
-        Log.i("creation", "app retrieved");
         preferences = FireTasksApp.getInstance().getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
     }
 

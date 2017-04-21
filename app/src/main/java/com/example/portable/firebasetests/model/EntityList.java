@@ -1,9 +1,7 @@
-package com.example.portable.firebasetests.core;
+package com.example.portable.firebasetests.model;
 
 
 import android.util.Log;
-
-import com.example.portable.firebasetests.network.FirebaseEntity;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,7 +11,7 @@ import java.util.Iterator;
  */
 
 public class EntityList<T extends FirebaseEntity> extends ArrayList<T> {
-    private final ArrayList<FirebaseObserver.OnEntityCreatedListener> createdListeners = new ArrayList<>();
+    private final ArrayList<FirebaseEntityListener<T>> listeners = new ArrayList<>();
 
     public T getById(String id) {
         for (T t : this) {
@@ -33,8 +31,12 @@ public class EntityList<T extends FirebaseEntity> extends ArrayList<T> {
         return false;
     }
 
-    public ArrayList<FirebaseObserver.OnEntityCreatedListener> getCreatedListeners() {
-        return createdListeners;
+    public void subscribe(FirebaseEntityListener<T> listener) {
+        listeners.add(listener);
+    }
+
+    public void unsubscribe(FirebaseEntityListener<T> listener) {
+        listeners.remove(listener);
     }
 
     public void sync(EntityList<T> syncedArray) {
@@ -47,13 +49,15 @@ public class EntityList<T extends FirebaseEntity> extends ArrayList<T> {
                 T t = this.getById(st.getId());
                 if (!t.isIdentical(st)) {
                     t.init(st);
-                    t.notifyEntityChanged();
+                    for (FirebaseEntityListener<T> listener : listeners) {
+                        listener.onChanged(t);
+                    }
                 }
                 t.setSynced(true);
             } else {
                 st.setSynced(true);
                 add(st);
-                for (FirebaseObserver.OnEntityCreatedListener listener : createdListeners) {
+                for (FirebaseEntityListener<T> listener : listeners) {
                     listener.onCreated(st);
                 }
             }
@@ -62,9 +66,19 @@ public class EntityList<T extends FirebaseEntity> extends ArrayList<T> {
         while (iterator.hasNext()) {
             T t = iterator.next();
             if (!t.isSynced()) {
-                t.notifyEntityDeleted();
+                for (FirebaseEntityListener<T> listener : listeners) {
+                    listener.onDeleted(t);
+                }
                 iterator.remove();
             }
         }
+    }
+
+    public interface FirebaseEntityListener<T> {
+        void onChanged(T t);
+
+        void onCreated(T t);
+
+        void onDeleted(T t);
     }
 }

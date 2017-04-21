@@ -1,8 +1,12 @@
 package com.example.portable.firebasetests.network.listeners;
 
-import com.example.portable.firebasetests.core.EntityList;
+import android.util.Log;
+
 import com.example.portable.firebasetests.core.Notifier;
+import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseObserver;
+import com.example.portable.firebasetests.network.FirebaseReferenceManager;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.google.firebase.database.DataSnapshot;
 
@@ -19,7 +23,7 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
     private int currentYear, day;
 
     public TaskDaySyncTask(int day) {
-        super(FirebaseUtils.getInstance().getDayReference(day));
+        super(FirebaseReferenceManager.getInstance().getDayReference(day));
         this.day = day;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -28,7 +32,7 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
 
     @Override
     protected void onDataChanged(EntityList<Task> entities) {
-
+        FirebaseObserver.getInstance().getTasksDay(day).sync(entities);
     }
 
     @Override
@@ -43,6 +47,7 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
             Task task = new Task((HashMap<String, Object>) tasks.get(key));
             task.setId(key);
             Notifier.setAlarms(task);
+            Log.i("fireSync", "task parsed " + task.getName() + "on day " + day);
             res.add(task);
         }
         return res;

@@ -1,15 +1,12 @@
 package com.example.portable.firebasetests.model;
 
-import com.example.portable.firebasetests.network.FirebaseEntity;
-
-import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Created by Salenko Vsevolod on 16.02.2017.
  */
 
-public class Tag extends FirebaseEntity implements Serializable {
+public class Tag extends FirebaseEntity {
     private String name;
     private long color;
 

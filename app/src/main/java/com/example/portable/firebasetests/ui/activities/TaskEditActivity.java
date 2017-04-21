@@ -7,9 +7,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -22,24 +24,28 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
+import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.ui.adapters.ReminderModifyRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubtaskClickableRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagRecyclerAdapter;
 import com.example.portable.firebasetests.utils.KeyBoardUtils;
+import com.example.portable.firebasetests.utils.TimeUtils;
 import com.example.portable.firebasetests.utils.ToastUtils;
 
 import java.util.ArrayList;
 
-public class TaskEditActivity extends AppCompatActivity implements View.OnClickListener {
+public class TaskEditActivity extends AppCompatActivity implements View.OnClickListener, EntityList.FirebaseEntityListener<Tag> {
 
     private static final String TASK_ARG = "task";
-    private final ArrayList<Tag> tags = new ArrayList<>();
+    private final ArrayList<Tag> tagsInRecycler = new ArrayList<>();
+    private final ArrayList<Remind> reminds = new ArrayList<>();
     private EditText descriptionEdit, nameEdit;
     private RecyclerView tagsRecycler;
     private RecyclerView subTasksRecycleView, remindersRecyclerView;
@@ -64,7 +70,6 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         tagsRecycler = (RecyclerView) findViewById(R.id.tags_recycler);
         subTasksRecycleView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         remindersRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
-
         task = (Task) getIntent().getSerializableExtra(TASK_ARG);
 
         findViewById(R.id.add_subtask).setOnClickListener(this);
@@ -93,7 +98,18 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    private void setTagsRecyclerVisibility(boolean visibility) {
+        if (visibility) {
+            tagsRecycler.setVisibility(View.VISIBLE);
+            findViewById(R.id.divider).setVisibility(View.VISIBLE);
+        } else {
+            tagsRecycler.setVisibility(View.GONE);
+            findViewById(R.id.divider).setVisibility(View.GONE);
+        }
+    }
+
     private void initTags() {
+        tagsInRecycler.addAll(FirebaseObserver.getInstance().getTags());
         TagRecyclerAdapter.OnTagInteractionListener onTagInteractionListener = new TagRecyclerAdapter.OnTagInteractionListener() {
             @Override
             public void clickOnTag(Tag tag) {
@@ -102,16 +118,33 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
 
             @Override
             public void clickOnEdit(Tag tag) {
-                TagEditorActivity.start(TaskEditActivity.this, tags, tag);
+                TagEditorActivity.start(TaskEditActivity.this, tag);
             }
         };
-        tagsRecycler.setAdapter(new TagRecyclerAdapter(tags, onTagInteractionListener));
+        tagsRecycler.setAdapter(new TagRecyclerAdapter(tagsInRecycler, onTagInteractionListener));
         tagsRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        FirebaseObserver.getInstance().getTags().subscribe(this);
+        if (tagsInRecycler.size() == 0) {
+            setTagsRecyclerVisibility(false);
+            tagTextView.setText("no tags created yet");
+            tagTextView.setTextColor(ContextCompat.getColor(TaskEditActivity.this, R.color.gray_text));
+            findViewById(R.id.tag_container).setOnClickListener(TaskEditActivity.this);
+        } else {
+            if (tagsInRecycler.size() > 1) {
+                setTagsRecyclerVisibility(true);
+            }
+            findViewById(R.id.tag_container).setOnClickListener(null);
+            tagsRecycler.getAdapter().notifyDataSetChanged();
+            if (task.getTagId() != null) {
+                selectTag(FirebaseObserver.getInstance().getTags().getById(task.getTagId()));
+            } else {
+                selectTag(tagsInRecycler.get(0));
+            }
+        }
     }
 
     private void initReminders() {
-/*TODO
-        remindersRecyclerView.setAdapter(new ReminderModifyRecyclerAdapter(task.getReminds(), new ReminderModifyRecyclerAdapter.OnReminderInteractionListener() {
+        remindersRecyclerView.setAdapter(new ReminderModifyRecyclerAdapter(reminds, new ReminderModifyRecyclerAdapter.OnReminderInteractionListener() {
             @Override
             public void deleteClick(Remind remind) {
                 deleteReminder(remind);
@@ -131,7 +164,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         } else {
             findViewById(R.id.reminders_container).setOnClickListener(this);
             findViewById(R.id.no_reminders).setVisibility(View.VISIBLE);
-        }*/
+        }
     }
 
     private void initSubtasks() {
@@ -155,65 +188,30 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        /* TODO final View divider = findViewById(R.id.divider);
-        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
-            @Override
-            public void onSync(ArrayList<Tag> tagsArray) {
-                if (tagsArray.size() == 0) {
-                    divider.setVisibility(View.GONE);
-                    tagsRecycler.setVisibility(View.GONE);
-                    tagTextView.setText("no tags created yet");
-                    tagTextView.setTextColor(ContextCompat.getColor(TaskEditActivity.this, R.color.gray_text));
-                    findViewById(R.id.tag_container).setOnClickListener(TaskEditActivity.this);
-                    task.setTagId(null);
-                    lastSelectedTag = null;
-                } else {
-                    if (tagsArray.size() > 1) {
-                        tagsRecycler.setVisibility(View.VISIBLE);
-                        divider.setVisibility(View.VISIBLE);
-                    }
-                    findViewById(R.id.tag_container).setOnClickListener(null);
-                    tags.clear();
-                    tags.addAll(tagsArray);
-                    tagsRecycler.getAdapter().notifyDataSetChanged();
-                    lastSelectedTag = null;
-                    if (task.getTagId() != null) {
-                        selectTag(Tag.getTagById(task.getTagId(), tagsArray));
-                    } else {
-                        selectTag(tags.get(0));
-                    }
-                }
-            }
-        });*/
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // TODO FirebaseListenersManager.getInstance().removeAllTagsListener();
-    }
-
     private void selectTag(Tag tag) {
-        int pos = tags.indexOf(tag);
-        tags.remove(pos);
+        int pos = tagsInRecycler.indexOf(tag);
+        tagsInRecycler.remove(pos);
         tagsRecycler.getAdapter().notifyItemRemoved(pos);
         task.setTagId(tag.getId());
         if (lastSelectedTag != null) {
-            tags.add(lastSelectedTag);
-            tagsRecycler.getAdapter().notifyItemInserted(tags.size());
+            tagsInRecycler.add(lastSelectedTag);
+            tagsRecycler.getAdapter().notifyItemInserted(tagsInRecycler.size());
         }
         drawNewTag(tag);
         lastSelectedTag = tag;
     }
 
+    //TODO bug with not setting listener to container on tag deleting
     private void drawNewTag(Tag tag) {
-        SpannableString content = new SpannableString(tag.getName());
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        tagTextView.setText(content);
-        tagTextView.setTextColor((int) tag.getColor());
+        if (tag == null) {
+            tagTextView.setText("no tags created yet");
+            tagTextView.setTextColor(ContextCompat.getColor(TaskEditActivity.this, R.color.gray_text));
+        } else {
+            SpannableString content = new SpannableString(tag.getName());
+            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+            tagTextView.setText(content);
+            tagTextView.setTextColor((int) tag.getColor());
+        }
     }
 
     private boolean canComplete() {
@@ -243,7 +241,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
                 startActivityForResult(ReminderEditorActivity.getStarterIntent(this, remind), 36);
                 break;
             case R.id.tag_text:
-                TagEditorActivity.start(TaskEditActivity.this, tags, lastSelectedTag);
+                TagEditorActivity.start(TaskEditActivity.this, lastSelectedTag);
                 break;
             case R.id.subtasks_container:
             case R.id.add_subtask:
@@ -251,7 +249,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.tag_container:
             case R.id.add_tag_imv:
-                TagEditorActivity.start(TaskEditActivity.this, tags, null);
+                TagEditorActivity.start(TaskEditActivity.this, null);
                 break;
         }
     }
@@ -266,10 +264,11 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         if (task.getId() == null) {
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
-        for (int i = 0; i < task.getReminds().size(); i++) {
-            //TODO     Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
+        FirebaseUtils.getInstance().saveReminders(reminds);
+        /* TODO for (int i = 0; i < task.getReminds().size(); i++) {
+                Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
         }
-        Notifier.setAlarms(task);
+        Notifier.setAlarms(task);*/
         FirebaseUtils.getInstance().saveTask(task);
     }
 
@@ -305,14 +304,15 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     private void handleRemindResult(int result, Remind remind) {
         switch (result) {
             case ReminderEditorActivity.CREATE:
-                //TODO  task.getReminds().add(remind);
+                task.getReminds().add(remind.getId());
+                reminds.add(remind);
                 findViewById(R.id.no_reminders).setVisibility(View.GONE);
                 findViewById(R.id.reminders_container).setOnClickListener(null);
                 remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
                 break;
             case ReminderEditorActivity.UPDATE:
-                final int index = task.getReminds().indexOf(remind);
-                //TODO     task.getReminds().set(index, remind);
+                final int index = reminds.indexOf(remind);
+                reminds.set(index, remind);
                 remindersRecyclerView.getAdapter().notifyItemChanged(index);
                 break;
         }
@@ -344,9 +344,15 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void deleteReminder(final Remind remind) {
-        int i = task.getReminds().indexOf(remind);
-        task.getReminds().remove(i);
-        remindersRecyclerView.getAdapter().notifyItemRemoved(i);
+        reminds.remove(remind);
+        for (int i = 0; i < task.getReminds().size(); i++) {
+            if (task.getReminds().get(i).equals(remind.getId())) {
+                task.getReminds().remove(i);
+                remindersRecyclerView.getAdapter().notifyItemRemoved(i);
+                break;
+            }
+        }
+
         if (task.getReminds().size() > 0) {
             findViewById(R.id.no_reminders).setVisibility(View.GONE);
             findViewById(R.id.reminders_container).setOnClickListener(null);
@@ -354,13 +360,15 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
             findViewById(R.id.no_reminders).setVisibility(View.VISIBLE);
             findViewById(R.id.reminders_container).setOnClickListener(this);
         }
+
         Snackbar snackbar = Snackbar
                 .make(findViewById(R.id.task_modify_root), "Remind deleted", Snackbar.LENGTH_LONG)
                 .setAction("Cancel", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (remind.getTimeStamp() > System.currentTimeMillis()) {
-                            //TODO         task.getReminds().add(remind);
+                            task.getReminds().add(remind.getId());
+                            reminds.add(remind);
                             findViewById(R.id.no_reminders).setVisibility(View.GONE);
                             remindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
                         } else {
@@ -418,5 +426,36 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         });
         builder.setNegativeButton("cancel", null);
         builder.show();
+    }
+
+    @Override
+    public void onChanged(Tag tag) {
+        if (lastSelectedTag != null && lastSelectedTag.getId().equals(tag.getId())) {
+            lastSelectedTag.init(tag);
+            drawNewTag(lastSelectedTag);
+        } else {
+            int index = tagsInRecycler.indexOf(tag);
+            tagsInRecycler.set(index, tag);
+            tagsRecycler.getAdapter().notifyItemChanged(index);
+        }
+    }
+
+    @Override
+    public void onCreated(Tag tag) {
+        tagsInRecycler.add(tag);
+        setTagsRecyclerVisibility(true);
+        tagsRecycler.getAdapter().notifyItemInserted(tagsInRecycler.indexOf(tag));
+    }
+
+    @Override
+    public void onDeleted(Tag tag) {
+        if (lastSelectedTag != null && lastSelectedTag.getId().equals(tag.getId())) {
+            lastSelectedTag = null;
+            drawNewTag(null);
+        } else {
+            int index = tagsInRecycler.indexOf(tag);
+            tagsInRecycler.remove(index);
+            tagsRecycler.getAdapter().notifyItemRemoved(index);
+        }
     }
 }

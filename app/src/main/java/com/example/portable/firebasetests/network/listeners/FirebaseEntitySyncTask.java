@@ -1,8 +1,7 @@
 package com.example.portable.firebasetests.network.listeners;
 
-import com.example.portable.firebasetests.core.EntityList;
-import com.example.portable.firebasetests.network.FirebaseEntity;
-import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.model.EntityList;
+import com.example.portable.firebasetests.model.FirebaseEntity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,12 +42,4 @@ public abstract class FirebaseEntitySyncTask<T extends FirebaseEntity> implement
     protected abstract void onDataChanged(EntityList<T> entities);
 
     protected abstract EntityList<T> parseEntities(DataSnapshot dataSnapshot);
-
-    //TODO can be a reason of bugs on changing google account
-    public void refresh() {
-        if (listener != null) {
-            FirebaseUtils.getInstance().getTagsReference().removeEventListener(listener);
-        }
-        addListener();
-    }
 }

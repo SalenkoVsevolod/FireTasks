@@ -1,8 +1,8 @@
 package com.example.portable.firebasetests.network.listeners;
 
-import com.example.portable.firebasetests.core.EntityList;
+import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
-import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.network.FirebaseReferenceManager;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class RemindersSyncTask extends FirebaseEntitySyncTask<Remind> {
 
     public RemindersSyncTask() {
-        super(FirebaseUtils.getInstance().getRemindersReference());
+        super(FirebaseReferenceManager.getInstance().getRemindersReference());
     }
 
     @Override

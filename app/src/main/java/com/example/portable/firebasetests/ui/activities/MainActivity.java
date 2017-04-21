@@ -13,7 +13,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,13 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
-import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.core.Preferences;
+import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseEntity;
-import com.example.portable.firebasetests.network.listeners.RemindersSyncTask;
-import com.example.portable.firebasetests.network.listeners.TagsSyncTask;
+import com.example.portable.firebasetests.network.FirebaseExecutorManager;
+import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
@@ -42,10 +40,8 @@ import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Calendar;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EntityList.FirebaseEntityListener<Tag> {
     private TabLayout tabLayout;
     private Spinner tagSpinner;
     private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
@@ -95,39 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        subscribe();
-        sync();
-    }
-
-    private void sync() {
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
-        executorService.submit(new TagsSyncTask());
-        executorService.submit(new RemindersSyncTask());
-    }
-
-    private void subscribe() {
-        FirebaseObserver.getInstance().getTags().getCreatedListeners().add(new FirebaseObserver.OnEntityCreatedListener() {
-            @Override
-            public void onCreated(final FirebaseEntity entity) {
-                Log.i("fireSync", "new tag created " + entity.getId());
-                tagSortingSpinnerAdapter.notifyDataSetChanged();
-                findViewById(R.id.show_first_container).setVisibility(View.VISIBLE);
-                entity.addListener(new FirebaseEntity.FirebaseEntityListener() {
-                    @Override
-                    public void onChanged() {
-                        Log.i("fireSync", "tag changed: " + entity.getId());
-                        tagSortingSpinnerAdapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onDeleted() {
-                        Log.i("fireSync", "tag deleted: " + entity.getId());
-                        tagSortingSpinnerAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        });
-
+        FirebaseObserver.getInstance().getTags().subscribe(this);
+        FirebaseExecutorManager.getInstance().startRemindersListener();
+        FirebaseExecutorManager.getInstance().startTagsListener();
     }
 
     @Override
@@ -163,6 +129,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FirebaseObserver.getInstance().getTags().unsubscribe(this);
+        FirebaseExecutorManager.getInstance().stopRemindersListener();
+        FirebaseExecutorManager.getInstance().stopTagsListener();
     }
 
     private int getSelectionDay() {
@@ -319,6 +293,25 @@ public class MainActivity extends AppCompatActivity {
             finish();
         } else {
             ToastUtils.showToast("Press back again to exit", true);
+        }
+    }
+
+    @Override
+    public void onChanged(Tag tag) {
+        tagSortingSpinnerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCreated(Tag tag) {
+        tagSortingSpinnerAdapter.notifyDataSetChanged();
+        findViewById(R.id.show_first_container).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDeleted(Tag tag) {
+        tagSortingSpinnerAdapter.notifyDataSetChanged();
+        if (FirebaseObserver.getInstance().getTags().size() == 0) {
+            findViewById(R.id.show_first_container).setVisibility(View.GONE);
         }
     }
 }

@@ -5,13 +5,14 @@ import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
  * Created by Black on 18.03.2017.
  */
 
-public class FirebaseUtils extends FirebaseMediator {
+public class FirebaseUtils {
     private static FirebaseUtils instance;
 
     public static FirebaseUtils getInstance() {
@@ -23,24 +24,31 @@ public class FirebaseUtils extends FirebaseMediator {
 
 
     public void deleteTask(int day, String taskId) {
-        //TODO getTaskReference(day, taskId).setValue(null);
+        FirebaseReferenceManager.getInstance().getDayReference(day).child(taskId).removeValue();
     }
 
 
     public void saveTask(Task task) {
         int day = task.getCalendar().get(Calendar.DAY_OF_YEAR);
-   /* TODO     getTaskReference(day, task.getId()).setValue(task);
-        for (Remind r : task.getReminds()) {
-            getTaskReference(day, task.getId()).child("reminds").child(r.getId()).setValue(r);
+        FirebaseReferenceManager.getInstance().getTaskReference(day, task.getId()).setValue(task);
+
+        for (String id : task.getReminds()) {
+            FirebaseReferenceManager.getInstance().getTaskReference(day, task.getId()).child("reminders").child(id).setValue(true);
         }
+
         for (SubTask subTask : task.getSubTasks()) {
-            DatabaseReference ref = getTaskReference(day, task.getId()).child("subTasks")
-                    .child(subTask.getId());
-            ref.setValue(subTask);
+            FirebaseReferenceManager.getInstance().getTaskReference(day, task.getId()).child("subTasks")
+                    .child(subTask.getId())
+                    .setValue(subTask);
         }
-*/
     }
 
+    public void saveReminders(ArrayList<Remind> reminders) {
+        for (Remind remind : reminders) {
+            FirebaseReferenceManager.getInstance().getRemindersReference().child(remind.getId()).setValue(remind);
+
+        }
+    }
 
     public void setSubTaskDone(int day, String taskId, SubTask subTask) {
         //TODO     getTaskReference(day, taskId).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
@@ -52,6 +60,6 @@ public class FirebaseUtils extends FirebaseMediator {
 
 
     public void addTag(Tag tag) {
-        getTagsReference().child(tag.getId()).setValue(tag);
+        FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).setValue(tag);
     }
 }

@@ -2,10 +2,10 @@ package com.example.portable.firebasetests.network.listeners;
 
 import android.util.Log;
 
-import com.example.portable.firebasetests.core.EntityList;
-import com.example.portable.firebasetests.core.FirebaseObserver;
+import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Tag;
-import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.network.FirebaseObserver;
+import com.example.portable.firebasetests.network.FirebaseReferenceManager;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.Set;
 public class TagsSyncTask extends FirebaseEntitySyncTask<Tag> {
 
     public TagsSyncTask() {
-        super(FirebaseUtils.getInstance().getTagsReference());
+        super(FirebaseReferenceManager.getInstance().getTagsReference());
     }
 
     @Override

@@ -12,25 +12,22 @@ import android.widget.EditText;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Tag;
+import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.utils.KeyBoardUtils;
 import com.example.portable.firebasetests.utils.ToastUtils;
 import com.jrummyapps.android.colorpicker.ColorPickerDialog;
 import com.jrummyapps.android.colorpicker.ColorPickerDialogListener;
 
-import java.util.ArrayList;
-
 public class TagEditorActivity extends AppCompatActivity implements ColorPickerDialogListener, View.OnClickListener {
-    private static final String TAG = "tag", ALL_TAGS = "all_tags";
+    private static final String TAG = "tag";
     private Tag tag;
     private EditText nameEdit;
     private View colorPreview;
-    private ArrayList<Tag> allTags;
 
-    public static void start(Context context, ArrayList<Tag> allTags, Tag tag) {
+    public static void start(Context context, Tag tag) {
         Intent starter = new Intent(context, TagEditorActivity.class);
         starter.putExtra(TAG, tag);
-        starter.putExtra(ALL_TAGS, allTags);
         context.startActivity(starter);
     }
 
@@ -44,10 +41,6 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
         colorPreview = findViewById(R.id.color_preview);
         colorPreview.setOnClickListener(this);
         tag = (Tag) getIntent().getSerializableExtra(TAG);
-        allTags = (ArrayList<Tag>) getIntent().getSerializableExtra(ALL_TAGS);
-        if (allTags == null) {
-            allTags = new ArrayList<>();
-        }
         if (tag == null) {
             tag = new Tag();
             tag.setColor(Color.GREEN);
@@ -100,7 +93,7 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
             tag.setId("tag" + System.currentTimeMillis());
         }
 
-        if (!allTags.contains(tag)) {
+        if (!FirebaseObserver.getInstance().getTags().contains(tag)) {
             FirebaseUtils.getInstance().addTag(tag);
             finish();
         } else {
