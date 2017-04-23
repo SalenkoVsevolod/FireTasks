@@ -40,6 +40,7 @@ import com.example.portable.firebasetests.utils.TimeUtils;
 import com.example.portable.firebasetests.utils.ToastUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class TaskEditActivity extends AppCompatActivity implements View.OnClickListener, EntityList.FirebaseEntityListener<Tag> {
 
@@ -161,6 +162,9 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
             findViewById(R.id.reminders_container).setVisibility(View.GONE);
         } else if (task.getReminds().size() > 0) {
             findViewById(R.id.no_reminders).setVisibility(View.GONE);
+            for (String s : task.getReminds()) {
+                reminds.add(FirebaseObserver.getInstance().getReminders().getById(s));
+            }
         } else {
             findViewById(R.id.reminders_container).setOnClickListener(this);
             findViewById(R.id.no_reminders).setVisibility(View.VISIBLE);
@@ -394,7 +398,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
 
     private void finishAndStartRightActivity() {
         if (task.getId() != null) {
-            TaskDisplayActivity.start(this, task);
+            TaskDisplayActivity.start(this, task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId());
         }
         finish();
     }

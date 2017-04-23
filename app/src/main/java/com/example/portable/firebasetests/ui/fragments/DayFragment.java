@@ -79,7 +79,7 @@ public class DayFragment extends Fragment {
         TasksDayRecyclerAdapter.OnTaskClickListener onTaskClickListener = new TasksDayRecyclerAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
-                TaskDisplayActivity.start(getActivity(), task);
+                TaskDisplayActivity.start(getActivity(), dayOfYear, task.getId());
             }
         };
         TasksDayRecyclerAdapter.OnDeletingListener onDeletingListener = new TasksDayRecyclerAdapter.OnDeletingListener() {

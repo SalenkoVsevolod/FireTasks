@@ -1,7 +1,10 @@
 package com.example.portable.firebasetests.network.listeners;
 
+import android.util.Log;
+
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
+import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseReferenceManager;
 import com.google.firebase.database.DataSnapshot;
 
@@ -12,14 +15,14 @@ import java.util.HashMap;
  */
 
 public class RemindersSyncTask extends FirebaseEntitySyncTask<Remind> {
-
     public RemindersSyncTask() {
         super(FirebaseReferenceManager.getInstance().getRemindersReference());
     }
 
     @Override
     protected void onDataChanged(EntityList<Remind> entities) {
-        //TODO FirebaseObserver.getInstance().syncReminders(entities);
+        Log.i("fireSync", "on data change:" + entities.toString());
+        FirebaseObserver.getInstance().getReminders().sync(entities);
     }
 
     @Override

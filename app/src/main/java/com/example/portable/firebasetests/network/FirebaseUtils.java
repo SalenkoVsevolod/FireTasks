@@ -46,7 +46,6 @@ public class FirebaseUtils {
     public void saveReminders(ArrayList<Remind> reminders) {
         for (Remind remind : reminders) {
             FirebaseReferenceManager.getInstance().getRemindersReference().child(remind.getId()).setValue(remind);
-
         }
     }
 
@@ -54,8 +53,9 @@ public class FirebaseUtils {
         //TODO     getTaskReference(day, taskId).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
     }
 
-    public void removeReminder(int day, String taskId, Remind remind) {
-        //TODO   getTaskReference(day, taskId).child("reminds").child(remind.getId()).setValue(null);
+    public void removeReminder(int day, String taskId, String reminderId) {
+        FirebaseReferenceManager.getInstance().getRemindersReference().child(reminderId).removeValue();
+        FirebaseReferenceManager.getInstance().getTaskReference(day, taskId).child("remindera").child(reminderId).removeValue();
     }
 
 

@@ -37,12 +37,9 @@ public class Task extends FirebaseEntity {
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
         tagId = (String) map.get("tagId");
-        subTasks = getSubTasks((HashMap<String, Object>) map.get("subTasks"));
+        parseSubTasks((HashMap<String, Object>) map.get("subTasks"));
+        parseReminds((HashMap<String, Object>) map.get("reminders"));
         Log.i("fireSync", "subtasks: " + subTasks);
-        reminds = (ArrayList<String>) map.get("reminds");
-        if (reminds == null) {
-            reminds = new ArrayList<>();
-        }
 
     }
 
@@ -59,18 +56,24 @@ public class Task extends FirebaseEntity {
         subTasks.addAll(task.getSubTasks());
     }
 
-    private ArrayList<SubTask> getSubTasks(HashMap<String, Object> map) {
+    private void parseReminds(HashMap<String, Object> rawData) {
+        if (rawData != null) {
+            for (String id : rawData.keySet()) {
+                reminds.add(id);
+            }
+        }
+    }
+
+    private void parseSubTasks(HashMap<String, Object> map) {
         if (map == null) {
             map = new HashMap<>();
         }
-        ArrayList<SubTask> subTasks = new ArrayList<>();
         Set<String> keys = map.keySet();
         for (String key : keys) {
             SubTask subTask = new SubTask((HashMap<String, Object>) map.get(key));
             subTask.setId(key);
             subTasks.add(subTask);
         }
-        return subTasks;
     }
 
     @Exclude
