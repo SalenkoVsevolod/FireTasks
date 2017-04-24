@@ -49,8 +49,8 @@ public class FirebaseUtils {
         }
     }
 
-    public void setSubTaskDone(int day, String taskId, SubTask subTask) {
-        //TODO     getTaskReference(day, taskId).child("subTasks").child(subTask.getId()).child("done").setValue(subTask.isDone());
+    public void setSubTaskDone(int day, String taskId, String subtaskId, boolean done) {
+        FirebaseReferenceManager.getInstance().getTaskReference(day, taskId).child("subTasks").child(subtaskId).child("done").setValue(done);
     }
 
     public void removeReminder(int day, String taskId, String reminderId) {

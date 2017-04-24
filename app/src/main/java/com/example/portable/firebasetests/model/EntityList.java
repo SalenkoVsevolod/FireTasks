@@ -1,8 +1,6 @@
 package com.example.portable.firebasetests.model;
 
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -40,7 +38,6 @@ public class EntityList<T extends FirebaseEntity> extends ArrayList<T> {
     }
 
     public void sync(EntityList<T> syncedArray) {
-        Log.i("fireSync", "sync in array");
         for (T t : this) {
             t.setSynced(false);
         }

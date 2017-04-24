@@ -10,7 +10,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,14 +56,12 @@ public class TaskDisplayActivity extends AppCompatActivity {
         final int day = getIntent().getIntExtra(DAY, -1);
         final String id = getIntent().getStringExtra(TASK_ID);
         task = FirebaseObserver.getInstance().getTasksDay(day).getById(id);
-        Log.i("fireSync", "input task for display:" + task.getReminds().toString());
         tag = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
         reminds = new ArrayList<>();
         SubtaskCheckableRecyclerAdapter adapter = new SubtaskCheckableRecyclerAdapter(task.getSubTasks(), new SubtaskCheckableRecyclerAdapter.OnSubtaskCheckListener() {
             @Override
             public void onCheck(SubTask subTask, boolean checked) {
-                subTask.setDone(checked);
-                FirebaseUtils.getInstance().setSubTaskDone(day, id, subTask);
+                FirebaseUtils.getInstance().setSubTaskDone(day, id, subTask.getId(), checked);
             }
         });
         subtasksRecyclerView.setAdapter(adapter);

@@ -32,15 +32,12 @@ public class Task extends FirebaseEntity {
 
     public Task(HashMap<String, Object> map) {
         this();
-        Log.i("fireSync", "raw task: " + map);
         name = (String) map.get("name");
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
         tagId = (String) map.get("tagId");
         parseSubTasks((HashMap<String, Object>) map.get("subTasks"));
         parseReminds((HashMap<String, Object>) map.get("reminders"));
-        Log.i("fireSync", "subtasks: " + subTasks);
-
     }
 
     @Override
@@ -145,10 +142,7 @@ public class Task extends FirebaseEntity {
     @Override
     public boolean isIdentical(FirebaseEntity entity) {
         Task task = (Task) entity;
-        if (reminds.size() != task.getReminds().size()) {
-            return false;
-        }
-
+        Log.i("fireSync", "checking task " + task.getName() + " for identical");
         if (subTasks.size() != task.getSubTasks().size()) {
             return false;
         }
@@ -157,10 +151,14 @@ public class Task extends FirebaseEntity {
                 return false;
             }
         }
+        Log.i("fireSync", "subtasks are identical");
         for (int i = 0; i < reminds.size(); i++) {
             if (!reminds.get(i).equals(task.getReminds().get(i))) {
                 return false;
             }
+        }
+        if (reminds.size() != task.getReminds().size()) {
+            return false;
         }
         return name.equals(task.getName())
                 && description.equals(task.getDescription())

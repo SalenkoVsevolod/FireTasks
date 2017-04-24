@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
@@ -27,7 +26,6 @@ import java.util.Comparator;
 public class DayFragment extends Fragment {
     private static final String DAY_OF_YEAR = "dayOfYear", SORTING = "sort";
     private RecyclerView tasksRecycler;
-    private ProgressBar progressBar;
     private int dayOfYear;
     private String sortingTagId;
     private TextView deletingTextView;
@@ -75,7 +73,6 @@ public class DayFragment extends Fragment {
                 hideDeleting();
             }
         });
-        progressBar = (ProgressBar) rootView.findViewById(R.id.day_progress_bar);
         TasksDayRecyclerAdapter.OnTaskClickListener onTaskClickListener = new TasksDayRecyclerAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
@@ -103,22 +100,19 @@ public class DayFragment extends Fragment {
             @Override
             public void onChanged(Task task) {
                 tasksRecycler.getAdapter().notifyItemChanged(tasks.indexOf(task));
-                progressBar.setVisibility(View.GONE);
+                Log.i("fireSync", "task " + task.getName() + " from day " + dayOfYear);
                 sortTasks();
             }
 
             @Override
             public void onCreated(Task task) {
-                Log.i("fireSync", "task " + task.getName() + " from day " + dayOfYear);
                 tasksRecycler.getAdapter().notifyItemInserted(tasks.indexOf(task));
-                progressBar.setVisibility(View.GONE);
                 setTasksVisibility(true);
                 sortTasks();
             }
 
             @Override
             public void onDeleted(Task task) {
-                progressBar.setVisibility(View.GONE);
                 if (tasks.size() == 0) {
                     setTasksVisibility(false);
                 } else {
@@ -142,10 +136,11 @@ public class DayFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.i("subtask", "day fragment onViewCreated " + dayOfYear);
         tasksRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        progressBar.setVisibility(View.VISIBLE);
         FirebaseExecutorManager.getInstance().startDayListener(dayOfYear);
         tasks.subscribe(tasksListener);
+        setTasksVisibility(tasks.size() != 0);
     }
 
     @Override
@@ -153,6 +148,7 @@ public class DayFragment extends Fragment {
         super.onDestroyView();
         tasks.unsubscribe(tasksListener);
         FirebaseExecutorManager.getInstance().stopDayListener(dayOfYear);
+        Log.i("subtask", "day fragment onDestroyView " + dayOfYear);
     }
 
     public void setSortingTagIdAndSort(String tagId) {

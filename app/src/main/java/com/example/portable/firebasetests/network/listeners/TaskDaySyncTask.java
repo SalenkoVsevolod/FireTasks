@@ -32,6 +32,7 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
 
     @Override
     protected void onDataChanged(EntityList<Task> entities) {
+        Log.i("fireSync", "tasks data on " + day + " changed");
         FirebaseObserver.getInstance().getTasksDay(day).sync(entities);
     }
 
@@ -47,7 +48,6 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
             Task task = new Task((HashMap<String, Object>) tasks.get(key));
             task.setId(key);
             Notifier.setAlarms(task);
-            Log.i("fireSync", "task parsed " + task.getName() + "on day " + day);
             res.add(task);
         }
         return res;

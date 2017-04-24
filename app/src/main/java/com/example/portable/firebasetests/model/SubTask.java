@@ -1,5 +1,7 @@
 package com.example.portable.firebasetests.model;
 
+import android.util.Log;
+
 import com.example.portable.firebasetests.R;
 import com.google.firebase.database.Exclude;
 
@@ -64,7 +66,11 @@ public class SubTask extends FirebaseEntity {
     @Override
     public boolean isIdentical(FirebaseEntity entity) {
         SubTask subTask = (SubTask) entity;
-        return name.equals(subTask.getName()) && done == subTask.isDone() && priority == subTask.getPriority();
+        Log.i("fireSync", "checking subtask: " + subTask.getName() + " for identical");
+
+        boolean res = name.equals(subTask.getName()) && done == subTask.isDone() && priority == subTask.getPriority();
+        Log.i("fireSync", "subtask identical: " + res);
+        return res;
     }
 
     @Override
