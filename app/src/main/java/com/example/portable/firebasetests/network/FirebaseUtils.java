@@ -55,9 +55,14 @@ public class FirebaseUtils {
 
     public void removeReminder(int day, String taskId, String reminderId) {
         FirebaseReferenceManager.getInstance().getRemindersReference().child(reminderId).removeValue();
-        FirebaseReferenceManager.getInstance().getTaskReference(day, taskId).child("remindera").child(reminderId).removeValue();
+        FirebaseReferenceManager.getInstance().getTaskReference(day, taskId).child("reminders").child(reminderId).removeValue();
     }
 
+    public void removeGlobalReminds(ArrayList<String> ids) {
+        for (String s : ids) {
+            FirebaseReferenceManager.getInstance().getRemindersReference().child(s).removeValue();
+        }
+    }
 
     public void addTag(Tag tag) {
         FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).setValue(tag);

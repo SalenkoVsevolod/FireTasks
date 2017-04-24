@@ -10,16 +10,19 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseExecutorManager;
 import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.adapters.ReminderDisplayRecyclerAdapter;
@@ -34,6 +37,9 @@ public class TaskDisplayActivity extends AppCompatActivity {
     private Tag tag;
     private RecyclerView remindsRecyclerView, subtasksRecyclerView;
     private ArrayList<Remind> reminds;
+    private String id;
+    private int day;
+    private EntityList.FirebaseEntityListener<Task> taskListener;
 
     public static void start(Context context, int day, String taskId) {
         Intent starter = new Intent(context, TaskDisplayActivity.class);
@@ -53,28 +59,13 @@ public class TaskDisplayActivity extends AppCompatActivity {
         subtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         tagTV = (TextView) findViewById(R.id.tagTextView);
 
-        final int day = getIntent().getIntExtra(DAY, -1);
-        final String id = getIntent().getStringExtra(TASK_ID);
-        task = FirebaseObserver.getInstance().getTasksDay(day).getById(id);
-        tag = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
+        day = getIntent().getIntExtra(DAY, -1);
+        id = getIntent().getStringExtra(TASK_ID);
+
         reminds = new ArrayList<>();
-        SubtaskCheckableRecyclerAdapter adapter = new SubtaskCheckableRecyclerAdapter(task.getSubTasks(), new SubtaskCheckableRecyclerAdapter.OnSubtaskCheckListener() {
-            @Override
-            public void onCheck(SubTask subTask, boolean checked) {
-                FirebaseUtils.getInstance().setSubTaskDone(day, id, subTask.getId(), checked);
-            }
-        });
-        subtasksRecyclerView.setAdapter(adapter);
+
         subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        View remindersContainer = findViewById(R.id.reminders_container);
-        if (task.getReminds() != null && task.getReminds().size() > 0) {
-            remindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(reminds, null));
-            remindsRecyclerView.setLayoutManager(new GridLayoutManager(this, 5));
-            remindersContainer.setVisibility(View.VISIBLE);
-        } else {
-            remindersContainer.setVisibility(View.GONE);
-        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -83,6 +74,30 @@ public class TaskDisplayActivity extends AppCompatActivity {
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
+
+        taskListener = new EntityList.FirebaseEntityListener<Task>() {
+            @Override
+            public void onChanged(Task task) {
+                if (task.getId().equals(id)) {
+                    Log.i("displaySync", "this task changed");
+                }
+            }
+
+            @Override
+            public void onCreated(Task task) {
+                Log.i("displaySync", "subtasks: " + task.getSubTasks().size());
+                if (task.getId().equals(id)) {
+                    Log.i("displaySync", "this task created");
+                }
+            }
+
+            @Override
+            public void onDeleted(Task task) {
+
+            }
+        };
+        FirebaseObserver.getInstance().getTasksDay(day).subscribe(taskListener);
+        FirebaseExecutorManager.getInstance().startDayListener(day);
     }
 
     private void initReminds() {
@@ -95,6 +110,31 @@ public class TaskDisplayActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        task = FirebaseObserver.getInstance().getTasksDay(day).getById(id);
+        if (task == null) {
+            task = new Task();
+            tag = new Tag();
+        } else {
+            tag = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
+        }
+
+        SubtaskCheckableRecyclerAdapter adapter = new SubtaskCheckableRecyclerAdapter(task.getSubTasks(), new SubtaskCheckableRecyclerAdapter.OnSubtaskCheckListener() {
+            @Override
+            public void onCheck(SubTask subTask, boolean checked) {
+                FirebaseUtils.getInstance().setSubTaskDone(day, id, subTask.getId(), checked);
+            }
+        });
+
+        View remindersContainer = findViewById(R.id.reminders_container);
+        if (task.getReminds() != null && task.getReminds().size() > 0) {
+            remindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(reminds, null));
+            remindsRecyclerView.setLayoutManager(new GridLayoutManager(this, 5));
+            remindersContainer.setVisibility(View.VISIBLE);
+        } else {
+            remindersContainer.setVisibility(View.GONE);
+        }
+        subtasksRecyclerView.setAdapter(adapter);
+
         nameTV.setText(task.getName());
         if (task.getDescription().length() > 0) {
             descriptionTV.setText(task.getDescription());
@@ -128,7 +168,6 @@ public class TaskDisplayActivity extends AppCompatActivity {
                 finish();
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

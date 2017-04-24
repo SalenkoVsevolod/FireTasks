@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
@@ -47,6 +48,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     private static final String TASK_ARG = "task";
     private final ArrayList<Tag> tagsInRecycler = new ArrayList<>();
     private final ArrayList<Remind> reminds = new ArrayList<>();
+    private final ArrayList<String> remindersToDelete = new ArrayList<>();
     private EditText descriptionEdit, nameEdit;
     private RecyclerView tagsRecycler;
     private RecyclerView subTasksRecycleView, remindersRecyclerView;
@@ -269,11 +271,9 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
         FirebaseUtils.getInstance().saveReminders(reminds);
-        /* TODO for (int i = 0; i < task.getReminds().size(); i++) {
-                Notifier.removeAlarm((int) task.getReminds().get(i).getTimeStamp());
-        }
-        Notifier.setAlarms(task);*/
+        Notifier.setAlarms(task.getId(), reminds);
         FirebaseUtils.getInstance().saveTask(task);
+        FirebaseUtils.getInstance().removeGlobalReminds(remindersToDelete);
     }
 
     @Override
@@ -349,6 +349,8 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
 
     private void deleteReminder(final Remind remind) {
         reminds.remove(remind);
+        remindersToDelete.add(remind.getId());
+        //TODO stupid crutch
         for (int i = 0; i < task.getReminds().size(); i++) {
             if (task.getReminds().get(i).equals(remind.getId())) {
                 task.getReminds().remove(i);

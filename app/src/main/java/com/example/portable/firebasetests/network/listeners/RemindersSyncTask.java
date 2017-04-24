@@ -1,7 +1,5 @@
 package com.example.portable.firebasetests.network.listeners;
 
-import android.util.Log;
-
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.network.FirebaseObserver;
@@ -21,7 +19,6 @@ public class RemindersSyncTask extends FirebaseEntitySyncTask<Remind> {
 
     @Override
     protected void onDataChanged(EntityList<Remind> entities) {
-        Log.i("fireSync", "on data change:" + entities.toString());
         FirebaseObserver.getInstance().getReminders().sync(entities);
     }
 

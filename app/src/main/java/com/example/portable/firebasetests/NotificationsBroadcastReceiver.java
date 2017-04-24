@@ -7,11 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseObserver;
-import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 
 import java.util.Calendar;
@@ -28,8 +28,11 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         String reminderId = intent.getStringExtra(REMINDER_ID);
         int day = intent.getIntExtra(DAY, -1);
         Task task = FirebaseObserver.getInstance().getTasksDay(day).getById(taskId);
+        Log.i("remind", "received remind id:" + reminderId);
+        for (Remind r : FirebaseObserver.getInstance().getReminders()) {
+            Log.i("remind", "id in storage:" + r.getId());
+        }
         Remind remind = FirebaseObserver.getInstance().getReminders().getById(reminderId);
-
         showPopUp(context, task, remind);
     }
 
@@ -38,7 +41,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_launcher);
-
         String sound = remind.getSound();
         if (sound != null) {
             builder.setSound(Uri.parse(sound));
@@ -54,7 +56,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         builder.setContentTitle(task.getName());
         builder.setContentText(task.getDescription());
         manager.notify(1, builder.build());
-        FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), remind.getId());
+        //TODO FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), remind.getId());
     }
 
 }

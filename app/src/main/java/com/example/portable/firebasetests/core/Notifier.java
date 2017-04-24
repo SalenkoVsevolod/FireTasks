@@ -5,13 +5,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
 import com.example.portable.firebasetests.model.Remind;
-import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -20,23 +20,23 @@ import java.util.Calendar;
 
 public class Notifier {
 
-    public static void setAlarms(Task task) {
+    public static void setAlarms(String taskId, ArrayList<Remind> reminds) {
         Intent notificationIntent = new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class);
-        for (String remindId : task.getReminds()) {
-            Remind r = FirebaseObserver.getInstance().getReminders().getById(remindId);
-            if (r.getTimeStamp() > System.currentTimeMillis()) {
-                notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_ID, task.getId());
-                notificationIntent.putExtra(NotificationsBroadcastReceiver.REMINDER_ID, remindId);
-                notificationIntent.putExtra(NotificationsBroadcastReceiver.DAY, task.getCalendar().get(Calendar.DAY_OF_YEAR));
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) r.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        for (Remind remind : reminds) {
+            if (remind.getTimeStamp() > System.currentTimeMillis()) {
+                notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_ID, taskId);
+                Log.i("remind", "putting remind with id:" + remind.getId());
+                notificationIntent.putExtra(NotificationsBroadcastReceiver.REMINDER_ID, remind.getId());
+                notificationIntent.putExtra(NotificationsBroadcastReceiver.DAY, remind.getCalendar().get(Calendar.DAY_OF_YEAR));
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) remind.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                 AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, r.round(), pendingIntent);
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, remind.round(), pendingIntent);
                 } else {
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, r.round(), pendingIntent);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, remind.round(), pendingIntent);
                 }
             } else {
-                FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), r.getId());
+                FirebaseUtils.getInstance().removeReminder(remind.getCalendar().get(Calendar.DAY_OF_YEAR), taskId, remind.getId());
             }
         }
     }

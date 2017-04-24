@@ -2,7 +2,6 @@ package com.example.portable.firebasetests.network.listeners;
 
 import android.util.Log;
 
-import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseObserver;
@@ -47,7 +46,6 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
         for (String key : keys) {
             Task task = new Task((HashMap<String, Object>) tasks.get(key));
             task.setId(key);
-            Notifier.setAlarms(task);
             res.add(task);
         }
         return res;

@@ -87,6 +87,14 @@ public class Remind extends FirebaseEntity {
     @Override
     public boolean isIdentical(FirebaseEntity entity) {
         Remind remind = (Remind) entity;
-        return getTimeStamp() == remind.getTimeStamp() && vibro == remind.isVibro() && sound.equals(remind.getSound());
+        return getTimeStamp() == remind.getTimeStamp() && vibro == remind.isVibro() && isSoundIdentical(remind.getSound());
+    }
+
+    private boolean isSoundIdentical(String inputSound) {
+        if (sound == null) {
+            return inputSound == null;
+        } else {
+            return sound.equals(inputSound);
+        }
     }
 }
