@@ -100,13 +100,18 @@ public class DayFragment extends Fragment {
             @Override
             public void onChanged(Task task) {
                 tasksRecycler.getAdapter().notifyItemChanged(tasks.indexOf(task));
-                Log.i("fireSync", "task " + task.getName() + " from day " + dayOfYear);
+                if (FirebaseObserver.getInstance().getTags().getById(task.getTagId()) == null) {
+                    FirebaseUtils.getInstance().deleteTask(dayOfYear, task.getId());
+                }
                 sortTasks();
             }
 
             @Override
             public void onCreated(Task task) {
                 tasksRecycler.getAdapter().notifyItemInserted(tasks.indexOf(task));
+                if (FirebaseObserver.getInstance().getTags().getById(task.getTagId()) == null) {
+                    FirebaseUtils.getInstance().deleteTask(dayOfYear, task.getId());
+                }
                 setTasksVisibility(true);
                 sortTasks();
             }

@@ -121,6 +121,11 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
 
             @Override
             public void clickOnEdit(Tag tag) {
+                showTagDeletingDialog(tag);
+            }
+
+            @Override
+            public void longClick(Tag tag) {
                 TagEditorActivity.start(TaskEditActivity.this, tag);
             }
         };
@@ -144,6 +149,21 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
                 selectTag(tagsInRecycler.get(0));
             }
         }
+    }
+
+    private void showTagDeletingDialog(final Tag tag) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Warning");
+        builder.setMessage("All tasks with this tag will be also deleted. Proceed?");
+        builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FirebaseUtils.getInstance().deleteTag(tag);
+            }
+        });
+        builder.setNegativeButton("cancel", null);
+        builder.setCancelable(true);
+        builder.show();
     }
 
     private void initReminders() {

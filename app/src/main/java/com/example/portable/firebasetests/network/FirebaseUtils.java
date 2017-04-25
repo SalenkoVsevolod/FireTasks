@@ -67,4 +67,8 @@ public class FirebaseUtils {
     public void addTag(Tag tag) {
         FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).setValue(tag);
     }
+
+    public void deleteTag(Tag tag) {
+        FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).removeValue();
+    }
 }

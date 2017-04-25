@@ -56,6 +56,8 @@ public class TagRecyclerAdapter extends RecyclerView.Adapter<TagRecyclerAdapter.
         void clickOnTag(Tag tag);
 
         void clickOnEdit(Tag tag);
+
+        void longClick(Tag tag);
     }
 
     class TagVH extends RecyclerView.ViewHolder {
@@ -72,6 +74,13 @@ public class TagRecyclerAdapter extends RecyclerView.Adapter<TagRecyclerAdapter.
                 @Override
                 public void onClick(View view) {
                     listener.clickOnTag(tags.get(getAdapterPosition()));
+                }
+            });
+            root.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    listener.longClick(tags.get(getAdapterPosition()));
+                    return false;
                 }
             });
             editIcon.setOnClickListener(new View.OnClickListener() {
