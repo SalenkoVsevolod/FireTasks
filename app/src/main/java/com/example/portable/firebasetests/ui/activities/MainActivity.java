@@ -28,6 +28,8 @@ import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseExecutorManager;
 import com.example.portable.firebasetests.network.FirebaseObserver;
+import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.network.listeners.DefaultTagsStateTask;
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
@@ -94,6 +96,14 @@ public class MainActivity extends AppCompatActivity implements EntityList.Fireba
         FirebaseObserver.getInstance().getTags().subscribe(this);
         FirebaseExecutorManager.getInstance().startRemindersListener();
         FirebaseExecutorManager.getInstance().startTagsListener();
+        new DefaultTagsStateTask(new DefaultTagsStateTask.DefaultTagsCreatedListener() {
+            @Override
+            public void created(boolean created) {
+                if (!created) {
+                    FirebaseUtils.getInstance().createDefaultTags();
+                }
+            }
+        }).execute();
     }
 
     @Override

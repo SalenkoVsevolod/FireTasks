@@ -71,4 +71,16 @@ public class FirebaseUtils {
     public void deleteTag(Tag tag) {
         FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).removeValue();
     }
+
+    public void createDefaultTags() {
+        for (Tag t : Tag.DEFAULT_TAGS) {
+            addTag(t);
+        }
+        setDefaultTagsCreated();
+    }
+
+    private void setDefaultTagsCreated() {
+        FirebaseReferenceManager.getInstance().getUserReference().child("defaultTagsCreated").setValue(true);
+    }
+
 }

@@ -1,12 +1,22 @@
 package com.example.portable.firebasetests.model;
 
+import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FireTasksApp;
+
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Salenko Vsevolod on 16.02.2017.
  */
 
 public class Tag extends FirebaseEntity {
+    public static final List<Tag> DEFAULT_TAGS = Arrays.asList(
+            new Tag("default_1", "Work", FireTasksApp.getInstance().getCompatColor(R.color.work_tag)),
+            new Tag("default_2", "Home", FireTasksApp.getInstance().getCompatColor(R.color.home_tag)),
+            new Tag("default_3", "Travel", FireTasksApp.getInstance().getCompatColor(R.color.travel_tag)));
+
     private String name;
     private long color;
 
@@ -17,6 +27,12 @@ public class Tag extends FirebaseEntity {
     public Tag(HashMap<String, Object> map) {
         name = (String) map.get("name");
         color = (long) map.get("color");
+    }
+
+    public Tag(String id, String name, long color) {
+        this.name = name;
+        this.color = color;
+        this.id = id;
     }
 
     public String getName() {

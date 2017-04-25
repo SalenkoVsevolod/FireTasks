@@ -27,6 +27,10 @@ public class FirebaseReferenceManager {
         userReference = FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId());
     }
 
+    public DatabaseReference getUserReference() {
+        return userReference;
+    }
+
     public DatabaseReference getTagsReference() {
         return userReference.child("tags");
     }

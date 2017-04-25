@@ -10,7 +10,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -86,7 +85,6 @@ public class TaskDisplayActivity extends AppCompatActivity {
             @Override
             public void onChanged(Task inputTask) {
                 if (task.getId().equals(id)) {
-                    Log.i("firetag", "task changed");
                     task.init(inputTask);
                     displayTask();
                 }
@@ -95,7 +93,6 @@ public class TaskDisplayActivity extends AppCompatActivity {
             @Override
             public void onCreated(Task inputTask) {
                 if (task.getId().equals(id)) {
-                    Log.i("firetag", "task created");
                     task.init(inputTask);
                     tag = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
                     displayTask();
@@ -113,9 +110,7 @@ public class TaskDisplayActivity extends AppCompatActivity {
         tagListener = new EntityList.FirebaseEntityListener<Tag>() {
             @Override
             public void onChanged(Tag inputTag) {
-                Log.i("firetag", "input:" + inputTag.getId() + ", this:" + task.getTagId());
                 if (inputTag.getId().equals(task.getTagId())) {
-                    Log.i("firetag", "tag changed");
                     tag.init(inputTag);
                     displayTag();
                 }
@@ -123,9 +118,7 @@ public class TaskDisplayActivity extends AppCompatActivity {
 
             @Override
             public void onCreated(Tag inputTag) {
-                Log.i("firetag", "input:" + inputTag.getId() + ", this:" + task.getTagId());
                 if (inputTag.getId().equals(task.getTagId())) {
-                    Log.i("firetag", "tag created");
                     tag.init(inputTag);
                     displayTag();
                 }

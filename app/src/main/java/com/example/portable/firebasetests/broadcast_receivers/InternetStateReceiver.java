@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests;
+package com.example.portable.firebasetests.broadcast_receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

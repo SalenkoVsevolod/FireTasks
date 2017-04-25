@@ -1,8 +1,6 @@
 package com.example.portable.firebasetests.model;
 
 
-import android.util.Log;
-
 import com.google.firebase.database.Exclude;
 
 import java.util.ArrayList;
@@ -62,7 +60,6 @@ public class Task extends FirebaseEntity {
     }
 
     private void parseSubTasks(HashMap<String, Object> map) {
-        Log.i("subtask", "parsing subtasks of task " + id);
         if (map == null) {
             map = new HashMap<>();
         }
@@ -73,7 +70,6 @@ public class Task extends FirebaseEntity {
             subTask.setId(key);
             subTasks.add(subTask);
         }
-        Log.i("subtask", "subtasks parsed:" + subTasks.size());
     }
 
     @Exclude

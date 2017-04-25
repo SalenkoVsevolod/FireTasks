@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,7 +140,6 @@ public class DayFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.i("subtask", "day fragment onViewCreated " + dayOfYear);
         tasksRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         FirebaseExecutorManager.getInstance().startDayListener(dayOfYear);
         tasks.subscribe(tasksListener);
@@ -153,7 +151,6 @@ public class DayFragment extends Fragment {
         super.onDestroyView();
         tasks.unsubscribe(tasksListener);
         FirebaseExecutorManager.getInstance().stopDayListener(dayOfYear);
-        Log.i("subtask", "day fragment onDestroyView " + dayOfYear);
     }
 
     public void setSortingTagIdAndSort(String tagId) {

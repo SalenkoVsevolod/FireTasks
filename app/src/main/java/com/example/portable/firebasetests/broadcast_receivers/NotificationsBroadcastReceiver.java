@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Task;
@@ -44,7 +43,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         Intent intent = new Intent(context, TaskDisplayActivity.class);
         intent.putExtra(TaskDisplayActivity.TASK_ID, task.getId());
         intent.putExtra(TaskDisplayActivity.DAY, task.getCalendar().get(Calendar.DAY_OF_YEAR));
-        Log.i("remind", "sending remind " + remind.getId());
         intent.putExtra(TaskDisplayActivity.REMINDER_TO_DELETE, remind.getId());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) remind.getTimeStamp(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);

@@ -5,20 +5,19 @@
     <color name="colorAccent">#00c7d4</color>
     <color name="yellow">#ffd300</color>
     <color name="blue_background">#00c7d4</color>
-    <color name="doneTask">#79ff4d</color>
-    <color name="failedTask">#ff3333</color>
-    <color name="undoneTask">#ffff4d</color>
-    <color name="doneDay">#66ff66</color>
-    <color name="failedDay">#ff4d4d</color>
-    <color name="emptyDay">#aeadad</color>
-    <color name="undoneDay">#ffff96</color>
+
     <color name="titleText">#ffffff</color>
     <color name="gray_inactive">#CFCFCF</color>
     <color name="main_background">#f9f9f9</color>
     <color name="gray_text">#B4B4B4</color>
     <color name="divider">#F3F3F3</color>
+
     <color name="low">#649F45</color>
     <color name="medium">#FDC800</color>
     <color name="high">#FF8800</color>
     <color name="urgent">#FF4133</color>
+
+    <color name="work_tag">#d50000</color>
+    <color name="travel_tag">#64dd17</color>
+    <color name="home_tag">#0026ca</color>
 </resources>

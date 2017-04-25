@@ -43,7 +43,7 @@
             android:theme="@style/MainTheme.Dialog" />
 
         <receiver
-            android:name=".InternetStateReceiver"
+            android:name=".broadcast_receivers.InternetStateReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
