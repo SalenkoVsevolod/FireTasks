@@ -10,7 +10,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.example.portable.firebasetests.model.Remind;
-import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 

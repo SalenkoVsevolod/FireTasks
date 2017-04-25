@@ -4,6 +4,8 @@
     package="com.example.portable.firebasetests">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".core.FireTasksApp"
@@ -23,7 +25,7 @@
         <activity android:name=".ui.activities.MainActivity" />
 
         <receiver
-            android:name=".broadcast_receivers.NotificationsBroadcastReceiver"
+            android:name=".NotificationsBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
 
@@ -40,6 +42,14 @@
             android:name=".ui.activities.SubtaskEditorActivity"
             android:theme="@style/MainTheme.Dialog" />
 
+        <receiver
+            android:name=".InternetStateReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
