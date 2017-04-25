@@ -36,7 +36,7 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
         spinner = (Spinner) findViewById(R.id.priority_spinner);
         spinner.setAdapter(new PrioritySpinnerAdapter());
         if (subtask != null) {
-            editText.setText(subtask.getDescription());
+            editText.setText(subtask.getName());
             spinner.setSelection((int) subtask.getPriority());
         }
         findViewById(R.id.dialog_cancel).setOnClickListener(this);
@@ -60,14 +60,14 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
             Intent intent = new Intent();
             if (subtask == null) {
                 subtask = new SubTask();
-                subtask.setDescription(editText.getText().toString());
+                subtask.setName(editText.getText().toString());
                 subtask.setId("" + System.currentTimeMillis());
                 subtask.setPriority(spinner.getSelectedItemId());
                 intent.putExtra(SUBTASK, subtask);
                 setResult(CREATE, intent);
                 finish();
             } else {
-                subtask.setDescription(editText.getText().toString());
+                subtask.setName(editText.getText().toString());
                 subtask.setPriority(spinner.getSelectedItemId());
                 intent.putExtra(SUBTASK, subtask);
                 setResult(UPDATE, intent);

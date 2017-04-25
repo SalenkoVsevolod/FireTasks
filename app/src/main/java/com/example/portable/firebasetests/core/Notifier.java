@@ -6,10 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.example.portable.firebasetests.broadcast_receivers.NotificationsBroadcastReceiver;
+import com.example.portable.firebasetests.NotificationsBroadcastReceiver;
+import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -18,24 +19,22 @@ import java.util.Calendar;
 
 public class Notifier {
 
-    public static void setAlarms(Task task) {
+    public static void setAlarms(Task task, ArrayList<Remind> reminds) {
         Intent notificationIntent = new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class);
-        notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_TAG, task);
-        for (int i = 0; i < task.getReminds().size(); i++) {
-            if (task.getReminds().get(i).getTimeStamp() > System.currentTimeMillis()) {
-                notificationIntent.putExtra(NotificationsBroadcastReceiver.INDEX, i);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) task.getReminds().get(i).getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        for (Remind remind : reminds) {
+            if (remind.getTimeStamp() > System.currentTimeMillis()) {
+                notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK, task);
+                notificationIntent.putExtra(NotificationsBroadcastReceiver.REMINDER, remind);
+                notificationIntent.putExtra(NotificationsBroadcastReceiver.DAY, remind.getCalendar().get(Calendar.DAY_OF_YEAR));
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) remind.getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                 AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).round(), pendingIntent);
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, remind.round(), pendingIntent);
                 } else {
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).round(), pendingIntent);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, remind.round(), pendingIntent);
                 }
-            } else {
-                FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(i));
             }
         }
-
     }
 
 

@@ -11,8 +11,7 @@ import java.util.HashMap;
  * Created by Salenko Vsevolod on 21.03.2017.
  */
 
-public class Remind implements Serializable {
-    private String id;
+public class Remind extends FirebaseEntity implements Serializable {
     private String sound;
     private boolean vibro;
     private Calendar calendar;
@@ -72,18 +71,31 @@ public class Remind implements Serializable {
         return c.getTimeInMillis();
     }
 
-    @Exclude
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Override
     public boolean equals(Object obj) {
         Remind r = (Remind) obj;
         return r.getId().equals(id);
+    }
+
+    @Override
+    public void init(FirebaseEntity entity) {
+        Remind remind = (Remind) entity;
+        calendar.setTimeInMillis(remind.getTimeStamp());
+        sound = remind.getSound();
+        vibro = remind.isVibro();
+    }
+
+    @Override
+    public boolean isIdentical(FirebaseEntity entity) {
+        Remind remind = (Remind) entity;
+        return getTimeStamp() == remind.getTimeStamp() && vibro == remind.isVibro() && isSoundIdentical(remind.getSound());
+    }
+
+    private boolean isSoundIdentical(String inputSound) {
+        if (sound == null) {
+            return inputSound == null;
+        } else {
+            return sound.equals(inputSound);
+        }
     }
 }

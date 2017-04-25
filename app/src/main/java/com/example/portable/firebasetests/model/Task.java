@@ -1,9 +1,10 @@
 package com.example.portable.firebasetests.model;
 
 
+import android.util.Log;
+
 import com.google.firebase.database.Exclude;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -14,13 +15,12 @@ import java.util.Set;
  */
 
 @SuppressWarnings("unchecked")
-public class Task implements Serializable {
+public class Task extends FirebaseEntity {
     private String name, description;
     private ArrayList<SubTask> subTasks;
-    private String id;
     private String tagId;
     private Calendar calendar;
-    private ArrayList<Remind> reminds;
+    private ArrayList<String> reminds;
 
     public Task() {
         description = "";
@@ -36,36 +36,44 @@ public class Task implements Serializable {
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
         tagId = (String) map.get("tagId");
-        subTasks = getSubTasks((HashMap<String, Object>) map.get("subTasks"));
-        reminds = getReminders((HashMap<String, Object>) map.get("reminds"));
+        parseSubTasks((HashMap<String, Object>) map.get("subTasks"));
+        parseReminds((HashMap<String, Object>) map.get("reminders"));
     }
 
-    private ArrayList<SubTask> getSubTasks(HashMap<String, Object> map) {
+    @Override
+    public void init(FirebaseEntity entity) {
+        Task task = (Task) entity;
+        name = task.getName();
+        description = task.getDescription();
+        tagId = task.getTagId();
+        reminds.clear();
+        reminds.addAll(task.getReminds());
+        calendar.setTimeInMillis(task.getCalendar().getTimeInMillis());
+        subTasks.clear();
+        subTasks.addAll(task.getSubTasks());
+    }
+
+    private void parseReminds(HashMap<String, Object> rawData) {
+        if (rawData != null) {
+            for (String id : rawData.keySet()) {
+                reminds.add(id);
+            }
+        }
+    }
+
+    private void parseSubTasks(HashMap<String, Object> map) {
+        Log.i("subtask", "parsing subtasks of task " + id);
         if (map == null) {
             map = new HashMap<>();
         }
-        ArrayList<SubTask> subTasks = new ArrayList<>();
         Set<String> keys = map.keySet();
+        subTasks.clear();
         for (String key : keys) {
             SubTask subTask = new SubTask((HashMap<String, Object>) map.get(key));
             subTask.setId(key);
             subTasks.add(subTask);
         }
-        return subTasks;
-    }
-
-    private ArrayList<Remind> getReminders(HashMap<String, Object> map) {
-        if (map == null) {
-            map = new HashMap<>();
-        }
-        ArrayList<Remind> res = new ArrayList<>();
-        Set<String> keys = map.keySet();
-        for (String key : keys) {
-            Remind remind = new Remind((HashMap<String, Object>) map.get(key));
-            remind.setId(key);
-            res.add(remind);
-        }
-        return res;
+        Log.i("subtask", "subtasks parsed:" + subTasks.size());
     }
 
     @Exclude
@@ -80,25 +88,6 @@ public class Task implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Exclude
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Exclude
-    public boolean isCompleted() {
-        for (SubTask subTask : subTasks) {
-            if (!subTask.isDone()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public long getTimeStamp() {
@@ -124,11 +113,11 @@ public class Task implements Serializable {
     }
 
     @Exclude
-    public ArrayList<Remind> getReminds() {
+    public ArrayList<String> getReminds() {
         return reminds;
     }
 
-    public void setReminds(ArrayList<Remind> reminds) {
+    public void setReminds(ArrayList<String> reminds) {
         this.reminds = reminds;
     }
 
@@ -151,5 +140,30 @@ public class Task implements Serializable {
             }
         }
         return (int) ((done / sum) * 100);
+    }
+
+    @Override
+    public boolean isIdentical(FirebaseEntity entity) {
+        Task task = (Task) entity;
+        if (subTasks.size() != task.getSubTasks().size()) {
+            return false;
+        }
+        for (int i = 0; i < subTasks.size(); i++) {
+            if (!subTasks.get(i).isIdentical(task.getSubTasks().get(i))) {
+                return false;
+            }
+        }
+        if (reminds.size() != task.getReminds().size()) {
+            return false;
+        }
+        for (int i = 0; i < reminds.size(); i++) {
+            if (!reminds.get(i).equals(task.getReminds().get(i))) {
+                return false;
+            }
+        }
+        return name.equals(task.getName())
+                && description.equals(task.getDescription())
+                && tagId.equals(task.getTagId())
+                && calendar.getTimeInMillis() == task.getCalendar().getTimeInMillis();
     }
 }

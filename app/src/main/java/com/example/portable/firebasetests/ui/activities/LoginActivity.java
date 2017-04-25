@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.Preferences;
+import com.example.portable.firebasetests.network.FirebaseReferenceManager;
 import com.example.portable.firebasetests.network.listeners.FirebaseLoginListener;
 import com.example.portable.firebasetests.utils.InternetUtils;
 import com.example.portable.firebasetests.utils.ToastUtils;
@@ -92,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
     private void login(GoogleSignInAccount account) {
         if (account != null && account.getId() != null) {
             Preferences.getInstance().writeUserId(account.getId());
+            FirebaseReferenceManager.getInstance().refresh();
             firebaseAuthWithGoogle(account.getIdToken());
         }
     }

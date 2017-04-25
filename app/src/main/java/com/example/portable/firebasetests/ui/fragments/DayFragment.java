@@ -5,46 +5,37 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseListenersManager;
+import com.example.portable.firebasetests.network.FirebaseExecutorManager;
+import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
-import com.example.portable.firebasetests.network.listeners.DayFirebaseListener;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 import com.example.portable.firebasetests.ui.adapters.TasksDayRecyclerAdapter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 public class DayFragment extends Fragment {
     private static final String DAY_OF_YEAR = "dayOfYear", SORTING = "sort";
     private RecyclerView tasksRecycler;
-    private ProgressBar progressBar;
     private int dayOfYear;
-    private ArrayList<Task> tasks;
     private String sortingTagId;
     private TextView deletingTextView;
     private TasksDayRecyclerAdapter adapter;
     private TextView noTasksTextView;
+    private EntityList<Task> tasks;
+    private EntityList.FirebaseEntityListener<Task> tasksListener;
 
     public DayFragment() {
         // Required empty public constructor
-    }
-
-    //TODO looks like crutch
-    public static DayFragment newInstance(int dayOfYear) {
-        DayFragment fragment = new DayFragment();
-        Bundle args = new Bundle();
-        args.putInt(DAY_OF_YEAR, dayOfYear);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     public static DayFragment newInstance(int dayOfYear, String sortingTagId) {
@@ -71,6 +62,7 @@ public class DayFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_day, container, false);
         tasksRecycler = (RecyclerView) rootView.findViewById(R.id.day_tasks_rv);
         noTasksTextView = (TextView) rootView.findViewById(R.id.no_tasks_tv);
+        tasks = FirebaseObserver.getInstance().getTasksDay(dayOfYear);
         deletingTextView = (TextView) rootView.findViewById(R.id.deleting_tv);
         deletingTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,12 +73,10 @@ public class DayFragment extends Fragment {
                 hideDeleting();
             }
         });
-        progressBar = (ProgressBar) rootView.findViewById(R.id.day_progress_bar);
-        tasks = new ArrayList<>();
         TasksDayRecyclerAdapter.OnTaskClickListener onTaskClickListener = new TasksDayRecyclerAdapter.OnTaskClickListener() {
             @Override
             public void onClick(Task task) {
-                TaskDisplayActivity.start(getActivity(), task);
+                TaskDisplayActivity.start(getActivity(), dayOfYear, task.getId());
             }
         };
         TasksDayRecyclerAdapter.OnDeletingListener onDeletingListener = new TasksDayRecyclerAdapter.OnDeletingListener() {
@@ -106,32 +96,64 @@ public class DayFragment extends Fragment {
         };
         adapter = new TasksDayRecyclerAdapter(tasks, onTaskClickListener, onDeletingListener);
         tasksRecycler.setAdapter(adapter);
+        tasksListener = new EntityList.FirebaseEntityListener<Task>() {
+            @Override
+            public void onChanged(Task task) {
+                tasksRecycler.getAdapter().notifyItemChanged(tasks.indexOf(task));
+                if (FirebaseObserver.getInstance().getTags().getById(task.getTagId()) == null) {
+                    FirebaseUtils.getInstance().deleteTask(dayOfYear, task.getId());
+                }
+                sortTasks();
+            }
 
+            @Override
+            public void onCreated(Task task) {
+                tasksRecycler.getAdapter().notifyItemInserted(tasks.indexOf(task));
+                if (FirebaseObserver.getInstance().getTags().getById(task.getTagId()) == null) {
+                    FirebaseUtils.getInstance().deleteTask(dayOfYear, task.getId());
+                }
+                setTasksVisibility(true);
+                sortTasks();
+            }
+
+            @Override
+            public void onDeleted(Task task) {
+                if (tasks.size() == 0) {
+                    setTasksVisibility(false);
+                } else {
+                    tasksRecycler.getAdapter().notifyItemRemoved(tasks.indexOf(task));
+                }
+            }
+        };
         return rootView;
+    }
+
+    private void setTasksVisibility(boolean visible) {
+        if (visible) {
+            noTasksTextView.setVisibility(View.GONE);
+            tasksRecycler.setVisibility(View.VISIBLE);
+        } else {
+            noTasksTextView.setVisibility(View.VISIBLE);
+            tasksRecycler.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        FirebaseListenersManager.getInstance().setDayListener(dayOfYear, new DayFirebaseListener.DataChangingListener() {
-            @Override
-            public void onDataChanged(ArrayList<Task> tasksArray) {
-                tasksRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-                progressBar.setVisibility(View.GONE);
-                if (tasksArray.size() > 0) {
-                    noTasksTextView.setVisibility(View.GONE);
-                    tasksRecycler.setVisibility(View.VISIBLE);
-                } else {
-                    noTasksTextView.setVisibility(View.VISIBLE);
-                }
-                tasks.clear();
-                tasks.addAll(tasksArray);
-                if (sortingTagId != null) {
-                    sortTasks();
-                }
-                tasksRecycler.getAdapter().notifyDataSetChanged();
-            }
-        });
+        Log.i("subtask", "day fragment onViewCreated " + dayOfYear);
+        tasksRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        FirebaseExecutorManager.getInstance().startDayListener(dayOfYear);
+        tasks.subscribe(tasksListener);
+        setTasksVisibility(tasks.size() != 0);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        tasks.unsubscribe(tasksListener);
+        FirebaseExecutorManager.getInstance().stopDayListener(dayOfYear);
+        Log.i("subtask", "day fragment onDestroyView " + dayOfYear);
     }
 
     public void setSortingTagIdAndSort(String tagId) {
@@ -142,26 +164,22 @@ public class DayFragment extends Fragment {
     }
 
     public void sortTasks() {
-        if (tasks != null) {
-            Collections.sort(tasks, new Comparator<Task>() {
-                @Override
-                public int compare(Task o1, Task o2) {
-                    if (o1.getTagId().equals(sortingTagId)) {
-                        return -1;
-                    } else if (o2.getTagId().equals(sortingTagId)) {
-                        return 1;
+        if (sortingTagId != null) {
+            if (tasks != null) {
+                Collections.sort(tasks, new Comparator<Task>() {
+                    @Override
+                    public int compare(Task o1, Task o2) {
+                        if (o1.getTagId().equals(sortingTagId)) {
+                            return -1;
+                        } else if (o2.getTagId().equals(sortingTagId)) {
+                            return 1;
+                        }
+                        return 0;
                     }
-                    return 0;
-                }
-            });
-            tasksRecycler.getAdapter().notifyDataSetChanged();
+                });
+                tasksRecycler.getAdapter().notifyDataSetChanged();
+            }
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        FirebaseListenersManager.getInstance().removeDayListener(dayOfYear);
     }
 
     public boolean hideDeleting() {

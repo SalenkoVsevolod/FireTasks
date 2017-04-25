@@ -1,6 +1,5 @@
 package com.example.portable.firebasetests.ui.adapters;
 
-import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
@@ -38,9 +37,6 @@ public class TagRecyclerAdapter extends RecyclerView.Adapter<TagRecyclerAdapter.
         Tag tag = tags.get(holder.getAdapterPosition());
         holder.text.setText(tag.getName());
         holder.text.setTextColor((int) tag.getColor());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            holder.editIcon.setImageTintList(ColorStateList.valueOf((int) tag.getColor()));
-        }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setStroke(5, (int) tag.getColor());
         drawable.setCornerRadius(270f);
@@ -60,6 +56,8 @@ public class TagRecyclerAdapter extends RecyclerView.Adapter<TagRecyclerAdapter.
         void clickOnTag(Tag tag);
 
         void clickOnEdit(Tag tag);
+
+        void longClick(Tag tag);
     }
 
     class TagVH extends RecyclerView.ViewHolder {
@@ -76,6 +74,13 @@ public class TagRecyclerAdapter extends RecyclerView.Adapter<TagRecyclerAdapter.
                 @Override
                 public void onClick(View view) {
                     listener.clickOnTag(tags.get(getAdapterPosition()));
+                }
+            });
+            root.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    listener.longClick(tags.get(getAdapterPosition()));
+                    return false;
                 }
             });
             editIcon.setOnClickListener(new View.OnClickListener() {
