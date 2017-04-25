@@ -62,15 +62,18 @@ public class Task extends FirebaseEntity {
     }
 
     private void parseSubTasks(HashMap<String, Object> map) {
+        Log.i("subtask", "parsing subtasks of task " + id);
         if (map == null) {
             map = new HashMap<>();
         }
         Set<String> keys = map.keySet();
+        subTasks.clear();
         for (String key : keys) {
             SubTask subTask = new SubTask((HashMap<String, Object>) map.get(key));
             subTask.setId(key);
             subTasks.add(subTask);
         }
+        Log.i("subtask", "subtasks parsed:" + subTasks.size());
     }
 
     @Exclude
@@ -142,7 +145,6 @@ public class Task extends FirebaseEntity {
     @Override
     public boolean isIdentical(FirebaseEntity entity) {
         Task task = (Task) entity;
-        Log.i("fireSync", "checking task " + task.getName() + " for identical");
         if (subTasks.size() != task.getSubTasks().size()) {
             return false;
         }
@@ -151,14 +153,13 @@ public class Task extends FirebaseEntity {
                 return false;
             }
         }
-        Log.i("fireSync", "subtasks are identical");
+        if (reminds.size() != task.getReminds().size()) {
+            return false;
+        }
         for (int i = 0; i < reminds.size(); i++) {
             if (!reminds.get(i).equals(task.getReminds().get(i))) {
                 return false;
             }
-        }
-        if (reminds.size() != task.getReminds().size()) {
-            return false;
         }
         return name.equals(task.getName())
                 && description.equals(task.getDescription())

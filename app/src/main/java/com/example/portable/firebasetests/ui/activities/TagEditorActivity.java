@@ -93,13 +93,17 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
             tag.setId("tag" + System.currentTimeMillis());
         }
 
-        if (!FirebaseObserver.getInstance().getTags().contains(tag)) {
-            FirebaseUtils.getInstance().addTag(tag);
-            finish();
-        } else {
-            ToastUtils.showToast("tag allready exists", false);
+        for (Tag t : FirebaseObserver.getInstance().getTags()) {
+            if (t.isIdentical(tag)) {
+                ToastUtils.showToast("tag already exists", false);
+                return;
+            }
         }
+        FirebaseUtils.getInstance().addTag(tag);
+        finish();
+
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

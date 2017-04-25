@@ -160,18 +160,20 @@ public class DayFragment extends Fragment {
 
     public void sortTasks() {
         if (sortingTagId != null) {
-            Collections.sort(tasks, new Comparator<Task>() {
-                @Override
-                public int compare(Task o1, Task o2) {
-                    if (o1.getTagId().equals(sortingTagId)) {
-                        return -1;
-                    } else if (o2.getTagId().equals(sortingTagId)) {
-                        return 1;
+            if (tasks != null) {
+                Collections.sort(tasks, new Comparator<Task>() {
+                    @Override
+                    public int compare(Task o1, Task o2) {
+                        if (o1.getTagId().equals(sortingTagId)) {
+                            return -1;
+                        } else if (o2.getTagId().equals(sortingTagId)) {
+                            return 1;
+                        }
+                        return 0;
                     }
-                    return 0;
-                }
-            });
-            tasksRecycler.getAdapter().notifyDataSetChanged();
+                });
+                tasksRecycler.getAdapter().notifyDataSetChanged();
+            }
         }
     }
 

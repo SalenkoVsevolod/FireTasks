@@ -11,28 +11,20 @@ import android.util.Log;
 
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 
 import java.util.Calendar;
 
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
-    public static final String DAY = "day", TASK_ID = "task_id", REMINDER_ID = "reminder_id";
+    public static final String DAY = "day", TASK = "task", REMINDER = "reminder";
 
     public NotificationsBroadcastReceiver() {
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String taskId = intent.getStringExtra(TASK_ID);
-        String reminderId = intent.getStringExtra(REMINDER_ID);
-        int day = intent.getIntExtra(DAY, -1);
-        Task task = FirebaseObserver.getInstance().getTasksDay(day).getById(taskId);
-        Log.i("remind", "received remind id:" + reminderId);
-        for (Remind r : FirebaseObserver.getInstance().getReminders()) {
-            Log.i("remind", "id in storage:" + r.getId());
-        }
-        Remind remind = FirebaseObserver.getInstance().getReminders().getById(reminderId);
+        Task task = (Task) intent.getSerializableExtra(TASK);
+        Remind remind = (Remind) intent.getSerializableExtra(REMINDER);
         showPopUp(context, task, remind);
     }
 
@@ -51,7 +43,9 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         Intent intent = new Intent(context, TaskDisplayActivity.class);
         intent.putExtra(TaskDisplayActivity.TASK_ID, task.getId());
         intent.putExtra(TaskDisplayActivity.DAY, task.getCalendar().get(Calendar.DAY_OF_YEAR));
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        Log.i("remind", "sending remind " + remind.getId());
+        intent.putExtra(TaskDisplayActivity.REMINDER_TO_DELETE, remind.getId());
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) remind.getTimeStamp(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
         builder.setContentTitle(task.getName());
         builder.setContentText(task.getDescription());

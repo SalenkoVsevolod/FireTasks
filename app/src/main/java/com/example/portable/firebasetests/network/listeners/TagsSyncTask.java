@@ -1,7 +1,5 @@
 package com.example.portable.firebasetests.network.listeners;
 
-import android.util.Log;
-
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.network.FirebaseObserver;
@@ -38,7 +36,6 @@ public class TagsSyncTask extends FirebaseEntitySyncTask<Tag> {
             Tag tag = new Tag((HashMap<String, Object>) rawMap.get(id));
             tag.setId(id);
             res.add(tag);
-            Log.i("tags", tag.getName());
         }
         return res;
     }

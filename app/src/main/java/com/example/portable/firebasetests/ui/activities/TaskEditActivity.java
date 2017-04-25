@@ -271,7 +271,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
         FirebaseUtils.getInstance().saveReminders(reminds);
-        Notifier.setAlarms(task.getId(), reminds);
+        Notifier.setAlarms(task, reminds);
         FirebaseUtils.getInstance().saveTask(task);
         FirebaseUtils.getInstance().removeGlobalReminds(remindersToDelete);
     }

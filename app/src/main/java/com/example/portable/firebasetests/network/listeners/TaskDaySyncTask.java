@@ -1,7 +1,5 @@
 package com.example.portable.firebasetests.network.listeners;
 
-import android.util.Log;
-
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseObserver;
@@ -31,7 +29,6 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
 
     @Override
     protected void onDataChanged(EntityList<Task> entities) {
-        Log.i("fireSync", "tasks data on " + day + " changed");
         FirebaseObserver.getInstance().getTasksDay(day).sync(entities);
     }
 

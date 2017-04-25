@@ -3,6 +3,7 @@ package com.example.portable.firebasetests.model;
 import com.example.portable.firebasetests.utils.StringUtils;
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -10,7 +11,7 @@ import java.util.HashMap;
  * Created by Salenko Vsevolod on 21.03.2017.
  */
 
-public class Remind extends FirebaseEntity {
+public class Remind extends FirebaseEntity implements Serializable {
     private String sound;
     private boolean vibro;
     private Calendar calendar;
