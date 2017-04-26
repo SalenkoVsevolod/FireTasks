@@ -1,17 +1,18 @@
 package com.example.portable.firebasetests.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.network.FirebaseReferenceManager;
 import com.example.portable.firebasetests.network.listeners.FirebaseLoginListener;
-import com.example.portable.firebasetests.utils.InternetUtils;
-import com.example.portable.firebasetests.utils.ToastUtils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -20,8 +21,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
     private GoogleApiClient mGoogleApiClient;
+
+    public static boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) FireTasksApp.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return (netInfo != null && netInfo.isConnectedOrConnecting());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +37,10 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.login_imv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (InternetUtils.isOnline()) {
+                if (isOnline()) {
                     loginClick();
                 } else {
-                    ToastUtils.showToast("Internet connection error", true);
+                    showToast("Internet connection error", true);
                 }
             }
         });
@@ -93,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(final String tokenId) {
-        if (InternetUtils.isOnline()) {
+        if (isOnline()) {
             FirebaseLoginListener task = new FirebaseLoginListener(this, tokenId);
             task.setOnLoginListener(new OnLoginListener() {
                 @Override
@@ -101,16 +108,15 @@ public class LoginActivity extends AppCompatActivity {
                     if (resultCode == FirebaseLoginListener.DONE) {
                         startTasksActivity();
                     } else {
-                        ToastUtils.showToast("Authentication failed", true);
+                        showToast("Authentication failed", true);
                     }
                 }
             });
             task.execute();
         } else {
-            ToastUtils.showToast("Internet connection error", true);
+            showToast("Internet connection error", true);
         }
     }
-
 
     public interface OnLoginListener {
         void onLogin(int resultCode);

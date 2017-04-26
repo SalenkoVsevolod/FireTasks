@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +34,6 @@ import com.example.portable.firebasetests.network.listeners.DefaultTagsStateTask
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
-import com.example.portable.firebasetests.utils.ToastUtils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -45,7 +43,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private TabLayout tabLayout;
     private Spinner tagSpinner;
     private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
@@ -350,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
         if (backPresses > 1) {
             finish();
         } else {
-            ToastUtils.showToast("Press back again to exit", true);
+            showToast("Press back again to exit", true);
         }
     }
 

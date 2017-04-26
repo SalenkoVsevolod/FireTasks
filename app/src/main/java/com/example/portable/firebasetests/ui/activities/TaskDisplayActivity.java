@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,11 +29,10 @@ import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.adapters.ReminderDisplayRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubtaskCheckableRecyclerAdapter;
-import com.example.portable.firebasetests.utils.ToastUtils;
 
 import java.util.ArrayList;
 
-public class TaskDisplayActivity extends AppCompatActivity {
+public class TaskDisplayActivity extends BaseActivity {
     public static final String TASK_ID = "id", DAY = "day", REMINDER_TO_DELETE = "reminder";
     private TextView tagTV, nameTV, descriptionTV;
     private Task task;
@@ -114,7 +112,7 @@ public class TaskDisplayActivity extends AppCompatActivity {
             @Override
             public void onDeleted(Task task) {
                 if (task.getId().equals(id)) {
-                    ToastUtils.showToast("Task deleted", true);
+                    showToast("Task deleted", true);
                     finish();
                 }
             }

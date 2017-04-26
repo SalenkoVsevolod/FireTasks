@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.view.View;
@@ -18,18 +17,18 @@ import android.widget.TimePicker;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Remind;
-import com.example.portable.firebasetests.utils.ToastUtils;
 
 import java.util.Calendar;
 
-public class ReminderEditorActivity extends AppCompatActivity implements View.OnClickListener {
+public class ReminderEditorActivity extends EditorActivity<Remind> {
     public static final String REMINDER = "remind";
-    public static final int CREATE = 1, UPDATE = 2;
+    public static final int REQUEST_CODE = 138;
     private static final int SOUND_CODE = 5;
     private Remind remind;
     private CheckBox vibro;
     private TimePicker reminderTime;
     private TextView soundTV;
+    private int resultCode;
 
     public static Intent getStarterIntent(Context context, @NonNull Remind remind) {
         Intent starter = new Intent(context, ReminderEditorActivity.class);
@@ -41,13 +40,11 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_editor);
+        setListeners();
         reminderTime = (TimePicker) findViewById(R.id.reminder_time_picker);
         reminderTime.setIs24HourView(true);
         soundTV = (TextView) findViewById(R.id.sound_tv);
         vibro = (CheckBox) findViewById(R.id.reminder_vibro);
-        soundTV.setOnClickListener(this);
-        findViewById(R.id.dialog_ok).setOnClickListener(this);
-        findViewById(R.id.dialog_cancel).setOnClickListener(this);
         remind = (Remind) getIntent().getSerializableExtra(REMINDER);
 
         if (remind.getSound() != null) {
@@ -63,30 +60,12 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
             reminderTime.setCurrentHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
             reminderTime.setCurrentMinute(remind.getCalendar().get(Calendar.MINUTE));
         }
-    }
-
-    private void saveClick() {
-        int hour, minute;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            hour = reminderTime.getHour();
-            minute = reminderTime.getMinute();
-        } else {
-            hour = reminderTime.getCurrentHour();
-            minute = reminderTime.getCurrentMinute();
-        }
-        remind.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
-        remind.getCalendar().set(Calendar.MINUTE, minute);
-        if (remind.getCalendar().getTimeInMillis() > System.currentTimeMillis()) {
-            remind.setVibro(vibro.isChecked());
-            if (remind.getId() == null) {
-                remind.setId("reminder_" + System.currentTimeMillis());
-                returnRemind(CREATE);
-            } else {
-                returnRemind(UPDATE);
+        soundTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseSound();
             }
-        } else {
-            ToastUtils.showToast("Please choose time in future", false);
-        }
+        });
     }
 
     private void chooseSound() {
@@ -116,26 +95,39 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sound_tv:
-                chooseSound();
-                break;
-            case R.id.dialog_ok:
-                saveClick();
-                break;
-            case R.id.dialog_cancel:
-                finish();
-                break;
+    protected boolean assembleEntityAndProceed() {
+        int hour, minute;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            hour = reminderTime.getHour();
+            minute = reminderTime.getMinute();
+        } else {
+            hour = reminderTime.getCurrentHour();
+            minute = reminderTime.getCurrentMinute();
         }
+        remind.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
+        remind.getCalendar().set(Calendar.MINUTE, minute);
+        if (remind.getCalendar().getTimeInMillis() <= System.currentTimeMillis()) {
+            showToast("Please choose time in future", false);
+            return false;
+        }
+        remind.setVibro(vibro.isChecked());
+        if (remind.getId() == null) {
+            remind.setId("reminder_" + System.currentTimeMillis());
+            resultCode = CREATE;
+        } else {
+            resultCode = UPDATE;
+        }
+        return true;
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (reminderTime.getVisibility() == View.GONE) {
-            reminderTime.setVisibility(View.VISIBLE);
-        }
+    protected int getResultCode() {
+        return resultCode;
+    }
+
+    @Override
+    protected Remind getResultData() {
+        return remind;
     }
 
     private String getRingtoneTitle(Uri sound) {
@@ -148,10 +140,4 @@ public class ReminderEditorActivity extends AppCompatActivity implements View.On
         return content;
     }
 
-    private void returnRemind(int code) {
-        Intent intent = new Intent();
-        intent.putExtra(REMINDER, remind);
-        setResult(code, intent);
-        finish();
-    }
 }

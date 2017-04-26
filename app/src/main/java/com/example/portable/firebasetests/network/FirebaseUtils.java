@@ -64,7 +64,7 @@ public class FirebaseUtils {
         }
     }
 
-    public void addTag(Tag tag) {
+    public void saveTag(Tag tag) {
         FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).setValue(tag);
     }
 
@@ -83,7 +83,7 @@ public class FirebaseUtils {
 
     public void createDefaultTags() {
         for (Tag t : Tag.DEFAULT_TAGS) {
-            addTag(t);
+            saveTag(t);
         }
         setDefaultTagsCreated();
     }
