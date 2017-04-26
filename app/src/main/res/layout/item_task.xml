@@ -8,8 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/task_done_checkbox"
+        <TextView
+            android:id="@+id/tag_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -20,20 +20,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp" />
 
-        <TextView
-            android:id="@+id/tag_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/task_done_checkbox"
-            android:layout_toRightOf="@id/task_done_checkbox" />
-
-        <TextView
-            android:id="@+id/task_name_tv"
+        <ImageView
+            android:id="@+id/task_done_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/tag_tv"
@@ -41,6 +29,17 @@
             android:layout_below="@id/tag_tv"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/task_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tag_tv"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@id/task_done_checkbox"
+            android:layout_toRightOf="@id/task_done_checkbox"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 

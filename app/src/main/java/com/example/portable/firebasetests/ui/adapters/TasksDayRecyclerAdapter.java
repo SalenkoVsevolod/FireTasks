@@ -113,6 +113,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         } else {
             holder.taskDone.setVisibility(View.VISIBLE);
             holder.taskDone.setImageDrawable(ContextCompat.getDrawable(FireTasksApp.getInstance(), t.isDone() ? R.drawable.taskdone : R.drawable.taskundone));
+            holder.subtasksLayout.removeAllViews();
         }
         holder.nameTextView.setText(t.getName());
         holder.progressBar.setProgress(t.getProgress());
