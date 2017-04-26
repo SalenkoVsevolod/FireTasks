@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +33,7 @@ import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
+import com.example.portable.firebasetests.network.FirebaseExecutorManager;
 import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.adapters.ReminderModifyRecyclerAdapter;
@@ -55,6 +58,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     private Task task;
     private Tag lastSelectedTag;
     private TextView tagTextView, noSubtasksTextView;
+    private String oldTagId;
 
     public static void start(Context context, @NonNull Task task) {
         Intent starter = new Intent(context, TaskEditActivity.class);
@@ -131,7 +135,6 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         };
         tagsRecycler.setAdapter(new TagRecyclerAdapter(tagsInRecycler, onTagInteractionListener));
         tagsRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        FirebaseObserver.getInstance().getTags().subscribe(this);
         if (tagsInRecycler.size() == 0) {
             setTagsRecyclerVisibility(false);
             tagTextView.setText("no tags created yet");
@@ -149,6 +152,8 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
                 selectTag(tagsInRecycler.get(0));
             }
         }
+        FirebaseObserver.getInstance().getTags().subscribe(this);
+        FirebaseExecutorManager.getInstance().startTagsListener();
     }
 
     private void showTagDeletingDialog(final Tag tag) {
@@ -158,6 +163,12 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        FirebaseUtils.getInstance().deleteTasksFromTag(tag);
+                    }
+                }, 200);
                 FirebaseUtils.getInstance().deleteTag(tag);
             }
         });
@@ -218,7 +229,6 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         int pos = tagsInRecycler.indexOf(tag);
         tagsInRecycler.remove(pos);
         tagsRecycler.getAdapter().notifyItemRemoved(pos);
-        task.setTagId(tag.getId());
         if (lastSelectedTag != null) {
             tagsInRecycler.add(lastSelectedTag);
             tagsRecycler.getAdapter().notifyItemInserted(tagsInRecycler.size());
@@ -290,9 +300,19 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         if (task.getId() == null) {
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
+        for (Remind r : reminds) {
+            r.setTitle(task.getName());
+            r.setMessage(task.getDescription());
+            r.setTaskId(task.getId());
+            Notifier.setAlarm(r);
+        }
+        for (String r : remindersToDelete) {
+            Notifier.removeAlarm(r);
+        }
+
         FirebaseUtils.getInstance().saveReminders(reminds);
-        Notifier.setAlarms(task, reminds);
         FirebaseUtils.getInstance().saveTask(task);
+        FirebaseUtils.getInstance().selectTag(oldTagId, task.getTagId(), task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId());
         FirebaseUtils.getInstance().removeGlobalReminds(remindersToDelete);
     }
 
@@ -429,6 +449,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
         task.setName(nameEdit.getText().toString());
         task.setDescription(descriptionEdit.getText().toString());
         if (lastSelectedTag != null) {
+            oldTagId = task.getTagId();
             task.setTagId(lastSelectedTag.getId());
         } else {
             task.setTagId(null);
@@ -475,6 +496,7 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onDeleted(Tag tag) {
+        Log.i("tagd", "tag " + tag.getName() + " with " + tag.getTasks().size() + " days was deleted");
         if (lastSelectedTag != null && lastSelectedTag.getId().equals(tag.getId())) {
             lastSelectedTag = null;
             drawNewTag(null);

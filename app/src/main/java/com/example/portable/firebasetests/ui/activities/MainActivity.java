@@ -22,8 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.EntityList;
+import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseExecutorManager;
@@ -43,13 +45,15 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements EntityList.FirebaseEntityListener<Tag> {
+public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private Spinner tagSpinner;
     private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
     private DayFragment currentFragment;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
     private int backPresses;
+    private EntityList.FirebaseEntityListener<Tag> tagsListener;
+    private EntityList.FirebaseEntityListener<Remind> remindsListener;
 
     @SuppressWarnings("all")
     @Override
@@ -93,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements EntityList.Fireba
 
             }
         };
-        FirebaseObserver.getInstance().getTags().subscribe(this);
-        FirebaseExecutorManager.getInstance().startRemindersListener();
         FirebaseExecutorManager.getInstance().startTagsListener();
         new DefaultTagsStateTask(new DefaultTagsStateTask.DefaultTagsCreatedListener() {
             @Override
@@ -104,6 +106,46 @@ public class MainActivity extends AppCompatActivity implements EntityList.Fireba
                 }
             }
         }).execute();
+        tagsListener = new EntityList.FirebaseEntityListener<Tag>() {
+            @Override
+            public void onChanged(Tag tag) {
+                tagSortingSpinnerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCreated(Tag tag) {
+                tagSortingSpinnerAdapter.notifyDataSetChanged();
+                findViewById(R.id.show_first_container).setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onDeleted(Tag tag) {
+                tagSortingSpinnerAdapter.notifyDataSetChanged();
+                if (FirebaseObserver.getInstance().getTags().size() == 0) {
+                    findViewById(R.id.show_first_container).setVisibility(View.GONE);
+                }
+            }
+        };
+        remindsListener = new EntityList.FirebaseEntityListener<Remind>() {
+            @Override
+            public void onChanged(Remind remind) {
+                Notifier.removeAlarm(remind.getId());
+                Notifier.setAlarm(remind);
+            }
+
+            @Override
+            public void onCreated(Remind remind) {
+                Notifier.removeAlarm(remind.getId());
+                Notifier.setAlarm(remind);
+            }
+
+            @Override
+            public void onDeleted(Remind remind) {
+                Notifier.removeAlarm(remind.getId());
+                Preferences.getInstance().removeRemindCode(remind.getId());
+            }
+        };
+        FirebaseObserver.getInstance().getTags().subscribe(tagsListener);
     }
 
     @Override
@@ -133,18 +175,22 @@ public class MainActivity extends AppCompatActivity implements EntityList.Fireba
             }
         });
         backPresses = 0;
+        FirebaseObserver.getInstance().getReminders().subscribe(remindsListener);
+        FirebaseExecutorManager.getInstance().startRemindersListener();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+        FirebaseObserver.getInstance().getReminders().unsubscribe(remindsListener);
+        FirebaseExecutorManager.getInstance().stopRemindersListener();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        FirebaseObserver.getInstance().getTags().unsubscribe(this);
+        FirebaseObserver.getInstance().getTags().unsubscribe(tagsListener);
         FirebaseExecutorManager.getInstance().stopRemindersListener();
         FirebaseExecutorManager.getInstance().stopTagsListener();
     }
@@ -165,12 +211,14 @@ public class MainActivity extends AppCompatActivity implements EntityList.Fireba
         int position = tagSpinner.getSelectedItemPosition();
         if (position != -1) {
             currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
-        } else
+        } else {
             currentFragment = DayFragment.newInstance(dayOfYear + 1, null);
+        }
         getFragmentManager().beginTransaction()
                 .replace(R.id.day_of_week_container, currentFragment)
                 .commit();
     }
+
 
     private int getCurrentDayOfYear() {
         Calendar calendar = Calendar.getInstance();
@@ -306,22 +354,4 @@ public class MainActivity extends AppCompatActivity implements EntityList.Fireba
         }
     }
 
-    @Override
-    public void onChanged(Tag tag) {
-        tagSortingSpinnerAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onCreated(Tag tag) {
-        tagSortingSpinnerAdapter.notifyDataSetChanged();
-        findViewById(R.id.show_first_container).setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onDeleted(Tag tag) {
-        tagSortingSpinnerAdapter.notifyDataSetChanged();
-        if (FirebaseObserver.getInstance().getTags().size() == 0) {
-            findViewById(R.id.show_first_container).setVisibility(View.GONE);
-        }
-    }
 }

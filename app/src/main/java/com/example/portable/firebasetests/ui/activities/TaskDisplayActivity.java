@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.Notifier;
+import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.SubTask;
@@ -138,6 +140,8 @@ public class TaskDisplayActivity extends AppCompatActivity {
                 if (pos != -1) {
                     reminds.get(pos).init(remind);
                     remindsRecyclerView.getAdapter().notifyItemChanged(pos);
+                    Notifier.removeAlarm(remind.getId());
+                    Notifier.setAlarm(remind);
                 }
             }
 
@@ -145,6 +149,8 @@ public class TaskDisplayActivity extends AppCompatActivity {
             public void onCreated(Remind remind) {
                 reminds.add(remind);
                 remindsRecyclerView.getAdapter().notifyItemInserted(reminds.size());
+                Notifier.removeAlarm(remind.getId());
+                Notifier.setAlarm(remind);
             }
 
             @Override
@@ -153,6 +159,8 @@ public class TaskDisplayActivity extends AppCompatActivity {
                 if (pos != -1) {
                     reminds.remove(remind);
                     remindsRecyclerView.getAdapter().notifyItemRemoved(pos);
+                    Notifier.removeAlarm(remind.getId());
+                    Preferences.getInstance().removeRemindCode(remind.getId());
                 }
             }
         };

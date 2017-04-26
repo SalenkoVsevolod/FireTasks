@@ -72,6 +72,15 @@ public class FirebaseUtils {
         FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).removeValue();
     }
 
+    public void deleteTasksFromTag(Tag tag) {
+        for (int i = 0; i < tag.getTasks().size(); i++) {
+            int day = tag.getTasks().keyAt(i);
+            for (String id : tag.getTasks().get(day)) {
+                deleteTask(day, id);
+            }
+        }
+    }
+
     public void createDefaultTags() {
         for (Tag t : Tag.DEFAULT_TAGS) {
             addTag(t);
@@ -83,4 +92,10 @@ public class FirebaseUtils {
         FirebaseReferenceManager.getInstance().getUserReference().child("defaultTagsCreated").setValue(true);
     }
 
+    public void selectTag(String oldTagId, String newTagId, int day, String taskId) {
+        if (oldTagId != null) {
+            FirebaseReferenceManager.getInstance().getTagsReference().child(oldTagId).child("tasks").child(day + "").child(taskId).removeValue();
+        }
+        FirebaseReferenceManager.getInstance().getTagsReference().child(newTagId).child("tasks").child(day + "").child(taskId).setValue(true);
+    }
 }

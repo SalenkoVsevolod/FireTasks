@@ -71,4 +71,20 @@ public class Preferences {
     public int readWhenLastOpened() {
         return preferences.getInt(LAST_OPENED, -1);
     }
+
+    public void writeRemindCode(String remindId, int code) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(remindId, code);
+        editor.apply();
+    }
+
+    public int readRemindCode(String remindId) {
+        return preferences.getInt(remindId, -1);
+    }
+
+    public void removeRemindCode(String remindId) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(remindId);
+        editor.apply();
+    }
 }

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.EntityList;
+import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseExecutorManager;
 import com.example.portable.firebasetests.network.FirebaseObserver;
@@ -32,6 +33,7 @@ public class DayFragment extends Fragment {
     private TextView noTasksTextView;
     private EntityList<Task> tasks;
     private EntityList.FirebaseEntityListener<Task> tasksListener;
+    private EntityList.FirebaseEntityListener<Tag> tagListener;
 
     public DayFragment() {
         // Required empty public constructor
@@ -97,20 +99,14 @@ public class DayFragment extends Fragment {
         tasksRecycler.setAdapter(adapter);
         tasksListener = new EntityList.FirebaseEntityListener<Task>() {
             @Override
-            public void onChanged(Task task) {
+            public void onChanged(final Task task) {
                 tasksRecycler.getAdapter().notifyItemChanged(tasks.indexOf(task));
-                if (FirebaseObserver.getInstance().getTags().getById(task.getTagId()) == null) {
-                    FirebaseUtils.getInstance().deleteTask(dayOfYear, task.getId());
-                }
                 sortTasks();
             }
 
             @Override
             public void onCreated(Task task) {
                 tasksRecycler.getAdapter().notifyItemInserted(tasks.indexOf(task));
-                if (FirebaseObserver.getInstance().getTags().getById(task.getTagId()) == null) {
-                    FirebaseUtils.getInstance().deleteTask(dayOfYear, task.getId());
-                }
                 setTasksVisibility(true);
                 sortTasks();
             }
@@ -122,6 +118,22 @@ public class DayFragment extends Fragment {
                 } else {
                     tasksRecycler.getAdapter().notifyItemRemoved(tasks.indexOf(task));
                 }
+            }
+        };
+        tagListener = new EntityList.FirebaseEntityListener<Tag>() {
+            @Override
+            public void onChanged(Tag tag) {
+                tasksRecycler.getAdapter().notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCreated(Tag tag) {
+                tasksRecycler.getAdapter().notifyDataSetChanged();
+            }
+
+            @Override
+            public void onDeleted(Tag tag) {
+                tasksRecycler.getAdapter().notifyDataSetChanged();
             }
         };
         return rootView;
@@ -142,6 +154,7 @@ public class DayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         tasksRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         FirebaseExecutorManager.getInstance().startDayListener(dayOfYear);
+        FirebaseObserver.getInstance().getTags().subscribe(tagListener);
         tasks.subscribe(tasksListener);
         setTasksVisibility(tasks.size() != 0);
     }

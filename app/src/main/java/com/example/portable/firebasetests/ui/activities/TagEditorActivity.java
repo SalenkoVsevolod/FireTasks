@@ -22,6 +22,7 @@ import com.jrummyapps.android.colorpicker.ColorPickerDialog;
 import com.jrummyapps.android.colorpicker.ColorPickerDialogListener;
 
 public class TagEditorActivity extends AppCompatActivity implements ColorPickerDialogListener, View.OnClickListener {
+
     private static final String TAG = "tag";
     private Tag tag;
     private EditText nameEdit;

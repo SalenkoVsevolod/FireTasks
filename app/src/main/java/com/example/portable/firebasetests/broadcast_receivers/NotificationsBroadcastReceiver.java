@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests;
+package com.example.portable.firebasetests.broadcast_receivers;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,26 +8,25 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
+import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.Remind;
-import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 
 import java.util.Calendar;
 
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
-    public static final String DAY = "day", TASK = "task", REMINDER = "reminder";
+    public static final String REMIND = "remind";
 
     public NotificationsBroadcastReceiver() {
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Task task = (Task) intent.getSerializableExtra(TASK);
-        Remind remind = (Remind) intent.getSerializableExtra(REMINDER);
-        showPopUp(context, task, remind);
+        Remind remind = (Remind) intent.getSerializableExtra(REMIND);
+        showPopUp(context, remind);
     }
 
-    private void showPopUp(Context context, Task task, Remind remind) {
+    private void showPopUp(Context context, Remind remind) {
         NotificationManager manager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -41,13 +40,13 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
             builder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
         }
         Intent intent = new Intent(context, TaskDisplayActivity.class);
-        intent.putExtra(TaskDisplayActivity.TASK_ID, task.getId());
-        intent.putExtra(TaskDisplayActivity.DAY, task.getCalendar().get(Calendar.DAY_OF_YEAR));
+        intent.putExtra(TaskDisplayActivity.TASK_ID, remind.getTaskId());
+        intent.putExtra(TaskDisplayActivity.DAY, remind.getCalendar().get(Calendar.DAY_OF_YEAR));
         intent.putExtra(TaskDisplayActivity.REMINDER_TO_DELETE, remind.getId());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) remind.getTimeStamp(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
-        builder.setContentTitle(task.getName());
-        builder.setContentText(task.getDescription());
+        builder.setContentTitle(remind.getTitle());
+        builder.setContentText(remind.getMessage());
         manager.notify(1, builder.build());
     }
 }
