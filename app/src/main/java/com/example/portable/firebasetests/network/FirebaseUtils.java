@@ -66,6 +66,16 @@ public class FirebaseUtils {
 
     public void saveTag(Tag tag) {
         FirebaseReferenceManager.getInstance().getTagsReference().child(tag.getId()).setValue(tag);
+        for (int i = 0; i < tag.getTasks().size(); i++) {
+            for (String id : tag.getTasks().get(tag.getTasks().keyAt(i))) {
+                FirebaseReferenceManager.getInstance().getTagsReference()
+                        .child(tag.getId())
+                        .child("tasks")
+                        .child(tag.getTasks().keyAt(i) + "")
+                        .child(id)
+                        .setValue(true);
+            }
+        }
     }
 
     public void deleteTag(Tag tag) {

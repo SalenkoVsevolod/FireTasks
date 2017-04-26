@@ -1,6 +1,5 @@
 package com.example.portable.firebasetests.model;
 
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.example.portable.firebasetests.R;
@@ -50,7 +49,6 @@ public class Tag extends FirebaseEntity {
         if (map != null) {
             for (String day : map.keySet()) {
                 int d = Integer.parseInt(day);
-                Log.i("logp", "parsing day " + day);
                 parseTask(d, (HashMap<String, Objects>) map.get(day));
             }
         }
@@ -61,7 +59,6 @@ public class Tag extends FirebaseEntity {
             if (tasks.get(day) == null) {
                 tasks.put(day, new ArrayList<String>());
             }
-            Log.i("logp", "parsing task " + taskId);
             tasks.get(day).add(taskId);
         }
     }
@@ -91,17 +88,14 @@ public class Tag extends FirebaseEntity {
     @Override
     public void init(FirebaseEntity entity) {
         Tag tag = (Tag) entity;
-        Log.i("tagi", "input:" + tag.getTasks().toString());
         name = tag.getName();
         color = tag.getColor();
         tasks = tag.getTasks();
-        Log.i("tagi", "res:" + tasks.toString());
     }
 
     @Override
     public boolean isIdentical(FirebaseEntity entity) {
         Tag tag = (Tag) entity;
-
         return tag.getColor() == color && tag.getName().equals(name) && tasksIsIdentical(tag.getTasks());
     }
 

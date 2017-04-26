@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -166,12 +165,7 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
         builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        FirebaseUtils.getInstance().deleteTasksFromTag(tag);
-                    }
-                }, 200);
+                Log.i("tagD", "deleting tag with " + tag.getTasks().size() + " days");
                 FirebaseUtils.getInstance().deleteTag(tag);
             }
         });
@@ -342,14 +336,13 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (lastSelectedTag.getId().equals(tag.getId())) {
-                        Log.i("tags", "tag that choose");
                         lastSelectedTag.setColor(tag.getColor());
                         lastSelectedTag.setName(tag.getName());
+                        Log.i("tagD", "modifying tag with " + lastSelectedTag.getTasks().size() + " days");
                         FirebaseUtils.getInstance().saveTag(lastSelectedTag);
                     } else {
                         for (Tag tagInRecycler : tagsInRecycler) {
                             if (tagInRecycler.equals(tag)) {
-                                Log.i("tags", "tag in recycler");
                                 tagInRecycler.setColor(tag.getColor());
                                 tagInRecycler.setName(tag.getName());
                                 FirebaseUtils.getInstance().saveTag(tagInRecycler);
@@ -531,7 +524,6 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     public void onDeleted(Tag tag) {
-        Log.i("tagd", "tag " + tag.getName() + " with " + tag.getTasks().size() + " days was deleted");
         if (lastSelectedTag != null && lastSelectedTag.getId().equals(tag.getId())) {
             lastSelectedTag = null;
             drawNewTag(null);
@@ -540,5 +532,6 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
             tagsInRecycler.remove(index);
             tagsRecycler.getAdapter().notifyItemRemoved(index);
         }
+        FirebaseUtils.getInstance().deleteTasksFromTag(tag);
     }
 }
