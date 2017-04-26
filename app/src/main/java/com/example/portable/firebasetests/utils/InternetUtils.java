@@ -14,6 +14,6 @@ public class InternetUtils {
     public static boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) FireTasksApp.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return (netInfo != null && netInfo.isConnected());
+        return (netInfo != null && netInfo.isConnectedOrConnecting());
     }
 }

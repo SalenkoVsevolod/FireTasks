@@ -7,10 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.example.portable.firebasetests.broadcast_receivers.NotificationsBroadcastReceiver;
-import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseUtils;
-
-import java.util.Calendar;
+import com.example.portable.firebasetests.model.Remind;
 
 /**
  * Created by Salenko Vsevolod on 27.01.2017.
@@ -18,30 +15,28 @@ import java.util.Calendar;
 
 public class Notifier {
 
-    public static void setAlarms(Task task) {
+    public static void setAlarm(Remind remind) {
         Intent notificationIntent = new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class);
-        notificationIntent.putExtra(NotificationsBroadcastReceiver.TASK_TAG, task);
-        for (int i = 0; i < task.getReminds().size(); i++) {
-            if (task.getReminds().get(i).getTimeStamp() > System.currentTimeMillis()) {
-                notificationIntent.putExtra(NotificationsBroadcastReceiver.INDEX, i);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), (int) task.getReminds().get(i).getTimeStamp(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-                AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).round(), pendingIntent);
-                } else {
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, task.getReminds().get(i).round(), pendingIntent);
-                }
+        if (remind.getTimeStamp() > System.currentTimeMillis()) {
+            notificationIntent.putExtra(NotificationsBroadcastReceiver.REMIND, remind);
+            int code = (int) remind.getTimeStamp();
+            Preferences.getInstance().writeRemindCode(remind.getId(), code);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(FireTasksApp.getInstance(), code, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, remind.round(), pendingIntent);
             } else {
-                FirebaseUtils.getInstance().removeReminder(task.getCalendar().get(Calendar.DAY_OF_YEAR), task.getId(), task.getReminds().get(i));
+                alarmManager.set(AlarmManager.RTC_WAKEUP, remind.round(), pendingIntent);
             }
         }
-
     }
 
-
-    public static void removeAlarm(int code) {
-        AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(PendingIntent.getBroadcast(FireTasksApp.getInstance(), code, new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT));
+    public static void removeAlarm(String remindId) {
+        int code = Preferences.getInstance().readRemindCode(remindId);
+        if (code != -1) {
+            AlarmManager alarmManager = (AlarmManager) FireTasksApp.getInstance().getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(PendingIntent.getBroadcast(FireTasksApp.getInstance(), code, new Intent(FireTasksApp.getInstance(), NotificationsBroadcastReceiver.class), PendingIntent.FLAG_CANCEL_CURRENT));
+        }
     }
 }
 

@@ -12,7 +12,6 @@ import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.ui.adapters.PrioritySpinnerAdapter;
 import com.example.portable.firebasetests.utils.KeyBoardUtils;
-import com.example.portable.firebasetests.utils.ToastUtils;
 
 public class SubtaskEditorActivity extends AppCompatActivity implements View.OnClickListener {
     public static final int UPDATE = 1, CREATE = 2;
@@ -37,7 +36,7 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
         spinner = (Spinner) findViewById(R.id.priority_spinner);
         spinner.setAdapter(new PrioritySpinnerAdapter());
         if (subtask != null) {
-            editText.setText(subtask.getDescription());
+            editText.setText(subtask.getName());
             spinner.setSelection((int) subtask.getPriority());
         }
         findViewById(R.id.dialog_cancel).setOnClickListener(this);
@@ -57,22 +56,23 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
     }
 
     private void returnResult() {
-        if (editText.getText().toString().trim().length() > 0) {
+        if (editText.getText().toString().length() > 0) {
             Intent intent = new Intent();
             if (subtask == null) {
                 subtask = new SubTask();
+                subtask.setName(editText.getText().toString());
                 subtask.setId("" + System.currentTimeMillis());
+                subtask.setPriority(spinner.getSelectedItemId());
                 intent.putExtra(SUBTASK, subtask);
                 setResult(CREATE, intent);
+                finish();
             } else {
+                subtask.setName(editText.getText().toString());
+                subtask.setPriority(spinner.getSelectedItemId());
                 intent.putExtra(SUBTASK, subtask);
                 setResult(UPDATE, intent);
+                finish();
             }
-            subtask.setDescription(editText.getText().toString().trim());
-            subtask.setPriority(spinner.getSelectedItemId());
-            finish();
-        } else {
-            ToastUtils.showToastNotChoosed("subtask name");
         }
     }
 

@@ -3,7 +3,6 @@ package com.example.portable.firebasetests.core;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * Created by Salenko Vsevolod on 15.02.2017.
@@ -16,7 +15,6 @@ public class Preferences {
     private SharedPreferences preferences;
 
     private Preferences() {
-        Log.i("creation", "app retrieved");
         preferences = FireTasksApp.getInstance().getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
     }
 
@@ -72,5 +70,21 @@ public class Preferences {
 
     public int readWhenLastOpened() {
         return preferences.getInt(LAST_OPENED, -1);
+    }
+
+    public void writeRemindCode(String remindId, int code) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(remindId, code);
+        editor.apply();
+    }
+
+    public int readRemindCode(String remindId) {
+        return preferences.getInt(remindId, -1);
+    }
+
+    public void removeRemindCode(String remindId) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(remindId);
+        editor.apply();
     }
 }

@@ -18,8 +18,7 @@ import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseListenersManager;
-import com.example.portable.firebasetests.network.listeners.TagFirebaseListener;
+import com.example.portable.firebasetests.network.FirebaseObserver;
 
 import java.util.ArrayList;
 
@@ -62,9 +61,8 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
 
     @Override
     public void onBindViewHolder(final DayTaskViewHolder holder, int position) {
-
         final Task t = tasks.get(holder.getAdapterPosition());
-
+        final Tag tag = FirebaseObserver.getInstance().getTags().getById(t.getTagId());
         View.OnClickListener onSubtaskClick;
         View.OnLongClickListener onSubtaskLongClick;
 
@@ -103,16 +101,12 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
                 }
             };
         }
-        //TODO big bad crutch!
-        FirebaseListenersManager.getInstance().setTagListener(t.getTagId(), new TagFirebaseListener.OnTagGetListener() {
-            @Override
-            public void onGet(Tag tag) {
-                holder.tagTextView.setText(tag.getName());
-                holder.tagTextView.setTextColor((int) tag.getColor());
-                Drawable drawable = holder.progressBar.getProgressDrawable();
-                drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) tag.getColor()));
-            }
-        });
+        if (tag != null) {
+            holder.tagTextView.setText(tag.getName());
+            holder.tagTextView.setTextColor((int) tag.getColor());
+            Drawable drawable = holder.progressBar.getProgressDrawable();
+            drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) tag.getColor()));
+        }
         inflateSubtasks(holder);
         holder.nameTextView.setText(t.getName());
         holder.progressBar.setProgress(t.getProgress());
@@ -128,7 +122,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             View subtaskView = LayoutInflater.from(FireTasksApp.getInstance()).inflate(R.layout.item_subtasks_preview, null);
             ImageView check = (ImageView) subtaskView.findViewById(R.id.subtask_done_imv);
             TextView text = (TextView) subtaskView.findViewById(R.id.subtask_tv);
-            text.setText(t.getSubTasks().get(i).getDescription());
+            text.setText(t.getSubTasks().get(i).getName());
             check.setImageDrawable(ContextCompat.getDrawable(FireTasksApp.getInstance(), t.getSubTasks().get(i).isDone() ? R.drawable.taskdone : R.drawable.taskundone));
             holder.subtasksLayout.addView(subtaskView);
         }

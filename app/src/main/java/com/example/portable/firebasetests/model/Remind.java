@@ -11,11 +11,13 @@ import java.util.HashMap;
  * Created by Salenko Vsevolod on 21.03.2017.
  */
 
-public class Remind implements Serializable {
-    private String id;
+public class Remind extends FirebaseEntity implements Serializable {
     private String sound;
     private boolean vibro;
     private Calendar calendar;
+    private String taskId;
+    private String title;
+    private String message;
 
     public Remind() {
         calendar = Calendar.getInstance();
@@ -26,6 +28,9 @@ public class Remind implements Serializable {
         calendar.setTimeInMillis((long) map.get("timeStamp"));
         vibro = (boolean) map.get("vibro");
         sound = (String) map.get("sound");
+        title = (String) map.get("title");
+        message = (String) map.get("message");
+        taskId = (String) map.get("taskId");
     }
 
 
@@ -72,18 +77,62 @@ public class Remind implements Serializable {
         return c.getTimeInMillis();
     }
 
-    @Exclude
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Override
     public boolean equals(Object obj) {
         Remind r = (Remind) obj;
         return r.getId().equals(id);
+    }
+
+    @Override
+    public void init(FirebaseEntity entity) {
+        Remind remind = (Remind) entity;
+        calendar.setTimeInMillis(remind.getTimeStamp());
+        sound = remind.getSound();
+        vibro = remind.isVibro();
+        taskId = remind.getTaskId();
+        title = remind.getTitle();
+        message = remind.getMessage();
+    }
+
+    @Override
+    public boolean isIdentical(FirebaseEntity entity) {
+        Remind remind = (Remind) entity;
+        return getTimeStamp() == remind.getTimeStamp()
+                && vibro == remind.isVibro()
+                && isSoundIdentical(remind.getSound())
+                && title.equals(remind.getTitle())
+                && message.equals(remind.getMessage());
+    }
+
+    private boolean isSoundIdentical(String inputSound) {
+        if (sound == null) {
+            return inputSound == null;
+        } else {
+            return sound.equals(inputSound);
+        }
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

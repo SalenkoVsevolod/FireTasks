@@ -22,11 +22,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
+import com.example.portable.firebasetests.model.EntityList;
+import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseListenersManager;
-import com.example.portable.firebasetests.network.listeners.AllTagsFirebaseListener;
+import com.example.portable.firebasetests.network.FirebaseExecutorManager;
+import com.example.portable.firebasetests.network.FirebaseObserver;
+import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.network.listeners.DefaultTagsStateTask;
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
 import com.example.portable.firebasetests.ui.fragments.DayFragment;
 import com.example.portable.firebasetests.utils.StringUtils;
@@ -38,17 +43,17 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
-    private ArrayList<Tag> tags;
     private Spinner tagSpinner;
     private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
     private DayFragment currentFragment;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
     private int backPresses;
+    private EntityList.FirebaseEntityListener<Tag> tagsListener;
+    private EntityList.FirebaseEntityListener<Remind> remindsListener;
 
     @SuppressWarnings("all")
     @Override
@@ -70,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         inflateDays(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
-        tags = new ArrayList<>();
-        tagSortingSpinnerAdapter = new TagSortingSpinnerAdapter(this, tags);
+        tagSortingSpinnerAdapter = new TagSortingSpinnerAdapter(this, FirebaseObserver.getInstance().getTags());
         tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
         tagSpinner.setAdapter(tagSortingSpinnerAdapter);
         onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -93,25 +97,62 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+        FirebaseExecutorManager.getInstance().startTagsListener();
+        new DefaultTagsStateTask(new DefaultTagsStateTask.DefaultTagsCreatedListener() {
+            @Override
+            public void created(boolean created) {
+                if (!created) {
+                    FirebaseUtils.getInstance().createDefaultTags();
+                }
+            }
+        }).execute();
+        tagsListener = new EntityList.FirebaseEntityListener<Tag>() {
+            @Override
+            public void onChanged(Tag tag) {
+                tagSortingSpinnerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCreated(Tag tag) {
+                tagSortingSpinnerAdapter.notifyDataSetChanged();
+                findViewById(R.id.show_first_container).setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onDeleted(Tag tag) {
+                tagSortingSpinnerAdapter.notifyDataSetChanged();
+                if (FirebaseObserver.getInstance().getTags().size() == 0) {
+                    findViewById(R.id.show_first_container).setVisibility(View.GONE);
+                }
+            }
+        };
+        remindsListener = new EntityList.FirebaseEntityListener<Remind>() {
+            @Override
+            public void onChanged(Remind remind) {
+                Notifier.removeAlarm(remind.getId());
+                Notifier.setAlarm(remind);
+            }
+
+            @Override
+            public void onCreated(Remind remind) {
+                Notifier.removeAlarm(remind.getId());
+                Notifier.setAlarm(remind);
+            }
+
+            @Override
+            public void onDeleted(Remind remind) {
+                Notifier.removeAlarm(remind.getId());
+                Preferences.getInstance().removeRemindCode(remind.getId());
+            }
+        };
+        FirebaseObserver.getInstance().getTags().subscribe(tagsListener);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        final View showFirstContainer = findViewById(R.id.show_first_container);
-        FirebaseListenersManager.getInstance().setAllTagsListener(new AllTagsFirebaseListener.OnTagsSyncListener() {
-            @Override
-            public void onSync(ArrayList<Tag> tagsArray) {
-                if (tagsArray.size() > 0) {
-                    showFirstContainer.setVisibility(View.VISIBLE);
-                    tags.clear();
-                    tags.addAll(tagsArray);
-                    tagSortingSpinnerAdapter.notifyDataSetChanged();
-                } else {
-                    showFirstContainer.setVisibility(View.GONE);
-                }
-            }
-        });
+        findViewById(R.id.show_first_container).setVisibility(
+                FirebaseObserver.getInstance().getTags().size() > 0 ? View.VISIBLE : View.GONE);
         new Handler().postDelayed(
                 new Runnable() {
                     @Override
@@ -130,17 +171,28 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                tabLayout.getTabAt(getSelectionDay()).select();
             }
         });
         backPresses = 0;
+        FirebaseObserver.getInstance().getReminders().subscribe(remindsListener);
+        FirebaseExecutorManager.getInstance().startRemindersListener();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        FirebaseListenersManager.getInstance().removeAllTagsListener();
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+        FirebaseObserver.getInstance().getReminders().unsubscribe(remindsListener);
+        FirebaseExecutorManager.getInstance().stopRemindersListener();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FirebaseObserver.getInstance().getTags().unsubscribe(tagsListener);
+        FirebaseExecutorManager.getInstance().stopRemindersListener();
+        FirebaseExecutorManager.getInstance().stopTagsListener();
     }
 
     private int getSelectionDay() {
@@ -159,12 +211,14 @@ public class MainActivity extends AppCompatActivity {
         int position = tagSpinner.getSelectedItemPosition();
         if (position != -1) {
             currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
-        } else
-            currentFragment = DayFragment.newInstance(dayOfYear + 1);
+        } else {
+            currentFragment = DayFragment.newInstance(dayOfYear + 1, null);
+        }
         getFragmentManager().beginTransaction()
                 .replace(R.id.day_of_week_container, currentFragment)
                 .commit();
     }
+
 
     private int getCurrentDayOfYear() {
         Calendar calendar = Calendar.getInstance();
@@ -299,4 +353,5 @@ public class MainActivity extends AppCompatActivity {
             ToastUtils.showToast("Press back again to exit", true);
         }
     }
+
 }

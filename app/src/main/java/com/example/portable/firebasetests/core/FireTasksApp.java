@@ -1,7 +1,7 @@
 package com.example.portable.firebasetests.core;
 
 import android.app.Application;
-import android.util.Log;
+import android.support.v4.content.ContextCompat;
 
 /**
  * Created by Black on 18.03.2017.
@@ -17,7 +17,10 @@ public class FireTasksApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("creation", "app created");
         instance = this;
+    }
+
+    public int getCompatColor(int id) {
+        return ContextCompat.getColor(this, id);
     }
 }
