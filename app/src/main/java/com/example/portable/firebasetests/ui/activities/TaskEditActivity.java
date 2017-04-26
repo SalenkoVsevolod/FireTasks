@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -165,7 +164,6 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
         builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.i("tagD", "deleting tag with " + tag.getTasks().size() + " days");
                 FirebaseUtils.getInstance().deleteTag(tag);
             }
         });
@@ -338,7 +336,6 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
                     if (lastSelectedTag.getId().equals(tag.getId())) {
                         lastSelectedTag.setColor(tag.getColor());
                         lastSelectedTag.setName(tag.getName());
-                        Log.i("tagD", "modifying tag with " + lastSelectedTag.getTasks().size() + " days");
                         FirebaseUtils.getInstance().saveTag(lastSelectedTag);
                     } else {
                         for (Tag tagInRecycler : tagsInRecycler) {

@@ -162,7 +162,7 @@ public class MainActivity extends BaseActivity {
         tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (currentFragment != null) {
+                if (currentFragment != null && tagSortingSpinnerAdapter.getCount() != 0) {
                     currentFragment.setSortingTagIdAndSort(((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
                 }
             }
@@ -276,8 +276,9 @@ public class MainActivity extends BaseActivity {
                         public void onResult(@NonNull Status status) {
                             if (status.isSuccess()) {
                                 Preferences.getInstance().logout();
-                                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                                finish();
+                                Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(i);
                             }
                         }
                     });

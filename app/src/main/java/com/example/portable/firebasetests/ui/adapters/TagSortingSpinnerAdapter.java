@@ -55,10 +55,12 @@ public class TagSortingSpinnerAdapter extends BaseAdapter {
             view = frameLayout;
         }
 
-        final Tag tag = (Tag) getItem(position);
-        TextView item = (TextView) view.findViewById(R.id.tagTextView);
-        item.setTextColor((int) tag.getColor());
-        item.setText(tag.getName());
+        if (tags.size() != 0) {
+            final Tag tag = (Tag) getItem(position);
+            TextView item = (TextView) view.findViewById(R.id.tagTextView);
+            item.setTextColor((int) tag.getColor());
+            item.setText(tag.getName());
+        }
         return view;
     }
 
