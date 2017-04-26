@@ -19,6 +19,7 @@ public class Task extends FirebaseEntity {
     private String tagId;
     private Calendar calendar;
     private ArrayList<String> reminds;
+    private boolean done;
 
     public Task() {
         description = "";
@@ -33,6 +34,7 @@ public class Task extends FirebaseEntity {
         name = (String) map.get("name");
         description = (String) map.get("description");
         calendar.setTimeInMillis((long) map.get("timeStamp"));
+        done = (boolean) map.get("done");
         tagId = (String) map.get("tagId");
         parseSubTasks((HashMap<String, Object>) map.get("subTasks"));
         parseReminds((HashMap<String, Object>) map.get("reminders"));
@@ -44,6 +46,7 @@ public class Task extends FirebaseEntity {
         name = task.getName();
         description = task.getDescription();
         tagId = task.getTagId();
+        done = task.isDone();
         reminds.clear();
         reminds.addAll(task.getReminds());
         calendar.setTimeInMillis(task.getCalendar().getTimeInMillis());
@@ -127,6 +130,9 @@ public class Task extends FirebaseEntity {
 
     @Exclude
     public int getProgress() {
+        if (subTasks.size() == 0) {
+            return done ? 100 : 0;
+        }
         float done = 0;
         float sum = 0;
         for (SubTask s : getSubTasks()) {
@@ -160,6 +166,15 @@ public class Task extends FirebaseEntity {
         return name.equals(task.getName())
                 && description.equals(task.getDescription())
                 && tagId.equals(task.getTagId())
-                && calendar.getTimeInMillis() == task.getCalendar().getTimeInMillis();
+                && calendar.getTimeInMillis() == task.getCalendar().getTimeInMillis()
+                && done == task.isDone();
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 }

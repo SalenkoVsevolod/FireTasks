@@ -113,11 +113,8 @@ public class DayFragment extends Fragment {
 
             @Override
             public void onDeleted(Task task) {
-                if (tasks.size() == 0) {
-                    setTasksVisibility(false);
-                } else {
-                    tasksRecycler.getAdapter().notifyItemRemoved(tasks.indexOf(task));
-                }
+                tasksRecycler.getAdapter().notifyItemRemoved(tasks.indexOf(task));
+                setTasksVisibility(tasks.size() == 0);
             }
         };
         tagListener = new EntityList.FirebaseEntityListener<Tag>() {

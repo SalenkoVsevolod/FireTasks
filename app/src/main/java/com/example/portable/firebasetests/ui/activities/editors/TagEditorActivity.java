@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.ui.activities;
+package com.example.portable.firebasetests.ui.activities.editors;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -121,7 +121,6 @@ public class TagEditorActivity extends AppCompatActivity implements ColorPickerD
             }
         }
         showTagModifyingDialog();
-
     }
 
 

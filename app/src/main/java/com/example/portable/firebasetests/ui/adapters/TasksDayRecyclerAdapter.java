@@ -107,7 +107,13 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             Drawable drawable = holder.progressBar.getProgressDrawable();
             drawable.setColorFilter(new LightingColorFilter(0xFF000000, (int) tag.getColor()));
         }
-        inflateSubtasks(holder);
+        if (t.getSubTasks().size() != 0) {
+            holder.taskDone.setVisibility(View.GONE);
+            inflateSubtasks(holder);
+        } else {
+            holder.taskDone.setVisibility(View.VISIBLE);
+            holder.taskDone.setImageDrawable(ContextCompat.getDrawable(FireTasksApp.getInstance(), t.isDone() ? R.drawable.taskdone : R.drawable.taskundone));
+        }
         holder.nameTextView.setText(t.getName());
         holder.progressBar.setProgress(t.getProgress());
         holder.rootView.setOnClickListener(onSubtaskClick);
@@ -155,6 +161,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
         ImageView moreDots;
         ProgressBar progressBar;
         CheckBox deletingCheckbox;
+        ImageView taskDone;
         LinearLayout subtasksLayout;
         View rootView;
 
@@ -166,6 +173,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             nameTextView = (TextView) itemView.findViewById(R.id.task_name_tv);
             subtasksLayout = (LinearLayout) itemView.findViewById(R.id.subtasks_container);
             moreDots = (ImageView) itemView.findViewById(R.id.more_dots_tv);
+            taskDone = (ImageView) itemView.findViewById(R.id.task_done_checkbox);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
             deletingCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override

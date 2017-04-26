@@ -36,6 +36,9 @@ import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseExecutorManager;
 import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
+import com.example.portable.firebasetests.ui.activities.editors.ReminderEditorActivity;
+import com.example.portable.firebasetests.ui.activities.editors.SubtaskEditorActivity;
+import com.example.portable.firebasetests.ui.activities.editors.TagEditorActivity;
 import com.example.portable.firebasetests.ui.adapters.ReminderModifyRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubtaskClickableRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.TagRecyclerAdapter;
@@ -259,10 +262,6 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
             ToastUtils.showToastNotChoosed("tag");
             return false;
         }
-        if (task.getSubTasks().size() == 0) {
-            ToastUtils.showToastNotChoosed("subtasks");
-            return false;
-        }
         return true;
 
     }
@@ -390,7 +389,6 @@ public class TaskEditActivity extends AppCompatActivity implements View.OnClickL
     private void deleteReminder(final Remind remind) {
         reminds.remove(remind);
         remindersToDelete.add(remind.getId());
-        //TODO stupid crutch
         for (int i = 0; i < task.getReminds().size(); i++) {
             if (task.getReminds().get(i).equals(remind.getId())) {
                 task.getReminds().remove(i);

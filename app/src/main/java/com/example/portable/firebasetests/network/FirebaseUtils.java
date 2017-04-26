@@ -98,4 +98,8 @@ public class FirebaseUtils {
         }
         FirebaseReferenceManager.getInstance().getTagsReference().child(newTagId).child("tasks").child(day + "").child(taskId).setValue(true);
     }
+
+    public void setTaskDone(int day, String taskId, boolean done) {
+        FirebaseReferenceManager.getInstance().getTaskReference(day, taskId).child("done").setValue(done);
+    }
 }

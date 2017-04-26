@@ -13,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
@@ -38,6 +40,8 @@ public class TaskDisplayActivity extends AppCompatActivity {
     private Task task;
     private Tag tag;
     private RecyclerView remindsRecyclerView, subtasksRecyclerView;
+    private View subtasksContainer, remindsContainer;
+    private CheckBox doneCheckBox;
     private ArrayList<Remind> reminds;
     private String id;
     private int day;
@@ -63,7 +67,9 @@ public class TaskDisplayActivity extends AppCompatActivity {
         remindsRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
         subtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         tagTV = (TextView) findViewById(R.id.tagTextView);
-
+        doneCheckBox = (CheckBox) findViewById(R.id.task_done_checkbox);
+        remindsContainer = findViewById(R.id.reminders_container);
+        subtasksContainer = findViewById(R.id.subtasks_container);
         day = getIntent().getIntExtra(DAY, -1);
         id = getIntent().getStringExtra(TASK_ID);
         deletingRemindId = getIntent().getStringExtra(REMINDER_TO_DELETE);
@@ -71,9 +77,13 @@ public class TaskDisplayActivity extends AppCompatActivity {
         task.setId(id);
         tag = new Tag();
         reminds = new ArrayList<>();
-
+        doneCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                FirebaseUtils.getInstance().setTaskDone(day, id, isChecked);
+            }
+        });
         subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -179,11 +189,10 @@ public class TaskDisplayActivity extends AppCompatActivity {
     }
 
     private void displayTask() {
-        View remindersContainer = findViewById(R.id.reminders_container);
         if (task.getReminds() != null && task.getReminds().size() > 0) {
-            remindersContainer.setVisibility(View.VISIBLE);
+            remindsContainer.setVisibility(View.VISIBLE);
         } else {
-            remindersContainer.setVisibility(View.GONE);
+            remindsContainer.setVisibility(View.GONE);
         }
         nameTV.setText(task.getName());
         if (task.getDescription().length() > 0) {
@@ -197,6 +206,14 @@ public class TaskDisplayActivity extends AppCompatActivity {
             remindsRecyclerView.getAdapter().notifyDataSetChanged();
         }
         subtasksRecyclerView.getAdapter().notifyDataSetChanged();
+        if (task.getSubTasks().size() != 0) {
+            doneCheckBox.setVisibility(View.GONE);
+            subtasksContainer.setVisibility(View.VISIBLE);
+        } else {
+            doneCheckBox.setVisibility(View.VISIBLE);
+            doneCheckBox.setChecked(task.isDone());
+            subtasksContainer.setVisibility(View.GONE);
+        }
         displayTag();
     }
 

@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.ui.activities;
+package com.example.portable.firebasetests.ui.activities.editors;
 
 import android.app.Activity;
 import android.content.Context;

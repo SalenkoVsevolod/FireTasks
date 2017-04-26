@@ -30,16 +30,16 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.activities.TagEditorActivity"
+            android:name=".ui.activities.editors.TagEditorActivity"
             android:theme="@style/MainTheme.Dialog" />
         <activity android:name=".ui.activities.TaskDisplayActivity" />
         <activity android:name=".ui.activities.TaskEditActivity" />
         <activity
-            android:name=".ui.activities.ReminderEditorActivity"
+            android:name=".ui.activities.editors.ReminderEditorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MainTheme.Dialog" />
         <activity
-            android:name=".ui.activities.SubtaskEditorActivity"
+            android:name=".ui.activities.editors.SubtaskEditorActivity"
             android:theme="@style/MainTheme.Dialog" />
 
         <receiver

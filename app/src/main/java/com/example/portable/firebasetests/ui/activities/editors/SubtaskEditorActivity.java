@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.ui.activities;
+package com.example.portable.firebasetests.ui.activities.editors;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +12,7 @@ import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.ui.adapters.PrioritySpinnerAdapter;
 import com.example.portable.firebasetests.utils.KeyBoardUtils;
+import com.example.portable.firebasetests.utils.ToastUtils;
 
 public class SubtaskEditorActivity extends AppCompatActivity implements View.OnClickListener {
     public static final int UPDATE = 1, CREATE = 2;
@@ -56,11 +57,11 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
     }
 
     private void returnResult() {
-        if (editText.getText().toString().length() > 0) {
+        if (editText.getText().toString().trim().length() > 0) {
             Intent intent = new Intent();
             if (subtask == null) {
                 subtask = new SubTask();
-                subtask.setName(editText.getText().toString());
+                subtask.setName(editText.getText().toString().trim());
                 subtask.setId("" + System.currentTimeMillis());
                 subtask.setPriority(spinner.getSelectedItemId());
                 intent.putExtra(SUBTASK, subtask);
@@ -73,6 +74,8 @@ public class SubtaskEditorActivity extends AppCompatActivity implements View.OnC
                 setResult(UPDATE, intent);
                 finish();
             }
+        } else {
+            ToastUtils.showToastNotChoosed("subtask name");
         }
     }
 

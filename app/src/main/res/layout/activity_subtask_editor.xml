@@ -8,7 +8,7 @@
     android:paddingLeft="32dp"
     android:paddingStart="32dp"
     android:paddingTop="32dp"
-    tools:context="com.example.portable.firebasetests.ui.activities.SubtaskEditorActivity">
+    tools:context="com.example.portable.firebasetests.ui.activities.editors.SubtaskEditorActivity">
 
     <TextView
         android:id="@+id/subtask_name_n"
