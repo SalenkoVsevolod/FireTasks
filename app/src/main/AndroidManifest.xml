@@ -18,7 +18,6 @@
         <activity android:name=".ui.activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -44,8 +43,7 @@
 
         <receiver
             android:name=".broadcast_receivers.InternetStateReceiver"
-            android:enabled="true"
-            android:exported="true">
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

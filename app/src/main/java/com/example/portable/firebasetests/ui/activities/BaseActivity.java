@@ -1,6 +1,7 @@
 package com.example.portable.firebasetests.ui.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,16 +12,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.ConnectionObserver;
 import com.example.portable.firebasetests.core.FireTasksApp;
 
 /**
  * Created by Salenko Vsevolod on 26.04.2017.
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements ConnectionObserver.OnConnectionStateChangingListener {
+    public static void showCancellingSnackBar() {
+        //TODO
+    }
 
-    public static void showCancellingSnackBar(String text /*TODO some listener*/) {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ConnectionObserver.getInstance().subscribe(this);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        ConnectionObserver.getInstance().unsubscribe(this);
     }
 
     public void showToast(String text, boolean lengthLong) {
@@ -60,6 +73,15 @@ public abstract class BaseActivity extends AppCompatActivity {
                         Activity.INPUT_METHOD_SERVICE);
         if (getCurrentFocus() != null) {
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    public void stateChanged(boolean online) {
+        if (!online) {
+            Intent i = new Intent(this, LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
         }
     }
 }

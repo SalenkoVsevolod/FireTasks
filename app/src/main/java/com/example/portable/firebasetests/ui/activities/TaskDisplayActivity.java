@@ -17,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.EntityList;
@@ -25,7 +26,6 @@ import com.example.portable.firebasetests.model.SubTask;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseExecutorManager;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.adapters.ReminderDisplayRecyclerAdapter;
 import com.example.portable.firebasetests.ui.adapters.SubtaskCheckableRecyclerAdapter;

@@ -10,8 +10,8 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.model.Tag;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.jrummyapps.android.colorpicker.ColorPickerDialog;
 import com.jrummyapps.android.colorpicker.ColorPickerDialogListener;
 

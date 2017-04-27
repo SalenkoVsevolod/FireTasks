@@ -1,4 +1,4 @@
-package com.example.portable.firebasetests.network;
+package com.example.portable.firebasetests.core;
 
 import android.util.SparseArray;
 

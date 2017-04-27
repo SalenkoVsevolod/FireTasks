@@ -1,8 +1,8 @@
 package com.example.portable.firebasetests.network.listeners;
 
+import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Remind;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseReferenceManager;
 import com.google.firebase.database.DataSnapshot;
 

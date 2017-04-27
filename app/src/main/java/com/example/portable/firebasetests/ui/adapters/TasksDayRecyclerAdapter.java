@@ -16,9 +16,9 @@ import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.FireTasksApp;
+import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 
 import java.util.ArrayList;
 

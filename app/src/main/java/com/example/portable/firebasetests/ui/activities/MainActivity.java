@@ -16,11 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.core.Notifier;
 import com.example.portable.firebasetests.core.Preferences;
 import com.example.portable.firebasetests.model.EntityList;
@@ -28,7 +30,6 @@ import com.example.portable.firebasetests.model.Remind;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseExecutorManager;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.network.listeners.DefaultTagsStateTask;
 import com.example.portable.firebasetests.ui.adapters.TagSortingSpinnerAdapter;
@@ -46,12 +47,15 @@ import java.util.Calendar;
 public class MainActivity extends BaseActivity {
     private TabLayout tabLayout;
     private Spinner tagSpinner;
+    private ProgressBar progressBar;
     private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
+    private FloatingActionButton addTaskFAB;
     private DayFragment currentFragment;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
     private int backPresses;
     private EntityList.FirebaseEntityListener<Tag> tagsListener;
     private EntityList.FirebaseEntityListener<Remind> remindsListener;
+    private View showFirstContainer, dayContainer;
 
     @SuppressWarnings("all")
     @Override
@@ -59,9 +63,12 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tabLayout = (TabLayout) findViewById(R.id.days_tabs);
-        FloatingActionButton addTaskfloatingActionButton = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
-        addTaskfloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
-        addTaskfloatingActionButton.setOnClickListener(new View.OnClickListener() {
+        showFirstContainer = findViewById(R.id.show_first_container);
+        dayContainer = findViewById(R.id.day_of_week_container);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        addTaskFAB = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
+        addTaskFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
+        addTaskFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startTaskModifier();
@@ -83,6 +90,7 @@ public class MainActivity extends BaseActivity {
                 putNewFragment(tab.getPosition());
                 Preferences.getInstance().writeWhenLastOpened(getCurrentDayOfYear());
                 Preferences.getInstance().writeLastOpenedDay(tab.getPosition());
+
             }
 
             @Override
@@ -113,17 +121,17 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onCreated(Tag tag) {
                 tagSortingSpinnerAdapter.notifyDataSetChanged();
-                findViewById(R.id.show_first_container).setVisibility(View.VISIBLE);
+                setDataVisibility(true);
+                addTaskFAB.show();
             }
 
             @Override
             public void onDeleted(Tag tag) {
                 tagSortingSpinnerAdapter.notifyDataSetChanged();
-                if (FirebaseObserver.getInstance().getTags().size() == 0) {
-                    findViewById(R.id.show_first_container).setVisibility(View.GONE);
-                }
+                showFirstContainer.setVisibility(FirebaseObserver.getInstance().getTags().size() == 0 ? View.GONE : View.VISIBLE);
             }
         };
+
         remindsListener = new EntityList.FirebaseEntityListener<Remind>() {
             @Override
             public void onChanged(Remind remind) {
@@ -142,15 +150,31 @@ public class MainActivity extends BaseActivity {
                 Notifier.removeAlarm(remind.getId());
                 Preferences.getInstance().removeRemindCode(remind.getId());
             }
-        };
+        }
+
+        ;
         FirebaseObserver.getInstance().getTags().subscribe(tagsListener);
+
+    }
+
+    private void setDataVisibility(boolean visibility) {
+        if (visibility) {
+            progressBar.setVisibility(View.GONE);
+            dayContainer.setVisibility(View.VISIBLE);
+            showFirstContainer.setVisibility(View.VISIBLE);
+            addTaskFAB.show();
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+            dayContainer.setVisibility(View.GONE);
+            showFirstContainer.setVisibility(View.GONE);
+            addTaskFAB.hide();
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        findViewById(R.id.show_first_container).setVisibility(
-                FirebaseObserver.getInstance().getTags().size() > 0 ? View.VISIBLE : View.GONE);
+        setDataVisibility(FirebaseObserver.getInstance().getTags().size() > 0);
         new Handler().postDelayed(
                 new Runnable() {
                     @Override

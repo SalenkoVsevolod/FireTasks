@@ -11,11 +11,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FirebaseObserver;
 import com.example.portable.firebasetests.model.EntityList;
 import com.example.portable.firebasetests.model.Tag;
 import com.example.portable.firebasetests.model.Task;
 import com.example.portable.firebasetests.network.FirebaseExecutorManager;
-import com.example.portable.firebasetests.network.FirebaseObserver;
 import com.example.portable.firebasetests.network.FirebaseUtils;
 import com.example.portable.firebasetests.ui.activities.TaskDisplayActivity;
 import com.example.portable.firebasetests.ui.adapters.TasksDayRecyclerAdapter;
