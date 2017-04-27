@@ -135,14 +135,22 @@ public class MainActivity extends BaseActivity {
         remindsListener = new EntityList.FirebaseEntityListener<Remind>() {
             @Override
             public void onChanged(Remind remind) {
-                Notifier.removeAlarm(remind.getId());
-                Notifier.setAlarm(remind);
+                if (remind.getCalendar().getTimeInMillis() > System.currentTimeMillis()) {
+                    Notifier.removeAlarm(remind.getId());
+                    Notifier.setAlarm(remind);
+                } else {
+                    FirebaseUtils.getInstance().removeReminder(remind.getCalendar().get(Calendar.DAY_OF_YEAR), remind.getTaskId(), remind.getId());
+                }
             }
 
             @Override
             public void onCreated(Remind remind) {
-                Notifier.removeAlarm(remind.getId());
-                Notifier.setAlarm(remind);
+                if (remind.getCalendar().getTimeInMillis() > System.currentTimeMillis()) {
+                    Notifier.removeAlarm(remind.getId());
+                    Notifier.setAlarm(remind);
+                } else {
+                    FirebaseUtils.getInstance().removeReminder(remind.getCalendar().get(Calendar.DAY_OF_YEAR), remind.getTaskId(), remind.getId());
+                }
             }
 
             @Override
