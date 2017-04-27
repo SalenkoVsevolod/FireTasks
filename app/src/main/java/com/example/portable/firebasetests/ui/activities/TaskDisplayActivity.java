@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
@@ -38,7 +39,7 @@ public class TaskDisplayActivity extends BaseActivity {
     private Task task;
     private Tag tag;
     private RecyclerView remindsRecyclerView, subtasksRecyclerView;
-    private View subtasksContainer, remindsContainer;
+    private View subtasksContainer, remindsContainer, displayContainer;
     private CheckBox doneCheckBox;
     private ArrayList<Remind> reminds;
     private String id;
@@ -47,6 +48,7 @@ public class TaskDisplayActivity extends BaseActivity {
     private EntityList.FirebaseEntityListener<Tag> tagListener;
     private EntityList.FirebaseEntityListener<Remind> remindsListener;
     private String deletingRemindId;
+    private ProgressBar progressBar;
 
     public static void start(Context context, int day, String taskId) {
         Intent starter = new Intent(context, TaskDisplayActivity.class);
@@ -55,7 +57,6 @@ public class TaskDisplayActivity extends BaseActivity {
         context.startActivity(starter);
     }
 
-    //TODO refactor
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,9 +66,11 @@ public class TaskDisplayActivity extends BaseActivity {
         remindsRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
         subtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
         tagTV = (TextView) findViewById(R.id.tagTextView);
+        displayContainer = findViewById(R.id.display_container);
         doneCheckBox = (CheckBox) findViewById(R.id.task_done_checkbox);
         remindsContainer = findViewById(R.id.reminders_container);
         subtasksContainer = findViewById(R.id.subtasks_container);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         day = getIntent().getIntExtra(DAY, -1);
         id = getIntent().getStringExtra(TASK_ID);
         deletingRemindId = getIntent().getStringExtra(REMINDER_TO_DELETE);
@@ -105,6 +108,7 @@ public class TaskDisplayActivity extends BaseActivity {
                 if (task.getId().equals(id)) {
                     task.init(inputTask);
                     tag = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
+                    setContentVisibility(true);
                     displayTask();
                 }
             }
@@ -174,6 +178,16 @@ public class TaskDisplayActivity extends BaseActivity {
         };
     }
 
+    private void setContentVisibility(boolean visible) {
+        if (visible) {
+            displayContainer.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+        } else {
+            displayContainer.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void displayTag() {
         tagTV.setText(tag.getName());
         tagTV.setTextColor((int) tag.getColor());
@@ -221,6 +235,9 @@ public class TaskDisplayActivity extends BaseActivity {
         Task taskInBase = FirebaseObserver.getInstance().getTasksDay(day).getById(id);
         if (taskInBase != null) {
             task.init(taskInBase);
+            setContentVisibility(true);
+        } else {
+            setContentVisibility(false);
         }
         Tag tagInBase = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
         if (tagInBase != null) {
