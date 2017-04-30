@@ -291,10 +291,12 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
         if (task.getId() == null) {
             task.setId(Preferences.getInstance().readUserId() + "_task_" + System.currentTimeMillis());
         }
+
         for (Remind r : reminds) {
             r.setTitle(task.getName());
             r.setMessage(task.getDescription());
             r.setTaskId(task.getId());
+            Notifier.removeAlarm(r.getId());
             Notifier.setAlarm(r);
         }
         for (String r : remindersToDelete) {
