@@ -35,20 +35,21 @@ import java.util.ArrayList;
 
 public class TaskDisplayActivity extends BaseActivity {
     public static final String TASK_ID = "id", DAY = "day", REMINDER_TO_DELETE = "reminder";
-    private TextView tagTV, nameTV, descriptionTV;
-    private Task task;
-    private Tag tag;
-    private RecyclerView remindsRecyclerView, subtasksRecyclerView;
-    private View subtasksContainer, remindsContainer, displayContainer;
-    private CheckBox doneCheckBox;
-    private ArrayList<Remind> reminds;
-    private String id;
-    private int day;
-    private EntityList.FirebaseEntityListener<Task> taskListener;
-    private EntityList.FirebaseEntityListener<Tag> tagListener;
-    private EntityList.FirebaseEntityListener<Remind> remindsListener;
-    private String deletingRemindId;
-    private ProgressBar progressBar;
+    private final ArrayList<Remind> mReminds = new ArrayList<>();
+    private final Task mTask = new Task();
+    private final Tag mTag = new Tag();
+    private TextView mTagTextView, mNameTextView, mDescriptionTextView;
+    private RecyclerView mRemindsRecyclerView, mSubtasksRecyclerView;
+    private View mSubtasksContainer, mRemindsContainer, mDataContainer;
+    private CheckBox mDoneCheckBox;
+    private ProgressBar mProgressBar;
+    private int mDay;
+    private String mDeletingRemindId;
+
+    private EntityList.FirebaseEntityListener<Task> mTasksSyncListener;
+    private EntityList.FirebaseEntityListener<Tag> mTagsListener;
+    private EntityList.FirebaseEntityListener<Remind> mRemindsListener;
+
 
     public static void start(Context context, int day, String taskId) {
         Intent starter = new Intent(context, TaskDisplayActivity.class);
@@ -61,30 +62,28 @@ public class TaskDisplayActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_display);
-        nameTV = (TextView) findViewById(R.id.name_tv);
-        descriptionTV = (TextView) findViewById(R.id.description_display);
-        remindsRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
-        subtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
-        tagTV = (TextView) findViewById(R.id.tagTextView);
-        displayContainer = findViewById(R.id.display_container);
-        doneCheckBox = (CheckBox) findViewById(R.id.task_done_checkbox);
-        remindsContainer = findViewById(R.id.reminders_container);
-        subtasksContainer = findViewById(R.id.subtasks_container);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        day = getIntent().getIntExtra(DAY, -1);
-        id = getIntent().getStringExtra(TASK_ID);
-        deletingRemindId = getIntent().getStringExtra(REMINDER_TO_DELETE);
-        task = new Task();
-        task.setId(id);
-        tag = new Tag();
-        reminds = new ArrayList<>();
-        doneCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mNameTextView = (TextView) findViewById(R.id.name_tv);
+        mDescriptionTextView = (TextView) findViewById(R.id.description_display);
+        mRemindsRecyclerView = (RecyclerView) findViewById(R.id.reminder_recycler);
+        mSubtasksRecyclerView = (RecyclerView) findViewById(R.id.subTasksRecyclerView);
+        mTagTextView = (TextView) findViewById(R.id.tagTextView);
+        mDataContainer = findViewById(R.id.display_container);
+        mDoneCheckBox = (CheckBox) findViewById(R.id.task_done_checkbox);
+        mRemindsContainer = findViewById(R.id.reminders_container);
+        mSubtasksContainer = findViewById(R.id.subtasks_container);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        mDay = getIntent().getIntExtra(DAY, -1);
+        mTask.setId(getIntent().getStringExtra(TASK_ID));
+        mDeletingRemindId = getIntent().getStringExtra(REMINDER_TO_DELETE);
+
+        mDoneCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                FirebaseUtils.getInstance().setTaskDone(day, id, isChecked);
+                FirebaseUtils.getInstance().setTaskDone(mDay, mTask.getId(), isChecked);
             }
         });
-        subtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mSubtasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskCreateToolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -94,20 +93,23 @@ public class TaskDisplayActivity extends BaseActivity {
             ab.setDisplayHomeAsUpEnabled(true);
         }
 
-        taskListener = new EntityList.FirebaseEntityListener<Task>() {
+        mTasksSyncListener = new EntityList.FirebaseEntityListener<Task>() {
             @Override
             public void onChanged(Task inputTask) {
-                if (task.getId().equals(id)) {
-                    task.init(inputTask);
+                if (inputTask.getId().equals(mTask.getId())) {
+                    mTask.init(inputTask);
                     displayTask();
                 }
             }
 
             @Override
             public void onCreated(Task inputTask) {
-                if (task.getId().equals(id)) {
-                    task.init(inputTask);
-                    tag = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
+                if (inputTask.getId().equals(mTask.getId())) {
+                    mTask.init(inputTask);
+                    Tag tag = FirebaseObserver.getInstance().getTags().getById(mTask.getTagId());
+                    if (tag != null) {
+                        mTag.init(tag);
+                    }
                     setContentVisibility(true);
                     displayTask();
                 }
@@ -115,43 +117,43 @@ public class TaskDisplayActivity extends BaseActivity {
 
             @Override
             public void onDeleted(Task task) {
-                if (task.getId().equals(id)) {
+                if (task.getId().equals(mTask.getId())) {
                     showToast("Task deleted", true);
                     finish();
                 }
             }
         };
-        tagListener = new EntityList.FirebaseEntityListener<Tag>() {
+        mTagsListener = new EntityList.FirebaseEntityListener<Tag>() {
             @Override
             public void onChanged(Tag inputTag) {
-                if (inputTag.getId().equals(task.getTagId())) {
-                    tag.init(inputTag);
+                if (inputTag.getId().equals(mTask.getTagId())) {
+                    mTag.init(inputTag);
                     displayTag();
                 }
             }
 
             @Override
             public void onCreated(Tag inputTag) {
-                if (inputTag.getId().equals(task.getTagId())) {
-                    tag.init(inputTag);
+                if (inputTag.getId().equals(mTask.getTagId())) {
+                    mTag.init(inputTag);
                     displayTag();
                 }
             }
 
             @Override
             public void onDeleted(Tag inputTag) {
-                if (inputTag.getId().equals(task.getTagId())) {
-                    FirebaseUtils.getInstance().deleteTask(day, id);
+                if (inputTag.getId().equals(mTask.getTagId())) {
+                    FirebaseUtils.getInstance().deleteTask(mDay, mTask.getId());
                 }
             }
         };
-        remindsListener = new EntityList.FirebaseEntityListener<Remind>() {
+        mRemindsListener = new EntityList.FirebaseEntityListener<Remind>() {
             @Override
             public void onChanged(Remind remind) {
-                int pos = reminds.indexOf(remind);
+                int pos = mReminds.indexOf(remind);
                 if (pos != -1) {
-                    reminds.get(pos).init(remind);
-                    remindsRecyclerView.getAdapter().notifyItemChanged(pos);
+                    mReminds.get(pos).init(remind);
+                    mRemindsRecyclerView.getAdapter().notifyItemChanged(pos);
                     Notifier.removeAlarm(remind.getId());
                     Notifier.setAlarm(remind);
                 }
@@ -159,18 +161,18 @@ public class TaskDisplayActivity extends BaseActivity {
 
             @Override
             public void onCreated(Remind remind) {
-                reminds.add(remind);
-                remindsRecyclerView.getAdapter().notifyItemInserted(reminds.size());
+                mReminds.add(remind);
+                mRemindsRecyclerView.getAdapter().notifyItemInserted(mReminds.size());
                 Notifier.removeAlarm(remind.getId());
                 Notifier.setAlarm(remind);
             }
 
             @Override
             public void onDeleted(Remind remind) {
-                int pos = reminds.indexOf(remind);
+                int pos = mReminds.indexOf(remind);
                 if (pos != -1) {
-                    reminds.remove(remind);
-                    remindsRecyclerView.getAdapter().notifyItemRemoved(pos);
+                    mReminds.remove(remind);
+                    mRemindsRecyclerView.getAdapter().notifyItemRemoved(pos);
                     Notifier.removeAlarm(remind.getId());
                     Preferences.getInstance().removeRemindCode(remind.getId());
                 }
@@ -180,51 +182,51 @@ public class TaskDisplayActivity extends BaseActivity {
 
     private void setContentVisibility(boolean visible) {
         if (visible) {
-            displayContainer.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
+            mDataContainer.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
         } else {
-            displayContainer.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
+            mDataContainer.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.VISIBLE);
         }
     }
 
     private void displayTag() {
-        tagTV.setText(tag.getName());
-        tagTV.setTextColor((int) tag.getColor());
+        mTagTextView.setText(mTag.getName());
+        mTagTextView.setTextColor((int) mTag.getColor());
     }
 
     private void initReminds() {
-        reminds.clear();
-        for (String id : task.getReminds()) {
-            reminds.add(FirebaseObserver.getInstance().getReminders().getById(id));
+        mReminds.clear();
+        for (String id : mTask.getReminds()) {
+            mReminds.add(FirebaseObserver.getInstance().getReminders().getById(id));
         }
     }
 
     private void displayTask() {
-        if (task.getReminds() != null && task.getReminds().size() > 0) {
-            remindsContainer.setVisibility(View.VISIBLE);
+        if (mTask.getReminds() != null && mTask.getReminds().size() > 0) {
+            mRemindsContainer.setVisibility(View.VISIBLE);
         } else {
-            remindsContainer.setVisibility(View.GONE);
+            mRemindsContainer.setVisibility(View.GONE);
         }
-        nameTV.setText(task.getName());
-        if (task.getDescription().length() > 0) {
-            descriptionTV.setText(task.getDescription());
-            descriptionTV.setVisibility(View.VISIBLE);
+        mNameTextView.setText(mTask.getName());
+        if (mTask.getDescription().length() > 0) {
+            mDescriptionTextView.setText(mTask.getDescription());
+            mDescriptionTextView.setVisibility(View.VISIBLE);
         } else {
-            descriptionTV.setVisibility(View.GONE);
+            mDescriptionTextView.setVisibility(View.GONE);
         }
         initReminds();
-        if (task.getReminds() != null && task.getReminds().size() > 0) {
-            remindsRecyclerView.getAdapter().notifyDataSetChanged();
+        if (mTask.getReminds() != null && mTask.getReminds().size() > 0) {
+            mRemindsRecyclerView.getAdapter().notifyDataSetChanged();
         }
-        subtasksRecyclerView.getAdapter().notifyDataSetChanged();
-        if (task.getSubTasks().size() != 0) {
-            doneCheckBox.setVisibility(View.GONE);
-            subtasksContainer.setVisibility(View.VISIBLE);
+        mSubtasksRecyclerView.getAdapter().notifyDataSetChanged();
+        if (mTask.getSubTasks().size() != 0) {
+            mDoneCheckBox.setVisibility(View.GONE);
+            mSubtasksContainer.setVisibility(View.VISIBLE);
         } else {
-            doneCheckBox.setVisibility(View.VISIBLE);
-            doneCheckBox.setChecked(task.isDone());
-            subtasksContainer.setVisibility(View.GONE);
+            mDoneCheckBox.setVisibility(View.VISIBLE);
+            mDoneCheckBox.setChecked(mTask.isDone());
+            mSubtasksContainer.setVisibility(View.GONE);
         }
         displayTag();
     }
@@ -232,35 +234,35 @@ public class TaskDisplayActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Task taskInBase = FirebaseObserver.getInstance().getTasksDay(day).getById(id);
+        Task taskInBase = FirebaseObserver.getInstance().getTasksDay(mDay).getById(mTask.getId());
         if (taskInBase != null) {
-            task.init(taskInBase);
+            mTask.init(taskInBase);
             setContentVisibility(true);
         } else {
             setContentVisibility(false);
         }
-        Tag tagInBase = FirebaseObserver.getInstance().getTags().getById(task.getTagId());
+        Tag tagInBase = FirebaseObserver.getInstance().getTags().getById(mTask.getTagId());
         if (tagInBase != null) {
-            tag.init(tagInBase);
+            mTag.init(tagInBase);
         }
 
-        SubtaskCheckableRecyclerAdapter adapter = new SubtaskCheckableRecyclerAdapter(task.getSubTasks(), new SubtaskCheckableRecyclerAdapter.OnSubtaskCheckListener() {
+        SubtaskCheckableRecyclerAdapter adapter = new SubtaskCheckableRecyclerAdapter(mTask.getSubTasks(), new SubtaskCheckableRecyclerAdapter.OnSubtaskCheckListener() {
             @Override
             public void onCheck(SubTask subTask, boolean checked) {
-                FirebaseUtils.getInstance().setSubTaskDone(day, id, subTask.getId(), checked);
+                FirebaseUtils.getInstance().setSubTaskDone(mDay, mTask.getId(), subTask.getId(), checked);
             }
         });
-        subtasksRecyclerView.setAdapter(adapter);
+        mSubtasksRecyclerView.setAdapter(adapter);
 
-        remindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(reminds, null));
-        remindsRecyclerView.setLayoutManager(new GridLayoutManager(this, 5));
-        if (deletingRemindId != null) {
-            FirebaseUtils.getInstance().removeReminder(day, id, deletingRemindId);
+        mRemindsRecyclerView.setAdapter(new ReminderDisplayRecyclerAdapter(mReminds, null));
+        mRemindsRecyclerView.setLayoutManager(new GridLayoutManager(this, 5));
+        if (mDeletingRemindId != null) {
+            FirebaseUtils.getInstance().removeReminder(mDay, mTask.getId(), mDeletingRemindId);
         }
-        FirebaseObserver.getInstance().getTasksDay(day).subscribe(taskListener);
-        FirebaseObserver.getInstance().getTags().subscribe(tagListener);
-        FirebaseObserver.getInstance().getReminders().subscribe(remindsListener);
-        FirebaseExecutorManager.getInstance().startDayListener(day);
+        FirebaseObserver.getInstance().getTasksDay(mDay).subscribe(mTasksSyncListener);
+        FirebaseObserver.getInstance().getTags().subscribe(mTagsListener);
+        FirebaseObserver.getInstance().getReminders().subscribe(mRemindsListener);
+        FirebaseExecutorManager.getInstance().startDayListener(mDay);
         FirebaseExecutorManager.getInstance().startRemindersListener();
         FirebaseExecutorManager.getInstance().startTagsListener();
         displayTask();
@@ -269,9 +271,9 @@ public class TaskDisplayActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        FirebaseObserver.getInstance().getTasksDay(day).unsubscribe(taskListener);
-        FirebaseObserver.getInstance().getTags().unsubscribe(tagListener);
-        FirebaseObserver.getInstance().getReminders().unsubscribe(remindsListener);
+        FirebaseObserver.getInstance().getTasksDay(mDay).unsubscribe(mTasksSyncListener);
+        FirebaseObserver.getInstance().getTags().unsubscribe(mTagsListener);
+        FirebaseObserver.getInstance().getReminders().unsubscribe(mRemindsListener);
     }
 
     @Override
@@ -284,7 +286,7 @@ public class TaskDisplayActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.edit_item:
-                TaskEditActivity.start(this, task);
+                TaskEditActivity.start(this, mTask);
                 finish();
                 break;
             case android.R.id.home:

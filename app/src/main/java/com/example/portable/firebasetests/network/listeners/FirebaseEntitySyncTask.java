@@ -12,11 +12,11 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public abstract class FirebaseEntitySyncTask<T extends FirebaseEntity> implements Runnable {
-    private ValueEventListener listener;
-    private DatabaseReference dbReference;
+    private ValueEventListener mListener;
+    private DatabaseReference mDbReference;
 
-    public FirebaseEntitySyncTask(DatabaseReference dbReference) {
-        this.dbReference = dbReference;
+    public FirebaseEntitySyncTask(DatabaseReference mDbReference) {
+        this.mDbReference = mDbReference;
     }
 
     @Override
@@ -25,7 +25,7 @@ public abstract class FirebaseEntitySyncTask<T extends FirebaseEntity> implement
     }
 
     private void addListener() {
-        listener = new ValueEventListener() {
+        mListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 onDataChanged(parseEntities(dataSnapshot));
@@ -36,7 +36,7 @@ public abstract class FirebaseEntitySyncTask<T extends FirebaseEntity> implement
 
             }
         };
-        dbReference.addValueEventListener(listener);
+        mDbReference.addValueEventListener(mListener);
     }
 
     protected abstract void onDataChanged(EntityList<T> entities);

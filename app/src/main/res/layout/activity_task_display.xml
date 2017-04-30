@@ -57,6 +57,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
+                            android:buttonTint="@color/gray_text"
                             android:visibility="gone" />
 
                         <TextView
@@ -64,7 +65,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:text="Task name"
                             android:textColor="@android:color/black"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -76,7 +76,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
                         android:maxLines="5"
-                        android:text="some long description"
                         android:textColor="@color/gray_text" />
 
                     <LinearLayout
@@ -89,7 +88,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
-                            android:text="@string/tagName"
+                            android:text="@string/tag_n"
                             android:textColor="@color/gray_text" />
 
                         <TextView
@@ -99,7 +98,6 @@
                             android:layout_gravity="bottom"
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
-                            android:text="Tag"
                             android:textSize="18sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -123,7 +121,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="Reminders"
+                        android:text="@string/reminders_n"
                         android:textColor="@color/gray_text" />
 
                     <android.support.v7.widget.RecyclerView
@@ -152,7 +150,7 @@
                         android:layout_marginBottom="8dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:text="@string/subtasks_name"
+                        android:text="@string/subtasks_n"
                         android:textColor="@color/gray_text" />
 
                     <android.support.v7.widget.RecyclerView

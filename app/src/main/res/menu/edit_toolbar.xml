@@ -4,6 +4,6 @@
     <item
         android:id="@id/edit_item"
         android:icon="@drawable/ic_edit_black_24dp"
-        android:title="edit"
+        android:title="@string/edit"
         app:showAsAction="ifRoom" />
 </menu>

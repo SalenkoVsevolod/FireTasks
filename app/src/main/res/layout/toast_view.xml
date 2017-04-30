@@ -16,6 +16,5 @@
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="toast"
         android:textColor="@android:color/white" />
 </LinearLayout>

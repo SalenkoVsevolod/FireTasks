@@ -27,7 +27,7 @@
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <android.support.v7.widget.CardView
@@ -48,7 +48,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_marginTop="16dp"
-                        android:text="@string/nameN"
+                        android:text="@string/name_n"
                         android:textColor="@color/gray_text" />
 
                     <View
@@ -66,7 +66,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_toEndOf="@id/nameNTV"
                         android:layout_toRightOf="@id/nameNTV"
-                        android:hint="name..."
+                        android:hint="@string/name_hint"
                         android:inputType="textMultiLine"
                         android:maxLines="2"
                         android:minLines="1"
@@ -81,7 +81,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_below="@id/nameET"
                         android:layout_marginTop="24dp"
-                        android:text="@string/descriptionName"
+                        android:text="@string/description_n"
                         android:textColor="@color/gray_text" />
 
                     <EditText
@@ -95,7 +95,7 @@
                         android:layout_toEndOf="@id/descriptionTextView"
                         android:layout_toRightOf="@id/descriptionTextView"
                         android:gravity="top"
-                        android:hint="@string/descriptionHint"
+                        android:hint="@string/description_hint"
                         android:inputType="textMultiLine"
                         android:maxLines="5"
                         android:minLines="1"
@@ -120,7 +120,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
-                        android:text="@string/tagName"
+                        android:text="@string/tag_n"
                         android:textColor="@color/gray_text" />
 
                     <TextView
@@ -132,7 +132,6 @@
                         android:layout_marginStart="8dp"
                         android:layout_toEndOf="@id/tagTextView"
                         android:layout_toRightOf="@id/tagTextView"
-                        android:text="some tag"
                         android:textSize="18sp" />
 
                     <View
@@ -186,7 +185,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
-                        android:text="Reminders:"
+                        android:text="@string/reminders_n"
                         android:textColor="@color/gray_text" />
 
                     <TextView
@@ -195,13 +194,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:text="no reminders created yet"
+                        android:text="@string/no_reminders_created_yet"
                         android:textColor="@color/gray_text"
                         android:visibility="gone" />
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/reminder_recycler"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
@@ -235,7 +234,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
-                        android:text="@string/subtasks_name"
+                        android:text="@string/subtasks_n"
                         android:textColor="@color/gray_text" />
 
                     <TextView
@@ -247,7 +246,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_toEndOf="@id/subTasksTextView"
                         android:layout_toRightOf="@id/subTasksTextView"
-                        android:text="no subtasks created yet"
+                        android:text="@string/no_subtasks_created_yet"
                         android:textColor="@color/gray_text"
                         android:visibility="gone" />
 

@@ -9,10 +9,10 @@ import java.util.ArrayList;
 public class ConnectionObserver {
 
     private static ConnectionObserver instance;
-    private ArrayList<OnConnectionStateChangingListener> listeners;
+    private ArrayList<OnConnectionStateChangingListener> mListeners;
 
     private ConnectionObserver() {
-        listeners = new ArrayList<>();
+        mListeners = new ArrayList<>();
     }
 
     public static ConnectionObserver getInstance() {
@@ -23,17 +23,17 @@ public class ConnectionObserver {
     }
 
     public void notifyStateChanged(boolean online) {
-        for (OnConnectionStateChangingListener listener : listeners) {
+        for (OnConnectionStateChangingListener listener : mListeners) {
             listener.stateChanged(online);
         }
     }
 
     public void subscribe(OnConnectionStateChangingListener listener) {
-        listeners.add(listener);
+        mListeners.add(listener);
     }
 
     public void unsubscribe(OnConnectionStateChangingListener listener) {
-        listeners.remove(listener);
+        mListeners.remove(listener);
     }
 
     public interface OnConnectionStateChangingListener {

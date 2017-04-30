@@ -14,7 +14,7 @@
         android:id="@+id/subtask_name_n"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/subtasks_name"
+        android:text="@string/subtasks_n"
         android:textSize="18sp" />
 
     <EditText
@@ -28,7 +28,7 @@
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@id/subtask_name_n"
         android:layout_toRightOf="@id/subtask_name_n"
-        android:hint="subtask name..."
+        android:hint="@string/subtask_hint"
         android:maxLines="3" />
 
     <LinearLayout
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Priority:"
+            android:text="@string/priority_n"
             android:textSize="18sp" />
 
         <Spinner
@@ -72,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="CANCEL"
+            android:text="@string/cancel"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -82,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="OK"
+            android:text="@string/ok"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
             android:textStyle="bold" />

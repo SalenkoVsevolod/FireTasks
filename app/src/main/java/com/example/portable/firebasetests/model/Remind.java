@@ -79,6 +79,9 @@ public class Remind extends FirebaseEntity implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof Remind)) {
+            return false;
+        }
         Remind r = (Remind) obj;
         return r.getId().equals(id);
     }
