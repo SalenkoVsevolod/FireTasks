@@ -14,7 +14,6 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingStart="16dp"
-        android:text="Normal"
         android:textColor="@android:color/white"
         android:textSize="12sp" />
 
@@ -25,11 +24,10 @@
 
         <TextView
             android:id="@+id/subtask_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:text="Subtask"
             android:textColor="@android:color/black" />
 
         <ImageView

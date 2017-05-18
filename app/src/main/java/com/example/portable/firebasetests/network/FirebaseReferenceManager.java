@@ -10,7 +10,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class FirebaseReferenceManager {
     private static FirebaseReferenceManager instance;
-    private DatabaseReference userReference;
+    private DatabaseReference mUserReference;
 
     private FirebaseReferenceManager() {
         refresh();
@@ -24,19 +24,19 @@ public class FirebaseReferenceManager {
     }
 
     public void refresh() {
-        userReference = FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId());
+        mUserReference = FirebaseDatabase.getInstance().getReference("users").child(Preferences.getInstance().readUserId());
     }
 
     public DatabaseReference getUserReference() {
-        return userReference;
+        return mUserReference;
     }
 
     public DatabaseReference getTagsReference() {
-        return userReference.child("tags");
+        return mUserReference.child("tags");
     }
 
     public DatabaseReference getDayReference(int day) {
-        return userReference.child("days").child("" + day);
+        return mUserReference.child("days").child("" + day);
     }
 
     public DatabaseReference getTaskReference(int day, String id) {
@@ -44,6 +44,6 @@ public class FirebaseReferenceManager {
     }
 
     public DatabaseReference getRemindersReference() {
-        return userReference.child("reminders");
+        return mUserReference.child("reminders");
     }
 }

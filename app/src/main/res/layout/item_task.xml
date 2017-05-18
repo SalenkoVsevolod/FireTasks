@@ -21,7 +21,7 @@
             android:layout_marginTop="8dp" />
 
         <ImageView
-            android:id="@+id/task_done_checkbox"
+            android:id="@+id/task_done_imv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/tag_tv"
@@ -38,8 +38,8 @@
             android:layout_below="@id/tag_tv"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
-            android:layout_toEndOf="@id/task_done_checkbox"
-            android:layout_toRightOf="@id/task_done_checkbox"
+            android:layout_toEndOf="@id/task_done_imv"
+            android:layout_toRightOf="@id/task_done_imv"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 

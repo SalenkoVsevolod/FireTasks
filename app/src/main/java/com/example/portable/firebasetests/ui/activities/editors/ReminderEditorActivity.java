@@ -24,11 +24,12 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
     public static final String REMINDER = "remind";
     public static final int REQUEST_CODE = 138;
     private static final int SOUND_CODE = 5;
-    private Remind remind;
-    private CheckBox vibro;
-    private TimePicker reminderTime;
-    private TextView soundTV;
-    private int resultCode;
+
+    private Remind mRemind;
+    private CheckBox mVibrationCheckBox;
+    private TimePicker mTimePicker;
+    private TextView mSoundTextView;
+    private int mResultCode;
 
     public static Intent getStarterIntent(Context context, @NonNull Remind remind) {
         Intent starter = new Intent(context, ReminderEditorActivity.class);
@@ -41,26 +42,26 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_editor);
         setListeners();
-        reminderTime = (TimePicker) findViewById(R.id.reminder_time_picker);
-        reminderTime.setIs24HourView(true);
-        soundTV = (TextView) findViewById(R.id.sound_tv);
-        vibro = (CheckBox) findViewById(R.id.reminder_vibro);
-        remind = (Remind) getIntent().getSerializableExtra(REMINDER);
+        mTimePicker = (TimePicker) findViewById(R.id.reminder_time_picker);
+        mTimePicker.setIs24HourView(true);
+        mSoundTextView = (TextView) findViewById(R.id.sound_tv);
+        mVibrationCheckBox = (CheckBox) findViewById(R.id.reminder_vibro);
+        mRemind = (Remind) getIntent().getSerializableExtra(REMINDER);
 
-        if (remind.getSound() != null) {
-            soundTV.setText(getSoundContent(getRingtoneTitle(Uri.parse(remind.getSound()))));
+        if (mRemind.getSound() != null) {
+            mSoundTextView.setText(getSoundContent(getRingtoneTitle(Uri.parse(mRemind.getSound()))));
         } else {
-            soundTV.setText(getSoundContent("No sound"));
+            mSoundTextView.setText(getSoundContent("No sound"));
         }
-        vibro.setChecked(remind.isVibro());
+        mVibrationCheckBox.setChecked(mRemind.isVibro());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            reminderTime.setHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
-            reminderTime.setMinute(remind.getCalendar().get(Calendar.MINUTE));
+            mTimePicker.setHour(mRemind.getCalendar().get(Calendar.HOUR_OF_DAY));
+            mTimePicker.setMinute(mRemind.getCalendar().get(Calendar.MINUTE));
         } else {
-            reminderTime.setCurrentHour(remind.getCalendar().get(Calendar.HOUR_OF_DAY));
-            reminderTime.setCurrentMinute(remind.getCalendar().get(Calendar.MINUTE));
+            mTimePicker.setCurrentHour(mRemind.getCalendar().get(Calendar.HOUR_OF_DAY));
+            mTimePicker.setCurrentMinute(mRemind.getCalendar().get(Calendar.MINUTE));
         }
-        soundTV.setOnClickListener(new View.OnClickListener() {
+        mSoundTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 chooseSound();
@@ -72,7 +73,7 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, remind.getSound() == null ? null : Uri.parse(remind.getSound()));
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, mRemind.getSound() == null ? null : Uri.parse(mRemind.getSound()));
         this.startActivityForResult(intent, SOUND_CODE);
     }
 
@@ -84,10 +85,10 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
                 if (resultCode == Activity.RESULT_OK) {
                     Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
                     if (uri != null) {
-                        remind.setSound(uri.toString());
-                        soundTV.setText(getSoundContent(getRingtoneTitle(uri)));
+                        mRemind.setSound(uri.toString());
+                        mSoundTextView.setText(getSoundContent(getRingtoneTitle(uri)));
                     } else {
-                        soundTV.setText(getSoundContent("No sound"));
+                        mSoundTextView.setText(getSoundContent("No sound"));
                     }
                 }
                 break;
@@ -98,36 +99,35 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
     protected boolean assembleEntityAndProceed() {
         int hour, minute;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            hour = reminderTime.getHour();
-            minute = reminderTime.getMinute();
+            hour = mTimePicker.getHour();
+            minute = mTimePicker.getMinute();
         } else {
-            hour = reminderTime.getCurrentHour();
-            minute = reminderTime.getCurrentMinute();
+            hour = mTimePicker.getCurrentHour();
+            minute = mTimePicker.getCurrentMinute();
         }
-        remind.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
-        remind.getCalendar().set(Calendar.MINUTE, minute);
-        if (remind.getCalendar().getTimeInMillis() <= System.currentTimeMillis()) {
+        mRemind.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
+        mRemind.getCalendar().set(Calendar.MINUTE, minute);
+        if (mRemind.getCalendar().getTimeInMillis() <= System.currentTimeMillis()) {
             showToast("Please choose time in future", false);
             return false;
         }
-        remind.setVibro(vibro.isChecked());
-        if (remind.getId() == null) {
-            remind.setId("reminder_" + System.currentTimeMillis());
-            resultCode = CREATE;
+        mRemind.setVibro(mVibrationCheckBox.isChecked());
+        if (mRemind.getId() == null) {
+            mRemind.setId("reminder_" + System.currentTimeMillis());
+            mResultCode = CREATE;
         } else {
-            resultCode = UPDATE;
+            mResultCode = UPDATE;
         }
         return true;
     }
 
-    @Override
-    protected int getResultCode() {
-        return resultCode;
+    protected int getmResultCode() {
+        return mResultCode;
     }
 
     @Override
     protected Remind getResultData() {
-        return remind;
+        return mRemind;
     }
 
     private String getRingtoneTitle(Uri sound) {

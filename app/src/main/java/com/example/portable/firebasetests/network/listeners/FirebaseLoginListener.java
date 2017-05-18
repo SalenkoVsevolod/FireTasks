@@ -18,37 +18,37 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class FirebaseLoginListener extends AsyncTask<Void, Void, Void> {
     public static final int DONE = 0;
-    private LoginActivity.OnLoginListener onLoginListener;
+    private LoginActivity.OnLoginListener mLoginListener;
     private FirebaseAuth mAuth;
-    private String tokenId;
-    private Activity activity;
-    private int resultCode;
+    private String mTokenId;
+    private Activity mActivity;
+    private int mResultCode;
 
-    public FirebaseLoginListener(Activity activity, String tokenId) {
-        this.activity = activity;
+    public FirebaseLoginListener(Activity activity, String mTokenId) {
+        this.mActivity = activity;
         mAuth = FirebaseAuth.getInstance();
-        this.tokenId = tokenId;
+        this.mTokenId = mTokenId;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(tokenId, null);
+        AuthCredential credential = GoogleAuthProvider.getCredential(mTokenId, null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(mActivity, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            resultCode = DONE;
+                            mResultCode = DONE;
                         } else {
-                            resultCode = 1;
+                            mResultCode = 1;
                         }
                     }
                 });
-        onLoginListener.onLogin(resultCode);
+        mLoginListener.onLogin(mResultCode);
         return null;
     }
 
     public void setOnLoginListener(LoginActivity.OnLoginListener onLoginListener) {
-        this.onLoginListener = onLoginListener;
+        this.mLoginListener = onLoginListener;
     }
 }

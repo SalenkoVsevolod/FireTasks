@@ -174,7 +174,7 @@ public class TasksDayRecyclerAdapter extends RecyclerView.Adapter<TasksDayRecycl
             nameTextView = (TextView) itemView.findViewById(R.id.task_name_tv);
             subtasksLayout = (LinearLayout) itemView.findViewById(R.id.subtasks_container);
             moreDots = (ImageView) itemView.findViewById(R.id.more_dots_tv);
-            taskDone = (ImageView) itemView.findViewById(R.id.task_done_checkbox);
+            taskDone = (ImageView) itemView.findViewById(R.id.task_done_imv);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
             deletingCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override

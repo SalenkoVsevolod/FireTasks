@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="@string/tagName"
+        android:text="@string/tag_n"
         android:textSize="18sp" />
 
     <EditText
@@ -27,7 +27,7 @@
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@id/tag_name"
         android:layout_toRightOf="@id/tag_name"
-        android:hint="tag name..."
+        android:hint="@string/tag_hint"
         android:inputType="text"
         android:lines="1"
         android:maxLength="12"
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tag_name_edit"
         android:layout_marginTop="16dp"
-        android:text="Color:"
+        android:text="@string/color_n"
         android:textSize="18sp" />
 
     <View
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="CANCEL"
+            android:text="@string/cancel"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -78,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="OK"
+            android:text="@string/ok"
             android:textColor="@color/colorAccent"
             android:textSize="16sp"
             android:textStyle="bold" />

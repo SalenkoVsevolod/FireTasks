@@ -20,9 +20,6 @@ import com.example.portable.firebasetests.core.FireTasksApp;
  */
 
 public abstract class BaseActivity extends AppCompatActivity implements ConnectionObserver.OnConnectionStateChangingListener {
-    public static void showCancellingSnackBar() {
-        //TODO
-    }
 
     @Override
     protected void onStart() {

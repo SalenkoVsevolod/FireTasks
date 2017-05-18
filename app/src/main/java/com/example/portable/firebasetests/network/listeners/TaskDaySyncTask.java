@@ -17,19 +17,19 @@ import java.util.Set;
  */
 
 public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
-    private int currentYear, day;
+    private int mCurrentYear, mDay;
 
     public TaskDaySyncTask(int day) {
         super(FirebaseReferenceManager.getInstance().getDayReference(day));
-        this.day = day;
+        this.mDay = day;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        currentYear = calendar.get(Calendar.YEAR);
+        mCurrentYear = calendar.get(Calendar.YEAR);
     }
 
     @Override
     protected void onDataChanged(EntityList<Task> entities) {
-        FirebaseObserver.getInstance().getTasksDay(day).sync(entities);
+        FirebaseObserver.getInstance().getTasksDay(mDay).sync(entities);
     }
 
     @Override
@@ -50,8 +50,8 @@ public class TaskDaySyncTask extends FirebaseEntitySyncTask<Task> {
 
     private void deleteOutdatedTasks(ArrayList<Task> tasks) {
         for (Task t : tasks) {
-            if (t.getCalendar().get(Calendar.YEAR) < currentYear) {
-                FirebaseUtils.getInstance().deleteTask(day, t.getId());
+            if (t.getCalendar().get(Calendar.YEAR) < mCurrentYear) {
+                FirebaseUtils.getInstance().deleteTask(mDay, t.getId());
             }
         }
     }

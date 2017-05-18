@@ -12,10 +12,10 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class DefaultTagsStateTask extends AsyncTask<Void, Void, Void> {
-    private DefaultTagsCreatedListener listener;
+    private DefaultTagsCreatedListener mListener;
 
-    public DefaultTagsStateTask(DefaultTagsCreatedListener listener) {
-        this.listener = listener;
+    public DefaultTagsStateTask(DefaultTagsCreatedListener mListener) {
+        this.mListener = mListener;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class DefaultTagsStateTask extends AsyncTask<Void, Void, Void> {
         FirebaseReferenceManager.getInstance().getUserReference().child("defaultTagsCreated").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                listener.created(dataSnapshot.getValue() != null);
+                mListener.created(dataSnapshot.getValue() != null);
             }
 
             @Override

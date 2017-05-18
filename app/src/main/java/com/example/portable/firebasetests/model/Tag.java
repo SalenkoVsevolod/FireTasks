@@ -81,6 +81,9 @@ public class Tag extends FirebaseEntity {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof Tag)) {
+            return false;
+        }
         Tag t = (Tag) obj;
         return t.getId().equals(id);
     }

@@ -1,25 +1,43 @@
 <resources>
     <string name="app_name">FireTasks</string>
-    <string name="descriptionHint">description…</string>
+    <string name="TOKEN_ID_SHARED_KED">mTokenId</string>
     <string name="ID_SHARED_KEY">user_id</string>
     <string name="sharedPreferencesFileName">prefs</string>
-    <string name="logout">logout</string>
-    <string name="login">Login</string>
-    <string name="add_subtask">add subtask</string>
-    <string name="descriptionName">Description:</string>
-    <string name="tagName">Tag:</string>
-    <string name="subtasks_name">Subtasks:</string>
-    <string name="timeName">Time:</string>
-    <string name="_0_0">0:0</string>
-    <string name="TOKEN_ID_SHARED_KED">tokenId</string>
+
+    <string name="description_n">Description:</string>
+    <string name="tag_n">Tag:</string>
+    <string name="subtasks_n">Subtasks:</string>
+    <string name="time_n">Time:</string>
+    <string name="name_n">Name:</string>
+    <string name="sound_n">Sound:</string>
+    <string name="volume_n">Volume:</string>
+    <string name="show_first_n">Show first:</string>
+    <string name="priority_n">Priority:</string>
+    <string name="color_n">Color:</string>
+    <string name="reminders_n">Reminds:</string>
+    <string name="name_hint">name…</string>
+
+    <string name="description_hint">description…</string>
+    <string name="sound_hint">sound…</string>
+    <string name="subtask_hint">subtask name…</string>
+    <string name="tag_hint">tag name…</string>
+
+    <string name="no_sound">No sound</string>
+    <string name="no_reminders_created_yet">no reminders created yet</string>
+    <string name="no_subtasks_created_yet">no subtasks created yet</string>
+    <string name="no_tasks_created_yet">No tasks created yet</string>
+    <string name="no_tags_created_yet">no tags created yet</string>
 
     <string name="name">name</string>
-    <string name="nameN">Name:</string>
-    <string name="soundN">Sound:</string>
-    <string name="vibro">Vibro</string>
-    <string name="volumeN">Volume:</string>
+    <string name="logout">logout</string>
+    <string name="login">Login</string>
+    <string name="vibration">Vibration</string>
+    <string name="add_subtask">add subtask</string>
     <string name="remind">Remind</string>
-    <string name="sound">sound...</string>
     <string name="delete_tasks">(%d) DELETE</string>
     <string name="you_should_choose">You should choose %s</string>
+    <string name="cancel">CANCEL</string>
+    <string name="ok">OK</string>
+    <string name="edit">edit</string>
+    <string name="save">save</string>
 </resources>

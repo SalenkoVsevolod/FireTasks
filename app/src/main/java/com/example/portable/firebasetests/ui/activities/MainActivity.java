@@ -19,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.portable.firebasetests.R;
 import com.example.portable.firebasetests.core.FirebaseObserver;
@@ -45,45 +44,48 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Calendar;
 
 public class MainActivity extends BaseActivity {
-    private TabLayout tabLayout;
-    private Spinner tagSpinner;
-    private ProgressBar progressBar;
-    private TagSortingSpinnerAdapter tagSortingSpinnerAdapter;
-    private FloatingActionButton addTaskFAB;
-    private DayFragment currentFragment;
-    private TabLayout.OnTabSelectedListener onTabSelectedListener;
-    private int backPresses;
-    private EntityList.FirebaseEntityListener<Tag> tagsListener;
-    private EntityList.FirebaseEntityListener<Remind> remindsListener;
-    private View showFirstContainer, dayContainer;
+    private TabLayout mTabLayout;
+    private Spinner mTagSpinner;
+    private ProgressBar mProgressBar;
+    private TagSortingSpinnerAdapter mTagSortingSpinnerAdapter;
+    private FloatingActionButton mAddFloatingActionButton;
+    private DayFragment mCurrentFragment;
+    private TabLayout.OnTabSelectedListener mTabSelectedListener;
+    private int mBackPresses;
+    private EntityList.FirebaseEntityListener<Tag> mTagsSyncListener;
+    private EntityList.FirebaseEntityListener<Remind> mRemindsSyncListener;
+    private View mSortingContainer, mDayContainer;
 
     @SuppressWarnings("all")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tabLayout = (TabLayout) findViewById(R.id.days_tabs);
-        showFirstContainer = findViewById(R.id.show_first_container);
-        dayContainer = findViewById(R.id.day_of_week_container);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        addTaskFAB = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
-        addTaskFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
-        addTaskFAB.setOnClickListener(new View.OnClickListener() {
+        mTabLayout = (TabLayout) findViewById(R.id.days_tabs);
+        mSortingContainer = findViewById(R.id.show_first_container);
+        mDayContainer = findViewById(R.id.day_of_week_container);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mAddFloatingActionButton = (FloatingActionButton) findViewById(R.id.homeFloatingActionButton);
+        mAddFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
+        mAddFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startTaskModifier();
             }
         });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.tasksActivityToolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         inflateDays(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
-        tagSortingSpinnerAdapter = new TagSortingSpinnerAdapter(this, FirebaseObserver.getInstance().getTags());
-        tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
-        tagSpinner.setAdapter(tagSortingSpinnerAdapter);
-        onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+
+        mTagSortingSpinnerAdapter = new TagSortingSpinnerAdapter(this, FirebaseObserver.getInstance().getTags());
+        mTagSpinner = (Spinner) findViewById(R.id.tagSpinner);
+        mTagSpinner.setAdapter(mTagSortingSpinnerAdapter);
+        mTabSelectedListener = new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 setTabViewSelected(tab, true);
@@ -112,27 +114,27 @@ public class MainActivity extends BaseActivity {
                 }
             }
         }).execute();
-        tagsListener = new EntityList.FirebaseEntityListener<Tag>() {
+        mTagsSyncListener = new EntityList.FirebaseEntityListener<Tag>() {
             @Override
             public void onChanged(Tag tag) {
-                tagSortingSpinnerAdapter.notifyDataSetChanged();
+                mTagSortingSpinnerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCreated(Tag tag) {
-                tagSortingSpinnerAdapter.notifyDataSetChanged();
+                mTagSortingSpinnerAdapter.notifyDataSetChanged();
                 setDataVisibility(true);
-                addTaskFAB.show();
+                mAddFloatingActionButton.show();
             }
 
             @Override
             public void onDeleted(Tag tag) {
-                tagSortingSpinnerAdapter.notifyDataSetChanged();
-                showFirstContainer.setVisibility(FirebaseObserver.getInstance().getTags().size() == 0 ? View.GONE : View.VISIBLE);
+                mTagSortingSpinnerAdapter.notifyDataSetChanged();
+                mSortingContainer.setVisibility(FirebaseObserver.getInstance().getTags().size() == 0 ? View.GONE : View.VISIBLE);
             }
         };
 
-        remindsListener = new EntityList.FirebaseEntityListener<Remind>() {
+        mRemindsSyncListener = new EntityList.FirebaseEntityListener<Remind>() {
             @Override
             public void onChanged(Remind remind) {
                 if (remind.getCalendar().getTimeInMillis() > System.currentTimeMillis()) {
@@ -158,24 +160,21 @@ public class MainActivity extends BaseActivity {
                 Notifier.removeAlarm(remind.getId());
                 Preferences.getInstance().removeRemindCode(remind.getId());
             }
-        }
-
-        ;
-        FirebaseObserver.getInstance().getTags().subscribe(tagsListener);
-
+        };
+        FirebaseObserver.getInstance().getTags().subscribe(mTagsSyncListener);
     }
 
     private void setDataVisibility(boolean visibility) {
         if (visibility) {
-            progressBar.setVisibility(View.GONE);
-            dayContainer.setVisibility(View.VISIBLE);
-            showFirstContainer.setVisibility(View.VISIBLE);
-            addTaskFAB.show();
+            mProgressBar.setVisibility(View.GONE);
+            mDayContainer.setVisibility(View.VISIBLE);
+            mSortingContainer.setVisibility(View.VISIBLE);
+            mAddFloatingActionButton.show();
         } else {
-            progressBar.setVisibility(View.VISIBLE);
-            dayContainer.setVisibility(View.GONE);
-            showFirstContainer.setVisibility(View.GONE);
-            addTaskFAB.hide();
+            mProgressBar.setVisibility(View.VISIBLE);
+            mDayContainer.setVisibility(View.GONE);
+            mSortingContainer.setVisibility(View.GONE);
+            mAddFloatingActionButton.hide();
         }
     }
 
@@ -187,40 +186,46 @@ public class MainActivity extends BaseActivity {
                 new Runnable() {
                     @Override
                     public void run() {
-                        tabLayout.getTabAt(getSelectionDay()).select();
+                        TabLayout.Tab tab = mTabLayout.getTabAt(getSelectionDay());
+                        if (tab != null) {
+                            tab.select();
+                        }
                     }
                 }, 100);
-        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
-        tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mTabLayout.addOnTabSelectedListener(mTabSelectedListener);
+        mTagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (currentFragment != null && tagSortingSpinnerAdapter.getCount() != 0) {
-                    currentFragment.setSortingTagIdAndSort(((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
+                if (mCurrentFragment != null && mTagSortingSpinnerAdapter.getCount() != 0) {
+                    mCurrentFragment.setSortingTagIdAndSort(((Tag) mTagSortingSpinnerAdapter.getItem(position)).getId());
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                tabLayout.getTabAt(getSelectionDay()).select();
+                TabLayout.Tab tab = mTabLayout.getTabAt(getSelectionDay());
+                if (tab != null) {
+                    tab.select();
+                }
             }
         });
-        backPresses = 0;
-        FirebaseObserver.getInstance().getReminders().subscribe(remindsListener);
+        mBackPresses = 0;
+        FirebaseObserver.getInstance().getReminders().subscribe(mRemindsSyncListener);
         FirebaseExecutorManager.getInstance().startRemindersListener();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
-        FirebaseObserver.getInstance().getReminders().unsubscribe(remindsListener);
+        mTabLayout.removeOnTabSelectedListener(mTabSelectedListener);
+        FirebaseObserver.getInstance().getReminders().unsubscribe(mRemindsSyncListener);
         FirebaseExecutorManager.getInstance().stopRemindersListener();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        FirebaseObserver.getInstance().getTags().unsubscribe(tagsListener);
+        FirebaseObserver.getInstance().getTags().unsubscribe(mTagsSyncListener);
         FirebaseExecutorManager.getInstance().stopRemindersListener();
         FirebaseExecutorManager.getInstance().stopTagsListener();
     }
@@ -238,14 +243,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void putNewFragment(int dayOfYear) {
-        int position = tagSpinner.getSelectedItemPosition();
+        int position = mTagSpinner.getSelectedItemPosition();
         if (position != -1) {
-            currentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) tagSortingSpinnerAdapter.getItem(position)).getId());
+            mCurrentFragment = DayFragment.newInstance(dayOfYear + 1, ((Tag) mTagSortingSpinnerAdapter.getItem(position)).getId());
         } else {
-            currentFragment = DayFragment.newInstance(dayOfYear + 1, null);
+            mCurrentFragment = DayFragment.newInstance(dayOfYear + 1, null);
         }
         getFragmentManager().beginTransaction()
-                .replace(R.id.day_of_week_container, currentFragment)
+                .replace(R.id.day_of_week_container, mCurrentFragment)
                 .commit();
     }
 
@@ -319,7 +324,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onConnectionSuspended(int i) {
-                Toast.makeText(MainActivity.this, "connection suspended", Toast.LENGTH_LONG).show();
+                showToast("connection suspended", true);
             }
         });
 
@@ -330,9 +335,9 @@ public class MainActivity extends BaseActivity {
         calendar.setTimeInMillis(System.currentTimeMillis());
         for (int i = 1; i <= maxDays; i++) {
             calendar.set(Calendar.DAY_OF_YEAR, i);
-            TabLayout.Tab tab = tabLayout.newTab();
+            TabLayout.Tab tab = mTabLayout.newTab();
             tab.setCustomView(inflateDay(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_WEEK)));
-            tabLayout.addTab(tab);
+            mTabLayout.addTab(tab);
         }
     }
 
@@ -340,7 +345,8 @@ public class MainActivity extends BaseActivity {
         View v = getLayoutInflater().inflate(R.layout.item_day_number, null);
         TextView dayOfMonthText = (TextView) v.findViewById(R.id.day_of_month);
         TextView dayOfWeekText = (TextView) v.findViewById(R.id.day_of_week);
-        dayOfMonthText.setText(dayOfMonth + "");
+        String day = dayOfMonth + "";
+        dayOfMonthText.setText(day);
         dayOfWeekText.setText(StringUtils.getDayOfWeekName(dayOfWeek));
         return v;
     }
@@ -348,7 +354,7 @@ public class MainActivity extends BaseActivity {
     private void startTaskModifier() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.DAY_OF_YEAR, tabLayout.getSelectedTabPosition() + 1);
+        calendar.set(Calendar.DAY_OF_YEAR, mTabLayout.getSelectedTabPosition() + 1);
         Task task = new Task();
         task.getCalendar().set(Calendar.DAY_OF_WEEK, calendar.get(Calendar.DAY_OF_WEEK));
         task.getCalendar().set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR));
@@ -358,10 +364,12 @@ public class MainActivity extends BaseActivity {
 
     private void setTabViewSelected(TabLayout.Tab tab, boolean selected) {
         View v = tab.getCustomView();
-        TextView week = (TextView) v.findViewById(R.id.day_of_week);
-        TextView month = (TextView) v.findViewById(R.id.day_of_month);
-        week.setTextColor(getTabColor(selected));
-        month.setTextColor(getTabColor(selected));
+        if (v != null) {
+            TextView week = (TextView) v.findViewById(R.id.day_of_week);
+            TextView month = (TextView) v.findViewById(R.id.day_of_month);
+            week.setTextColor(getTabColor(selected));
+            month.setTextColor(getTabColor(selected));
+        }
     }
 
     private int getTabColor(boolean selected) {
@@ -370,15 +378,15 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        boolean handled = currentFragment.hideDeleting();
+        boolean handled = mCurrentFragment.hideDeleting();
         if (!handled) {
             exit();
         }
     }
 
     private void exit() {
-        backPresses++;
-        if (backPresses > 1) {
+        mBackPresses++;
+        if (mBackPresses > 1) {
             finish();
         } else {
             showToast("Press back again to exit", true);

@@ -15,11 +15,11 @@ import java.util.concurrent.Executors;
 
 public class FirebaseExecutorManager {
     private static FirebaseExecutorManager instance;
-    private ExecutorService tagsService, remindersService;
-    private SparseArray<ExecutorService> daysExecutors;
+    private ExecutorService mTagsService, mRemindersService;
+    private SparseArray<ExecutorService> mDaysExecutors;
 
     private FirebaseExecutorManager() {
-        daysExecutors = new SparseArray<>();
+        mDaysExecutors = new SparseArray<>();
     }
 
     public static FirebaseExecutorManager getInstance() {
@@ -30,29 +30,29 @@ public class FirebaseExecutorManager {
     }
 
     public void startTagsListener() {
-        tagsService = Executors.newSingleThreadExecutor();
-        tagsService.submit(new TagsSyncTask());
+        mTagsService = Executors.newSingleThreadExecutor();
+        mTagsService.submit(new TagsSyncTask());
     }
 
     public void stopTagsListener() {
-        tagsService.shutdownNow();
+        mTagsService.shutdownNow();
     }
 
     public void startRemindersListener() {
-        remindersService = Executors.newSingleThreadExecutor();
-        remindersService.submit(new RemindersSyncTask());
+        mRemindersService = Executors.newSingleThreadExecutor();
+        mRemindersService.submit(new RemindersSyncTask());
     }
 
     public void stopRemindersListener() {
-        remindersService.shutdownNow();
+        mRemindersService.shutdownNow();
     }
 
     public void startDayListener(int day) {
-        daysExecutors.put(day, Executors.newSingleThreadExecutor());
-        daysExecutors.get(day).submit(new TaskDaySyncTask(day));
+        mDaysExecutors.put(day, Executors.newSingleThreadExecutor());
+        mDaysExecutors.get(day).submit(new TaskDaySyncTask(day));
     }
 
     public void stopDayListener(int day) {
-        daysExecutors.get(day).shutdownNow();
+        mDaysExecutors.get(day).shutdownNow();
     }
 }

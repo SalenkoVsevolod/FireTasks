@@ -14,7 +14,6 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingStart="16dp"
-        android:text="Normal"
         android:textColor="@android:color/white"
         android:textSize="12sp" />
 
@@ -26,7 +25,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         android:buttonTint="@color/gray_text"
-        android:text="Subtask"
         android:textColor="@color/gray_text"
         android:textSize="18sp" />
 

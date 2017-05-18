@@ -69,6 +69,9 @@ public class SubTask extends FirebaseEntity {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof SubTask)) {
+            return false;
+        }
         SubTask s = (SubTask) obj;
         return s.getId().equals(id);
     }
