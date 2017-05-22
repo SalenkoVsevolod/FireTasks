@@ -43,7 +43,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Connecti
         toast.show();
     }
 
-    public void showToastNotChoosed(String cause) {
+    public void showToastNotChose(String cause) {
         showToast(String.format(FireTasksApp.getInstance().getString(R.string.you_should_choose), cause), true);
     }
 

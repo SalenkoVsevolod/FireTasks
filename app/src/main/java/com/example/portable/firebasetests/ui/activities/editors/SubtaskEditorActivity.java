@@ -42,7 +42,7 @@ public class SubtaskEditorActivity extends EditorActivity<SubTask> {
     @Override
     protected boolean assembleEntityAndProceed() {
         if (editText.getText().toString().trim().length() == 0) {
-            showToastNotChoosed("subtask name");
+            showToastNotChose(getString(R.string.subtask_name));
             return false;
         }
         if (subtask == null) {

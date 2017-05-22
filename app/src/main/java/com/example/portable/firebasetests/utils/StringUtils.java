@@ -1,14 +1,13 @@
 package com.example.portable.firebasetests.utils;
 
-import java.util.Arrays;
-import java.util.List;
+import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FireTasksApp;
 
 /**
  * Created by Salenko Vsevolod on 15.02.2017.
  */
 
 public class StringUtils {
-    private static final List<String> DAYS_OF_WEEK = Arrays.asList("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN");
 
     private static String formatNumber(int num) {
         return (num < 10 ? "0" : "") + num;
@@ -28,6 +27,6 @@ public class StringUtils {
     }
 
     public static String getDayOfWeekName(int dayOfWeek) {
-        return DAYS_OF_WEEK.get(TimeUtils.realToAdapter(dayOfWeek));
+        return FireTasksApp.getInstance().getResources().getStringArray(R.array.days_of_week)[TimeUtils.realToAdapter(dayOfWeek)];
     }
 }

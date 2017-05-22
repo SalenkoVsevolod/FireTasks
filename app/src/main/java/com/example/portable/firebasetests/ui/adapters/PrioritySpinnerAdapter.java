@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.portable.firebasetests.R;
+import com.example.portable.firebasetests.core.FireTasksApp;
 import com.example.portable.firebasetests.model.SubTask;
 
 /**
@@ -18,12 +19,12 @@ public class PrioritySpinnerAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return SubTask.PRIORITIES.size();
+        return FireTasksApp.getInstance().getResources().getStringArray(R.array.priorities).length;
     }
 
     @Override
     public Object getItem(int position) {
-        return SubTask.PRIORITIES.get(position);
+        return FireTasksApp.getInstance().getResources().getStringArray(R.array.priorities)[position];
     }
 
     @Override
@@ -37,7 +38,7 @@ public class PrioritySpinnerAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_priority, parent, false);
         }
         TextView tv = (TextView) convertView.findViewById(R.id.priority_tv);
-        tv.setText(SubTask.PRIORITIES.get(position));
+        tv.setText(FireTasksApp.getInstance().getResources().getStringArray(R.array.priorities)[position]);
         tv.setBackgroundColor(ContextCompat.getColor(parent.getContext(), SubTask.PRIORITY_COLORS_IDS.get(position)));
         return convertView;
     }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="days_of_week">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+        <item>Сб</item>
+        <item>Вс</item>
+    </string-array>
+    <string-array name="default_tags">
+        <item>Робота</item>
+        <item>"Сім'я"</item>
+        <item>Подорожі</item>
+    </string-array>
+    <string-array name="priorities">
+        <item>Низький</item>
+        <item>Нормальний</item>
+        <item>Високий</item>
+        <item>Найвищий</item>
+    </string-array>
+
+    <string name="color_n">Колір:</string>
+    <string name="delete_tasks">(%d)ВИДАЛИТИ</string>
+    <string name="description_hint">опис...</string>
+    <string name="description_n">Опис:</string>
+    <string name="edit">редагувати</string>
+    <string name="logout">Вийти</string>
+    <string name="name_hint">назва...</string>
+    <string name="name_n">Назва:</string>
+    <string name="no_reminders_created_yet">нагадування не створені</string>
+    <string name="no_sound">Без звуку</string>
+    <string name="no_subtasks_created_yet">підзадачі не створені</string>
+    <string name="no_tags_created_yet">ярлики не створені</string>
+    <string name="no_tasks_created_yet">Задачі не створені</string>
+    <string name="priority_n">Пріоритет:</string>
+    <string name="reminders_n">Нагадування:</string>
+    <string name="save">зберегти</string>
+    <string name="show_first_n">Відображати першим:</string>
+    <string name="sound_n">Звук:</string>
+    <string name="subtask_hint">назва підзадачі</string>
+    <string name="subtasks_n">Підзадачі:</string>
+    <string name="tag_hint">назва ярлику...</string>
+    <string name="tag_n">Ярлик:</string>
+    <string name="vibration">Вібрація</string>
+    <string name="you_should_choose">Ви повинні вибрати %s</string>
+    <string name="logout_from_app">Вийти з додатку?</string>
+    <string name="tag_changing">Ярлик буде змінено у всіх завданнях. Продовжити?</string>
+    <string name="tag_deleting">Усі завдання з цим ярликом будуть також видалені. Продовжити?</string>
+    <string name="unsaved_data">Уся незбережена інформація буде втрачена</string>
+    <string name="warning">Застереження</string>
+    <string name="choose_time_in_future">Будь ласка, оберіть час у майбутньому</string>
+    <string name="select_tone">Оберіть мелодію</string>
+    <string name="reminder_deleted">Нагадування видалено</string>
+    <string name="subtask_deleted">Підзавдяння видалено</string>
+    <string name="authentication_failed">Помилка під час аутентифікації</string>
+    <string name="internet_connection_error">\"Помилка з\'їднання\"</string>
+    <string name="name">назву</string>
+    <string name="press_back_again">Натисніть ще раз для виходу</string>
+    <string name="subtask_name">назву підзадачі</string>
+    <string name="tag">ярлик</string>
+    <string name="tag_exists">ярлик вже існує</string>
+    <string name="tag_name">назву ярлику</string>
+    <string name="task_deleted">Завдання видалено</string>
+    <string name="time_in_future">час у майбутньому</string>
+</resources>

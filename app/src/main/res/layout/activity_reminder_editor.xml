@@ -16,7 +16,6 @@
             android:layout_margin="16dp" />
 
         <TextView
-            android:id="@+id/sound_n_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -47,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="@string/cancel"
+                android:text="@android:string/cancel"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -57,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="@string/ok"
+                android:text="@android:string/ok"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp"
                 android:textStyle="bold" />

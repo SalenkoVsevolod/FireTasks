@@ -118,7 +118,7 @@ public class TaskDisplayActivity extends BaseActivity {
             @Override
             public void onDeleted(Task task) {
                 if (task.getId().equals(mTask.getId())) {
-                    showToast("Task deleted", true);
+                    showToast(getString(R.string.task_deleted), true);
                     finish();
                 }
             }

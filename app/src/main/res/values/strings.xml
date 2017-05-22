@@ -1,24 +1,38 @@
 <resources>
-    <string name="app_name">FireTasks</string>
-    <string name="TOKEN_ID_SHARED_KED">mTokenId</string>
-    <string name="ID_SHARED_KEY">user_id</string>
-    <string name="sharedPreferencesFileName">prefs</string>
+    <string name="app_name" translatable="false">FireTasks</string>
 
+    <string-array name="days_of_week">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+    <string-array name="default_tags">
+        <item>Work</item>
+        <item>Family</item>
+        <item>Travel</item>
+    </string-array>
+    <string-array name="priorities">
+        <item>Low</item>
+        <item>Normal</item>
+        <item>High</item>
+        <item>Urgent</item>
+    </string-array>
     <string name="description_n">Description:</string>
     <string name="tag_n">Tag:</string>
     <string name="subtasks_n">Subtasks:</string>
-    <string name="time_n">Time:</string>
     <string name="name_n">Name:</string>
     <string name="sound_n">Sound:</string>
-    <string name="volume_n">Volume:</string>
     <string name="show_first_n">Show first:</string>
     <string name="priority_n">Priority:</string>
     <string name="color_n">Color:</string>
-    <string name="reminders_n">Reminds:</string>
+    <string name="reminders_n">Reminders:</string>
     <string name="name_hint">name…</string>
 
     <string name="description_hint">description…</string>
-    <string name="sound_hint">sound…</string>
     <string name="subtask_hint">subtask name…</string>
     <string name="tag_hint">tag name…</string>
 
@@ -28,16 +42,29 @@
     <string name="no_tasks_created_yet">No tasks created yet</string>
     <string name="no_tags_created_yet">no tags created yet</string>
 
+    <string name="subtask_name">subtask name</string>
+    <string name="tag_name">tag name</string>
     <string name="name">name</string>
-    <string name="logout">logout</string>
-    <string name="login">Login</string>
+    <string name="tag">tag</string>
+    <string name="time_in_future">time in future</string>
+    <string name="internet_connection_error">Internet connection error</string>
+    <string name="authentication_failed">Authentication failed</string>
+    <string name="press_back_again">Press back again to exit</string>
+    <string name="tag_exists">tag already exists</string>
+    <string name="subtask_deleted">Subtask deleted</string>
+    <string name="reminder_deleted">Reminder deleted</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="select_tone">Select Tone</string>
+    <string name="choose_time_in_future">Please choose time in future</string>
+    <string name="warning">Warning</string>
+    <string name="unsaved_data">All unsaved data will be removed</string>
+    <string name="tag_changing">Tag will be changed in all tasks. Proceed?</string>
+    <string name="tag_deleting">All tasks with this tag will be also deleted. Proceed?</string>
+    <string name="logout_from_app">Logout from app?</string>
+    <string name="logout">Logout</string>
     <string name="vibration">Vibration</string>
-    <string name="add_subtask">add subtask</string>
-    <string name="remind">Remind</string>
     <string name="delete_tasks">(%d) DELETE</string>
     <string name="you_should_choose">You should choose %s</string>
-    <string name="cancel">CANCEL</string>
-    <string name="ok">OK</string>
     <string name="edit">edit</string>
     <string name="save">save</string>
 </resources>

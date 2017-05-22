@@ -38,7 +38,7 @@ public class SubtaskCheckableRecyclerAdapter extends RecyclerView.Adapter<Subtas
         holder.checkBox.setText(subTasks.get(position).getName());
         holder.checkBox.setChecked(subTasks.get(position).isDone());
         int priorityId = (int) subTasks.get(position).getPriority();
-        holder.priority.setText(SubTask.PRIORITIES.get(priorityId));
+        holder.priority.setText(FireTasksApp.getInstance().getResources().getStringArray(R.array.priorities)[priorityId]);
         holder.priority.setBackgroundColor(ContextCompat.getColor(FireTasksApp.getInstance(), SubTask.PRIORITY_COLORS_IDS.get(priorityId)));
     }
 

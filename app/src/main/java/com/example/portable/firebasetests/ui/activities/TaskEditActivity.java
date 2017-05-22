@@ -159,15 +159,15 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
 
     private void showTagDeletingDialog(final Tag tag) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Warning");
-        builder.setMessage("All tasks with this tag will be also deleted. Proceed?");
-        builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.warning);
+        builder.setMessage(R.string.tag_deleting);
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 FirebaseUtils.getInstance().deleteTag(tag);
             }
         });
-        builder.setNegativeButton("cancel", null);
+        builder.setNegativeButton(android.R.string.cancel, null);
         builder.setCancelable(true);
         builder.show();
     }
@@ -232,7 +232,6 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
         lastSelectedTag = tag;
     }
 
-    //TODO bug with not setting listener to container on tag deleting
     private void drawNewTag(Tag tag) {
         if (tag == null) {
             mTagTextView.setText(R.string.no_tags_created_yet);
@@ -247,11 +246,11 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
 
     private boolean canComplete() {
         if (task.getName().length() == 0) {
-            showToastNotChoosed("name");
+            showToastNotChose(getString(R.string.name));
             return false;
         }
         if (task.getTagId() == null) {
-            showToastNotChoosed("tag");
+            showToastNotChose(getString(R.string.name));
             return false;
         }
         return true;
@@ -330,9 +329,9 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
             FirebaseUtils.getInstance().saveTag(tag);
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Warning");
-            builder.setMessage("Tag will be changed in all tasks. Proceed?");
-            builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            builder.setTitle(R.string.warning);
+            builder.setMessage(R.string.tag_changing);
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (lastSelectedTag.getId().equals(tag.getId())) {
@@ -351,7 +350,7 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
                     }
                 }
             });
-            builder.setNegativeButton("cancel", null);
+            builder.setNegativeButton(android.R.string.cancel, null);
             builder.setCancelable(true);
             builder.show();
         }
@@ -403,8 +402,8 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
         }
 
         Snackbar snackbar = Snackbar
-                .make(findViewById(R.id.task_modify_root), "Subtask deleted", Snackbar.LENGTH_LONG)
-                .setAction("Cancel", new View.OnClickListener() {
+                .make(findViewById(R.id.task_modify_root), R.string.subtask_deleted, Snackbar.LENGTH_LONG)
+                .setAction(android.R.string.cancel, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         task.getSubTasks().add(subTask);
@@ -435,8 +434,8 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
         }
 
         Snackbar snackbar = Snackbar
-                .make(findViewById(R.id.task_modify_root), "Remind deleted", Snackbar.LENGTH_LONG)
-                .setAction("Cancel", new View.OnClickListener() {
+                .make(findViewById(R.id.task_modify_root), R.string.reminder_deleted, Snackbar.LENGTH_LONG)
+                .setAction(android.R.string.cancel, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (remind.getTimeStamp() > System.currentTimeMillis()) {
@@ -445,7 +444,7 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
                             findViewById(R.id.no_reminders).setVisibility(View.GONE);
                             mRemindersRecyclerView.getAdapter().notifyItemInserted(task.getReminds().size());
                         } else {
-                            showToastNotChoosed("time in future");
+                            showToastNotChose(getString(R.string.time_in_future));
                         }
                     }
                 });
@@ -490,15 +489,15 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Warning");
-        builder.setMessage("All unsaved data will be removed");
-        builder.setPositiveButton("quit", new DialogInterface.OnClickListener() {
+        builder.setTitle(getString(R.string.warning));
+        builder.setMessage(R.string.unsaved_data);
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
             }
         });
-        builder.setNegativeButton("cancel", null);
+        builder.setNegativeButton(android.R.string.cancel, null);
         builder.show();
     }
 

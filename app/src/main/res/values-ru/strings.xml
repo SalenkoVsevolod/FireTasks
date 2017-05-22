@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="days_of_week">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+        <item>Сб</item>
+        <item>Вс</item>
+    </string-array>
+    <string-array name="default_tags">
+        <item>Работа</item>
+        <item>Семья</item>
+        <item>Путешествия</item>
+    </string-array>
+    <string-array name="priorities">
+        <item>Низкий</item>
+        <item>Нормальный</item>
+        <item>Высокий</item>
+        <item>Наивысший</item>
+    </string-array>
+
+    <string name="color_n">Цвет:</string>
+    <string name="delete_tasks">(%d)УДАЛИТЬ</string>
+    <string name="description_hint">описание...</string>
+    <string name="description_n">Описание:</string>
+    <string name="edit">редактировать</string>
+    <string name="logout">Выйти</string>
+    <string name="name_hint">название...</string>
+    <string name="name_n">Название:</string>
+    <string name="no_reminders_created_yet">напоминания не созданы</string>
+    <string name="no_sound">Без звука</string>
+    <string name="no_subtasks_created_yet">подзадачи не созданы</string>
+    <string name="no_tags_created_yet">ярлыки не созданы</string>
+    <string name="no_tasks_created_yet">Задачи не созданы</string>
+    <string name="priority_n">Приоритет:</string>
+    <string name="reminders_n">Напоминания:</string>
+    <string name="save">сохранить</string>
+    <string name="show_first_n">Отображать первым:</string>
+    <string name="sound_n">Звук:</string>
+    <string name="subtask_hint">название подзадачи...</string>
+    <string name="subtasks_n">Подзадачи:</string>
+    <string name="tag_hint">название ярлыка...</string>
+    <string name="tag_n">Ярлык:</string>
+    <string name="vibration">Вибрация</string>
+    <string name="you_should_choose">Вы должны выбрать %s</string>
+    <string name="logout_from_app">Выйти из приложения?</string>
+    <string name="tag_changing">Ярлык будет изменён во всех заданиях. Продолжить?</string>
+    <string name="tag_deleting">Все задания с этим ярлыком также будут удалены. Продолжить?</string>
+    <string name="unsaved_data">Вся несохранённая информация будет утеряна</string>
+    <string name="warning">Предупреждение</string>
+    <string name="choose_time_in_future">Пожалуйста, выберите время в будущем</string>
+    <string name="select_tone">Выберите мелодию</string>
+    <string name="reminder_deleted">Напоминание удалено</string>
+    <string name="subtask_deleted">Подзадание удалено</string>
+    <string name="authentication_failed">Ошибка аутентификации</string>
+    <string name="internet_connection_error">Ошибка соединения</string>
+    <string name="name">название</string>
+    <string name="press_back_again">Нажмите ещё раз для выхода</string>
+    <string name="subtask_name">название подзадания</string>
+    <string name="tag">ярлык</string>
+    <string name="tag_exists">ярлык уже существует</string>
+    <string name="tag_name">название ярлика</string>
+    <string name="task_deleted">Задание удалено</string>
+    <string name="time_in_future">время в будущем</string>
+</resources>

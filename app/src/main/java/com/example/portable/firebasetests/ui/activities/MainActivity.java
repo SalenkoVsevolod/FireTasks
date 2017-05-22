@@ -279,8 +279,8 @@ public class MainActivity extends BaseActivity {
 
     private void showLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Logout");
-        builder.setMessage("Logout from app?");
+        builder.setTitle(R.string.logout);
+        builder.setMessage(R.string.logout_from_app);
         builder.setCancelable(true);
         builder.setNegativeButton(android.R.string.cancel, null);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -324,7 +324,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onConnectionSuspended(int i) {
-                showToast("connection suspended", true);
+                showToast(getString(R.string.internet_connection_error), true);
             }
         });
 
@@ -389,7 +389,7 @@ public class MainActivity extends BaseActivity {
         if (mBackPresses > 1) {
             finish();
         } else {
-            showToast("Press back again to exit", true);
+            showToast(getString(R.string.press_back_again), true);
         }
     }
 

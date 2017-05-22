@@ -59,7 +59,7 @@ public class TagEditorActivity extends EditorActivity<Tag> implements ColorPicke
     @Override
     protected boolean assembleEntityAndProceed() {
         if (nameEdit.getText().toString().trim().length() == 0) {
-            showToastNotChoosed("tag name");
+            showToastNotChose(getString(R.string.tag_name));
             return false;
         }
         tag.setName(nameEdit.getText().toString().trim());
@@ -69,7 +69,7 @@ public class TagEditorActivity extends EditorActivity<Tag> implements ColorPicke
 
         for (Tag t : FirebaseObserver.getInstance().getTags()) {
             if (t.isIdentical(tag)) {
-                showToast("tag already exists", false);
+                showToast(getString(R.string.tag_exists), false);
                 return false;
             }
         }

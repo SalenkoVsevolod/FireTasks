@@ -40,7 +40,7 @@ public class LoginActivity extends BaseActivity {
                 if (isOnline()) {
                     loginClick();
                 } else {
-                    showToast("Internet connection error", true);
+                    showToast(getString(R.string.internet_connection_error), true);
                 }
             }
         });
@@ -108,13 +108,13 @@ public class LoginActivity extends BaseActivity {
                     if (resultCode == FirebaseLoginListener.DONE) {
                         startTasksActivity();
                     } else {
-                        showToast("Authentication failed", true);
+                        showToast(getString(R.string.authentication_failed), true);
                     }
                 }
             });
             task.execute();
         } else {
-            showToast("Internet connection error", true);
+            showToast(getString(R.string.internet_connection_error), true);
         }
     }
 

@@ -51,7 +51,7 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
         if (mRemind.getSound() != null) {
             mSoundTextView.setText(getSoundContent(getRingtoneTitle(Uri.parse(mRemind.getSound()))));
         } else {
-            mSoundTextView.setText(getSoundContent("No sound"));
+            mSoundTextView.setText(getSoundContent(getString(R.string.no_sound)));
         }
         mVibrationCheckBox.setChecked(mRemind.isVibro());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -72,7 +72,7 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
     private void chooseSound() {
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.select_tone));
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, mRemind.getSound() == null ? null : Uri.parse(mRemind.getSound()));
         this.startActivityForResult(intent, SOUND_CODE);
     }
@@ -88,7 +88,7 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
                         mRemind.setSound(uri.toString());
                         mSoundTextView.setText(getSoundContent(getRingtoneTitle(uri)));
                     } else {
-                        mSoundTextView.setText(getSoundContent("No sound"));
+                        mSoundTextView.setText(getSoundContent(getString(R.string.no_sound)));
                     }
                 }
                 break;
@@ -108,7 +108,7 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
         mRemind.getCalendar().set(Calendar.HOUR_OF_DAY, hour);
         mRemind.getCalendar().set(Calendar.MINUTE, minute);
         if (mRemind.getCalendar().getTimeInMillis() <= System.currentTimeMillis()) {
-            showToast("Please choose time in future", false);
+            showToast(getString(R.string.choose_time_in_future), false);
             return false;
         }
         mRemind.setVibro(mVibrationCheckBox.isChecked());

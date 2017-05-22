@@ -18,9 +18,9 @@ import java.util.Objects;
 
 public class Tag extends FirebaseEntity {
     public static final List<Tag> DEFAULT_TAGS = Arrays.asList(
-            new Tag("default_1", "Work", FireTasksApp.getInstance().getCompatColor(R.color.work_tag)),
-            new Tag("default_2", "Home", FireTasksApp.getInstance().getCompatColor(R.color.home_tag)),
-            new Tag("default_3", "Travel", FireTasksApp.getInstance().getCompatColor(R.color.travel_tag)));
+            new Tag("default_1", FireTasksApp.getInstance().getResources().getStringArray(R.array.default_tags)[0], FireTasksApp.getInstance().getCompatColor(R.color.work_tag)),
+            new Tag("default_2", FireTasksApp.getInstance().getResources().getStringArray(R.array.default_tags)[1], FireTasksApp.getInstance().getCompatColor(R.color.home_tag)),
+            new Tag("default_3", FireTasksApp.getInstance().getResources().getStringArray(R.array.default_tags)[2], FireTasksApp.getInstance().getCompatColor(R.color.travel_tag)));
 
     private String name;
     private long color;
