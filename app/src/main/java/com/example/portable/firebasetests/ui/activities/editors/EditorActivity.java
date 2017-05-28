@@ -31,13 +31,13 @@ public abstract class EditorActivity<T extends FirebaseEntity> extends BaseActiv
 
     protected abstract boolean assembleEntityAndProceed();
 
-    protected abstract int getmResultCode();
+    protected abstract int getResultCode();
 
     protected abstract T getResultData();
 
     private void okClick() {
         if (assembleEntityAndProceed()) {
-            returnEntity(getmResultCode(), getResultData());
+            returnEntity(getResultCode(), getResultData());
         }
     }
 

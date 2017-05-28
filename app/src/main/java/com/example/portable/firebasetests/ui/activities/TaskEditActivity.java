@@ -325,34 +325,39 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void handleTagResult(int result, final Tag tag) {
-        if (result == CREATE) {
-            FirebaseUtils.getInstance().saveTag(tag);
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.warning);
-            builder.setMessage(R.string.tag_changing);
-            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (lastSelectedTag.getId().equals(tag.getId())) {
-                        lastSelectedTag.setColor(tag.getColor());
-                        lastSelectedTag.setName(tag.getName());
-                        FirebaseUtils.getInstance().saveTag(lastSelectedTag);
-                    } else {
-                        for (Tag tagInRecycler : mTagsInRecycler) {
-                            if (tagInRecycler.equals(tag)) {
-                                tagInRecycler.setColor(tag.getColor());
-                                tagInRecycler.setName(tag.getName());
-                                FirebaseUtils.getInstance().saveTag(tagInRecycler);
-                                break;
+        switch (result) {
+            case CREATE:
+                FirebaseUtils.getInstance().saveTag(tag);
+                break;
+            case UPDATE:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.warning);
+                builder.setMessage(R.string.tag_changing);
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (lastSelectedTag.getId().equals(tag.getId())) {
+                            lastSelectedTag.setColor(tag.getColor());
+                            lastSelectedTag.setName(tag.getName());
+                            mTagTextView.setText(tag.getName());
+                            mTagTextView.setTextColor((int) tag.getColor());
+                            FirebaseUtils.getInstance().saveTag(lastSelectedTag);
+                        } else {
+                            for (Tag tagInRecycler : mTagsInRecycler) {
+                                if (tagInRecycler.equals(tag)) {
+                                    tagInRecycler.setColor(tag.getColor());
+                                    tagInRecycler.setName(tag.getName());
+                                    FirebaseUtils.getInstance().saveTag(tagInRecycler);
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-            });
-            builder.setNegativeButton(android.R.string.cancel, null);
-            builder.setCancelable(true);
-            builder.show();
+                });
+                builder.setNegativeButton(android.R.string.cancel, null);
+                builder.setCancelable(true);
+                builder.show();
+                break;
         }
     }
 

@@ -59,7 +59,7 @@ public class SubtaskEditorActivity extends EditorActivity<SubTask> {
         return true;
     }
 
-    protected int getmResultCode() {
+    protected int getResultCode() {
         return resultCode;
     }
 

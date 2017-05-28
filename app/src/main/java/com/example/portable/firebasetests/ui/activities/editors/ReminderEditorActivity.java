@@ -121,7 +121,7 @@ public class ReminderEditorActivity extends EditorActivity<Remind> {
         return true;
     }
 
-    protected int getmResultCode() {
+    protected int getResultCode() {
         return mResultCode;
     }
 

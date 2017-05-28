@@ -108,18 +108,20 @@ public class Tag extends FirebaseEntity {
         }
         for (int i = 0; i < tasks.size(); i++) {
             ArrayList<String> day = tasks.get(tasks.keyAt(i));
-            ArrayList<String> inputDay = tasksInput.get(tasksInput.keyAt(i));
-            if (day.size() != inputDay.size()) {
-                return false;
-            }
-            for (String s : day) {
-                if (!inputDay.contains(s)) {
+            if (day != null) {
+                ArrayList<String> inputDay = tasksInput.get(tasksInput.keyAt(i));
+                if (day.size() != inputDay.size()) {
                     return false;
                 }
-            }
-            for (String s : inputDay) {
-                if (!day.contains(s)) {
-                    return false;
+                for (String s : day) {
+                    if (!inputDay.contains(s)) {
+                        return false;
+                    }
+                }
+                for (String s : inputDay) {
+                    if (!day.contains(s)) {
+                        return false;
+                    }
                 }
             }
         }

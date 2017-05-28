@@ -77,7 +77,7 @@ public class TagEditorActivity extends EditorActivity<Tag> implements ColorPicke
         return true;
     }
 
-    protected int getmResultCode() {
+    protected int getResultCode() {
         return resultCode;
     }
 
