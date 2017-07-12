@@ -22,6 +22,8 @@ public class TagEditorActivity extends EditorActivity<Tag> implements ColorPicke
     private EditText nameEdit;
     private View colorPreview;
     private int resultCode;
+    private String initName = "";
+    private long initColor = Color.GREEN;
 
     public static Intent getStarterIntent(Context context, Tag tag) {
         Intent starter = new Intent(context, TagEditorActivity.class);
@@ -50,6 +52,8 @@ public class TagEditorActivity extends EditorActivity<Tag> implements ColorPicke
             colorPreview.setBackgroundColor(Color.GREEN);
         } else {
             resultCode = UPDATE;
+            initName = tag.getName();
+            initColor = tag.getColor();
             nameEdit.setText(tag.getName());
             nameEdit.setTextColor((int) tag.getColor());
             colorPreview.setBackgroundColor((int) tag.getColor());
@@ -66,14 +70,17 @@ public class TagEditorActivity extends EditorActivity<Tag> implements ColorPicke
         if (tag.getId() == null) {
             tag.setId("tag" + System.currentTimeMillis());
         }
-
-        for (Tag t : FirebaseObserver.getInstance().getTags()) {
-            if (t.isIdentical(tag)) {
-                showToast(getString(R.string.tag_exists), false);
-                return false;
+        if (tag.getName().equals(initName) && tag.getColor() == initColor) {
+            finish();
+            return false;
+        } else {
+            for (Tag t : FirebaseObserver.getInstance().getTags()) {
+                if (t.isIdentical(tag)) {
+                    showToast(getString(R.string.tag_exists), false);
+                    return false;
+                }
             }
         }
-
         return true;
     }
 

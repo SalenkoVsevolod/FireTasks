@@ -343,10 +343,12 @@ public class TaskEditActivity extends BaseActivity implements View.OnClickListen
                             mTagTextView.setTextColor((int) tag.getColor());
                             FirebaseUtils.getInstance().saveTag(lastSelectedTag);
                         } else {
-                            for (Tag tagInRecycler : mTagsInRecycler) {
+                            for (int i = 0; i < mTagsInRecycler.size(); i++) {
+                                final Tag tagInRecycler = mTagsInRecycler.get(i);
                                 if (tagInRecycler.equals(tag)) {
                                     tagInRecycler.setColor(tag.getColor());
                                     tagInRecycler.setName(tag.getName());
+                                    mTagsRecyclerView.getAdapter().notifyItemChanged(i);
                                     FirebaseUtils.getInstance().saveTag(tagInRecycler);
                                     break;
                                 }
